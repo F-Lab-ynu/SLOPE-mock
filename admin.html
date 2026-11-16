@@ -1267,6 +1267,8 @@ svg.fli{width:15px;height:15px;flex:none;color:#9CA3AF}
 .tkboth .uh,.tkboth .ur{grid-template-columns:16px 44px minmax(110px,1fr) 76px minmax(60px,150px) 24px;padding:0 6px}
 @media (max-width:760px){ .sideb{display:none !important} }
 @media (min-width:761px){ .tkbar{display:none} }
+.vrow{cursor:default;padding-bottom:0}
+.vp .vsub .seg button{padding:0 12px}
 </style>
 </head>
 <body>
@@ -3777,6 +3779,76 @@ document.addEventListener('click', function (e) {
   }
 }, true);
 
+// ---------- ux17: ガントの表示設定（フォルダー／ファイル版） ----------
+LEVELS = [['1', '1段'], ['2', '2段'], ['3', '3段'], ['9', 'すべて']];
+HLS = [
+  ['late', '期限切れ', '#DC2626'],
+  ['soon', '期限が近い', '#D97706'],
+  ['over', '中身が期限を超えたフォルダー', '#B91C1C'],
+  ['nobody', '担当未定', '#6B7280'],
+  ['active', '進行中', '#2563EB'],
+  ['mine', '自分の担当', '#111827']
+];
+EXPS = [['depth', '深さで開く', '今いるフォルダーから何段下まで開くか'], ['active', '進行中の所だけ', '今日が期間内のフォルダーだけ開く'], ['mine', '自分の担当まで', '自分が関わるフォルダー・ファイルまで開く'], ['flag', '強調した所まで', '強調に当てはまるものまで開く']];
+function vs() { if (!S.view2) S.view2 = { exp: 'depth', hl: { late: true, soon: true, over: true }, days: 7, done: 'show', dimDone: false, focus: false, foldersOnly: false }; if (!S.view2.done) S.view2.done = S.view2.dimDone ? 'dim' : 'show'; return S.view2; }
+function overOf(n) { return isFolder(n) && nodesOf(n).slice(1).some(function (x) { return dayOf(x.end) > dayOf(n.end); }); }
+function hlFlags(n) {
+  var v = vs(), f = [], dn = isDone(n), leaf = !isFolder(n);
+  if (v.hl.late && !dn && dayOf(n.end) < TODAY && (leaf || kids(n).some(function (k) { return !isDone(k); }))) f.push('late');
+  else if (v.hl.soon && !dn && dayOf(n.end) >= TODAY && dayOf(n.end) <= TODAY + v.days * DAY) f.push('soon');
+  if (v.hl.over && !dn && overOf(n)) f.push('over');
+  if (v.hl.nobody && !dn && !teamOf(n).length) f.push('nobody');
+  if (v.hl.active && isActiveN(n)) f.push('active');
+  if (v.hl.mine && inTeam(n, S.me)) f.push('mine');
+  return f;
+}
+function vShow(n) { var v = vs(); if (v.done === 'hide' && isDone(n) && (!isFolder(n) || progress(n).n)) return false; if (v.foldersOnly && !isFolder(n)) return false; return true; }
+function rowsOf(all, ghosts) {
+  var out = [], gantt = S.view === 'projects' && S.fmode === 'gantt';
+  (function each(list, d) {
+    list.forEach(function (n) {
+      if (!visNode(n) || (gantt && !vShow(n))) return;
+      var c = kids(n).filter(function (k) { return visNode(k) && (!gantt || vShow(k)); }), slot = ghosts && isFolder(n) && canEdit(n) && !(gantt && vs().foldersOnly);
+      var open = all ? true : isOpen(n, d);
+      out.push({ n: n, d: d, has: c.length > 0 || slot, open: open, ctx: !(canEdit(n) || editSelf(n) || inTeam(n, S.me)) });
+      if (open) { each(c, d + 1); if (slot) out.push({ ghost: true, parent: n, d: d + 1 }); }
+    });
+  })(visibleRoots(), 0);
+  return out;
+}
+function vSummary() {
+  var v = vs(), e = v.exp === 'depth' ? (LEVELS.filter(function (l) { return +l[0] === (S.depth || 2); })[0] || LEVELS[1])[1] : EXPS.filter(function (x) { return x[0] === v.exp; })[0][1];
+  return e;
+}
+function vPanelHTML() {
+  var v = vs(), dsel = S.depth || 2;
+  var exp = EXPS.map(function (x) {
+    var on = v.exp === x[0];
+    return '<label class="vopt"><input type="radio" name="vexp" data-vexp="' + x[0] + '"' + (on ? ' checked' : '') + '><span><b>' + x[1] + '</b><small>' + x[2] + '</small></span></label>' +
+      (x[0] === 'depth' ? '<div class="vsub"><span class="seg" role="group" aria-label="開く深さ">' + LEVELS.map(function (l) { return '<button data-act="vdepth" data-v="' + l[0] + '" aria-pressed="' + (on && String(dsel) === l[0]) + '">' + l[1] + '</button>'; }).join('') + '</span></div>' : '');
+  }).join('');
+  var hl = HLS.map(function (h) {
+    return '<label class="vopt"><input type="checkbox" data-vhl="' + h[0] + '"' + (v.hl[h[0]] ? ' checked' : '') + '><i class="vdot" style="background:' + h[2] + '"></i><span><b>' + h[1] + '</b></span>' +
+      (h[0] === 'soon' ? '<span class="vdays">' + [3, 7, 14].map(function (d) { return '<button data-act="vdays" data-v="' + d + '" aria-pressed="' + (v.days === d) + '">' + d + '日</button>'; }).join('') + '</span>' : '') + '</label>';
+  }).join('');
+  var done = '<div class="vsub"><span class="seg" role="group" aria-label="完了したもの">' + [['show', 'そのまま'], ['dim', '薄く'], ['hide', '隠す']].map(function (x) { return '<button data-act="vdone" data-v="' + x[0] + '" aria-pressed="' + (v.done === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span></div>';
+  return '<div class="vph"><b>ガントの表示</b><button class="btn sm ghost" data-act="vreset">初期設定に戻す</button><button class="ib vclose" data-act="vclose" aria-label="閉じる">' + ic('x') + '</button></div>' +
+    '<div class="vsec"><div class="vt">開き方</div>' + exp + '</div>' +
+    '<div class="vsec"><div class="vt">見せるもの</div>' +
+      '<div class="vopt vrow"><span><b>完了したもの</b></span></div>' + done +
+      '<label class="vopt"><input type="checkbox" data-vopt="foldersOnly"' + (v.foldersOnly ? ' checked' : '') + '><span><b>フォルダーだけ表示</b><small>ファイルを隠して全体の流れだけ見る</small></span></label></div>' +
+    '<div class="vsec"><div class="vt">強調</div>' + hl +
+      '<div class="vline"></div>' +
+      '<label class="vopt"><input type="checkbox" data-vopt="focus"' + (v.focus ? ' checked' : '') + '><span><b>強調以外を薄く</b></span></label></div>';
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="vdone"],[data-act="vreset"]'); if (!b) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  if (b.dataset.act === 'vreset') { S.view2 = null; S.depth = 2; vApply(); return; }
+  var v = vs(); v.done = b.dataset.v; v.dimDone = v.done === 'dim'; vApply();
+}, true);
+
+function vApply() { S.fold = {}; UI.sp = null; save(); render(); if (UI.vp) openVPanel(); }
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
