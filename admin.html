@@ -1269,6 +1269,29 @@ svg.fli{width:15px;height:15px;flex:none;color:#9CA3AF}
 @media (min-width:761px){ .tkbar{display:none} }
 .vrow{cursor:default;padding-bottom:0}
 .vp .vsub .seg button{padding:0 12px}
+/* ---------- ux18 ---------- */
+.gr.hl .gl,.gr.hl-late .gl,.wcard .wr.hl > .wn{box-shadow:none !important}
+.gl .lt{display:none}
+.hldot{flex:none;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px #fff}
+.ur.ufix{background:#FFFBEB}
+.ur.ufix .ufl{font-size:11px;font-weight:700;color:#B45309;letter-spacing:.04em;padding-left:2px}
+.ur.ufix .ut{font-weight:500}
+.ur.ghost .uc{color:var(--accent)}
+.ur.ghost .uc::placeholder{color:var(--dim);font-weight:400}
+svg.bki{width:16px;height:16px;flex:none;color:#9CA3AF}
+.tki svg.bki{margin-right:2px}
+.tki[aria-pressed="true"]{background:#FFF7ED;color:var(--text);box-shadow:inset 3px 0 0 #F59E0B}
+.tki[aria-pressed="true"] svg.bki{color:#F59E0B}
+.tkh0 > svg.bki{width:22px;height:22px;color:#F59E0B}
+.tdel{width:30px;height:30px;color:var(--muted);border:1px solid transparent;border-radius:6px}
+.tdel:hover{color:var(--bad);border-color:#FCA5A5;background:#FEF2F2}
+.tdel.sure{width:auto;padding:0 10px;color:#fff;background:var(--bad);border-color:var(--bad);font-size:12px;font-weight:600}
+.tkboth .ph{display:flex;align-items:center;gap:6px}
+.tkboth .tktab .ph::before{content:"";width:8px;height:8px;border-radius:2px;background:#F59E0B}
+.tkboth .tkmap .ph::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.udr .rt small{color:var(--accent)}
+.tkboth .ph{justify-content:flex-start}
+.tkboth .ph > span{margin-left:auto}
 </style>
 </head>
 <body>
@@ -3849,6 +3872,105 @@ document.addEventListener('click', function (e) {
 }, true);
 
 function vApply() { S.fold = {}; UI.sp = null; save(); render(); if (UI.vp) openVPanel(); }
+// ---------- ux18: 表示パネルの高さ・強調は点に統一・教材の削除/右クリック/START・GOALを表に/コードから追加 ----------
+var openVPanel18 = openVPanel;
+openVPanel = function () { openVPanel18(); var p = document.getElementById('vp'); if (p && !p.classList.contains('sheet')) p.style.maxHeight = Math.max(240, window.innerHeight - p.getBoundingClientRect().top - 16) + 'px'; };
+var HLN = { late: '期限切れ', soon: '期限が近い', over: '中身が期限超過', nobody: '担当未定', active: '進行中', mine: '自分の担当' };
+var decorateGantt18 = decorateGantt12;
+decorateGantt12 = function () {
+  decorateGantt18();
+  if (S.view !== 'projects' || S.fmode !== 'gantt') return;
+  document.querySelectorAll('.gg .gr[data-row]').forEach(function (row) {
+    var gl = row.querySelector('.gl'); if (!gl || gl.querySelector('.hldot')) return;
+    var n = task(row.dataset.row); if (!n) return; var f = hlFlags(n); if (!f.length) return;
+    var col = (HLS.filter(function (h) { return h[0] === f[0]; })[0] || [])[2];
+    var w = gl.querySelector('.gwho, .gwho2, .gsel2');
+    var dot = '<i class="hldot" style="background:' + col + '" title="' + f.map(function (k) { return HLN[k] || k; }).join('・') + '"></i>';
+    if (w) w.insertAdjacentHTML('beforebegin', dot); else gl.insertAdjacentHTML('beforeend', dot);
+  });
+};
+// 教材：START / GOAL を表の中に、コードから追加
+var unitsHTML18 = unitsHTML;
+unitsHTML = function (t) {
+  var h = unitsHTML18(t), k = h.indexOf('</div>') + 6;
+  var fix = function (lab, key, ph) { return '<div class="ur ufix"><span></span><span class="uc num ufl">' + lab + '</span><input class="cell ut" data-bind="' + key + '" value="' + esc(t[key] || '') + '" placeholder="' + ph + '" aria-label="' + lab + '" autocomplete="off"><span></span><span></span><span></span></div>'; };
+  h = h.slice(0, k) + fix('START', 'start', '始点（前提となる状態）') + h.slice(k);
+  h = h.replace('<div class="ur ghost"><span></span><span></span><input class="cell ut" data-u="new"', '<div class="ur ghost"><span></span><input class="cell uc num" data-u="newcode" placeholder="コード" aria-label="新しい単元のコード" autocomplete="off" spellcheck="false"><input class="cell ut" data-u="new"');
+  return h + fix('GOAL', 'goal', '終点（到達する状態）');
+};
+function addByCode(el) {
+  var t = track(), c = el.value.trim().toUpperCase().replace(/\s+/g, ''); if (!c) return false;
+  if (unitIdx(t, c) >= 0) { toast(c + ' はすでにあります'); el.select(); return false; }
+  el.value = ''; snap(); var u = addUnit(t, ''); renameUnit(t, u.code, c);
+  renderUnits('.cell[data-u="title"][data-code="' + CSS.escape(c) + '"]'); return true;
+}
+document.addEventListener('keydown', function (e) {
+  var el = e.target; if (!el.dataset || el.dataset.u !== 'newcode' || e.isComposing) return;
+  if (e.key === 'Enter' || e.key === 'Tab') { if (el.value.trim()) { e.preventDefault(); e.stopImmediatePropagation(); addByCode(el); } }
+}, true);
+document.addEventListener('focusout', function (e) { var el = e.target; if (el.dataset && el.dataset.u === 'newcode' && el.value.trim() && !(e.relatedTarget && e.relatedTarget.dataset && e.relatedTarget.dataset.u === 'new')) addByCode(el); }, true);
+document.addEventListener('focusout', function (e) { var el = e.target; if (el.dataset && (el.dataset.bind === 'start' || el.dataset.bind === 'goal') && S.view === 'tracks') { renderMap(); } }, true);
+// 教材：トラックの削除・右クリック
+function delTrack(id) {
+  if (S.tracks.length <= 1) { toast('最後のトラックは削除できません'); return; }
+  var t = S.tracks.filter(function (x) { return x.id === id; })[0]; if (!t) return;
+  snap(); S.tracks = S.tracks.filter(function (x) { return x.id !== id; }); if (S.cur === id) { S.cur = S.tracks[0].id; S.sel = null; }
+  save(); render(); toastUndo('トラック「' + t.name + '」を削除しました');
+}
+function trkCM(t, x, y) {
+  var m = document.getElementById('cm'); if (!m) { m = document.createElement('div'); m.id = 'cm'; m.className = 'cm'; m.setAttribute('role', 'menu'); document.body.appendChild(m); }
+  UI.cmT = t.id; UI.cm = null;
+  m.innerHTML = '<div class="cmh">' + BOOK + '<span>' + esc(t.name) + '</span></div>' +
+    '<button data-tcm="open">開く</button><button data-tcm="rename">名前を変更</button><button data-tcm="status">' + (t.status === 'pub' ? '下書きに戻す' : '公開する') + '</button><button data-tcm="dup">複製</button><i class="cmsep"></i><button data-tcm="del" class="cmdel">削除</button>';
+  m.style.left = '0px'; m.style.top = '0px'; var w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.min(x, window.innerWidth - w - 8) + 'px'; m.style.top = Math.min(y, window.innerHeight - h - 8) + 'px';
+}
+function unitCM(code, x, y) {
+  var t = track(), u = tl(t)[unitIdx(t, code)]; if (!u) return;
+  var m = document.getElementById('cm'); if (!m) { m = document.createElement('div'); m.id = 'cm'; m.className = 'cm'; m.setAttribute('role', 'menu'); document.body.appendChild(m); }
+  UI.cmU = code; UI.cm = null; UI.cmT = null;
+  m.innerHTML = '<div class="cmh"><span class="num">' + esc(code) + '</span><span>' + esc(u.title) + '</span></div><button data-ucm="open">単元ページを開く</button><button data-ucm="up">上へ</button><button data-ucm="down">下へ</button><i class="cmsep"></i><button data-ucm="del" class="cmdel">削除</button>';
+  m.style.left = '0px'; m.style.top = '0px'; var w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.min(x, window.innerWidth - w - 8) + 'px'; m.style.top = Math.min(y, window.innerHeight - h - 8) + 'px';
+}
+document.addEventListener('contextmenu', function (e) {
+  var b = e.target.closest && e.target.closest('.tki[data-id]');
+  if (b) { e.preventDefault(); var t = S.tracks.filter(function (x) { return x.id === b.dataset.id; })[0]; if (t) trkCM(t, e.clientX, e.clientY); return; }
+  var r = e.target.closest && e.target.closest('#units .ur[data-code], #map [data-code]');
+  if (r && S.view === 'tracks' && !(e.target.tagName === 'INPUT' && e.target.selectionStart !== e.target.selectionEnd)) { e.preventDefault(); unitCM(r.dataset.code, e.clientX, e.clientY); }
+});
+document.addEventListener('click', function (e) {
+  var c = e.target.closest && e.target.closest('[data-tcm],[data-ucm],[data-act="tDel"]'); if (!c) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var isDel = c.dataset.tcm === 'del' || c.dataset.ucm === 'del' || c.dataset.act === 'tDel';
+  if (isDel && !c.classList.contains('sure')) { c.classList.add('sure'); if (c.dataset.act === 'tDel') c.innerHTML = 'もう一度押すと削除'; else c.textContent = 'もう一度押すと削除'; return; }
+  closeCM();
+  if (c.dataset.act === 'tDel') { delTrack(track().id); return; }
+  if (c.dataset.ucm) {
+    var t0 = track(), code = UI.cmU, L = tl(t0), i = unitIdx(t0, code); if (i < 0) return;
+    if (c.dataset.ucm === 'open') { S.sel = code; save(); render(); }
+    else if (c.dataset.ucm === 'up' || c.dataset.ucm === 'down') { var j = i + (c.dataset.ucm === 'down' ? 1 : -1); if (j < 0 || j >= L.length) return; snap(); var u = L.splice(i, 1)[0]; L.splice(j, 0, u); changedTrack(t0); renderUnits(); }
+    else { snap(); var gone = L.splice(i, 1)[0]; if (S.sel === gone.code) S.sel = null; changedTrack(t0); render(); toastUndo(gone.code + ' を削除しました'); }
+    return;
+  }
+  var t = S.tracks.filter(function (x) { return x.id === UI.cmT; })[0]; if (!t) return; var a = c.dataset.tcm;
+  if (a === 'open') { S.cur = t.id; S.sel = null; save(); render(); }
+  else if (a === 'rename') { S.cur = t.id; S.sel = null; save(); render(); var n = document.getElementById('tName'); if (n) { n.focus(); n.select(); } }
+  else if (a === 'status') { t.status = t.status === 'pub' ? 'draft' : 'pub'; touch(t); save(); render(); }
+  else if (a === 'dup') { var c2 = JSON.parse(JSON.stringify(t)); c2.id = uid('t'); c2.name = t.name + '（コピー）'; c2.status = 'draft'; delete c2.list; S.tracks.splice(S.tracks.indexOf(t) + 1, 0, c2); S.cur = c2.id; S.sel = null; save(); render(); toast('複製しました'); }
+  else if (a === 'del') delTrack(t.id);
+}, true);
+var BOOK = '<svg class="i bki" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H19v14H5.5A1.5 1.5 0 0 0 4 19.5z"/><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H19v-3"/></svg>';
+var viewTracks18 = viewTracks;
+viewTracks = function () {
+  var h = viewTracks18(), t = track();
+  h = h.replace(/<div class="tkh1">[\s\S]*?<\/div>/, '<div class="tkh1"><label class="tkf"><span>担当</span><select id="tOwner" class="input sm" data-bind="owner">' + S.members.filter(function (m) { return hasPerm(m, 'tracks'); }).map(function (m) { return '<option' + (m.name === t.owner ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('') + '</select></label><span class="dim num tkup" title="最終更新">' + esc(t.updated) + '</span></div>');
+  h = h.replace('<input id="tName" class="tkname"', BOOK + '<input id="tName" class="tkname"');
+  h = h.replace('<select id="tStatus"', '<button class="ib tdel" data-act="tDel" title="このトラックを削除" aria-label="このトラックを削除"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button><select id="tStatus"');
+  h = h.replace(/<button class="tki" data-act="track" data-id="([^"]+)" aria-pressed="(true|false)"><span class="tkn">/g, '<button class="tki" data-act="track" data-id="$1" aria-pressed="$2">' + BOOK + '<span class="tkn">');
+  return h;
+};
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
