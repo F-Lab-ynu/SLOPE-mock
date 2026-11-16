@@ -1142,6 +1142,61 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
 .srtm button{white-space:nowrap}
 .gr[data-row]:not(.isf) .gl{background:#fff !important}
 .gr[data-row]:not(.isf):hover .gl{background:#F9FAFB !important}
+/* ---------- ux12 ---------- */
+.brand{position:relative}
+.sideb{margin-left:auto;width:28px;height:28px;color:var(--muted)}
+@media (min-width:761px){
+  body.sidec .app{grid-template-columns:56px minmax(0,1fr)}
+  body.sidec .brand{padding:0 14px;font-size:0;gap:0}
+  body.sidec .brand > svg:first-child{display:none}
+  body.sidec .brand small{display:none}
+  body.sidec .sideb{margin:0 auto}
+  body.sidec .nav button{justify-content:center;padding:0;position:relative}
+  body.sidec .nav .full{display:none}
+  body.sidec .nav .n{position:absolute;top:2px;right:4px;min-width:14px;height:14px;line-height:14px;font-size:9px;padding:0 3px}
+  body.sidec .acct .mode span,body.sidec .acct .who,body.sidec .acct button > svg.i{display:none}
+  body.sidec .acct .mode{justify-content:center;padding:4px 0 8px}
+  body.sidec .acct > button{justify-content:center;padding:6px 0}
+  body.sidec .acct .menu{left:56px;right:auto;bottom:8px;width:260px}
+  body.ftreec .wk{grid-template-columns:minmax(0,1fr)}
+  body.ftreec .ftree{display:none}
+}
+.ftbar{display:flex;align-items:center;justify-content:space-between;padding:0 4px 6px 10px;font-size:11px;font-weight:600;color:var(--muted)}
+.ftbar .ib{width:24px;height:24px}
+.fback{margin-right:2px}
+.gr.gtop{border-top:1px solid #E5E7EB}
+.gname{flex:1;min-width:0;text-align:left;border:0;background:transparent;font:inherit;color:inherit;padding:4px 6px;border-radius:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gname:hover{background:rgba(17,24,39,.05)}
+.gr.isf .gname{font-weight:600}
+.gr.gdone .gname,.gr.fdone .gname{text-decoration:line-through;color:var(--dim)}
+.gwho{flex:0 0 96px;width:96px;display:flex;align-items:center;gap:6px;border:0;background:transparent;font:inherit;font-size:12px;color:var(--sub);padding:2px 4px;border-radius:6px;cursor:pointer;min-width:0;overflow:hidden;white-space:nowrap}
+.gwho:hover{background:rgba(17,24,39,.05)}
+.gwho span:not(.av):not(.avs){overflow:hidden;text-overflow:ellipsis}
+.gwho .av{width:20px;height:20px;font-size:10px}
+.gedit{flex:none;width:26px;height:26px;border:0;border-radius:6px;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0}
+.gedit.ph{cursor:default}
+.gr:hover .gedit:not(.ph),.gedit:focus-visible{opacity:1}
+.gedit:hover{background:rgba(17,24,39,.06);color:var(--text)}
+.gedit svg.i{width:15px;height:15px}
+.gl .ga{display:none !important}
+@media (hover:none){ .gedit:not(.ph){opacity:1} }
+.gpop{position:fixed;z-index:90;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(17,24,39,.16);padding:8px;min-width:220px;max-width:300px}
+.gph{font-weight:600;font-size:13px;padding:4px 6px 6px}
+.gpm{font-size:12px;color:var(--muted);padding:0 6px 6px}
+.gpi{display:flex;align-items:center;gap:8px;padding:5px 6px;font-size:13px}
+.gpi small{margin-left:auto;font-size:11px;color:var(--muted)}
+.gpmemo{font-size:12px;line-height:1.6;color:var(--sub);background:#F7F7F5;border-radius:8px;padding:8px 10px;margin:6px 0 2px;white-space:pre-wrap;word-break:break-word;max-height:160px;overflow:auto}
+.gpmemo a{color:var(--accent)}
+.gpf{display:flex;justify-content:flex-end;padding-top:6px}
+.cm{position:fixed;z-index:95;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(17,24,39,.18);padding:4px;min-width:200px}
+.cmh{display:flex;align-items:center;gap:6px;padding:6px 10px 4px;font-size:11px;color:var(--muted);max-width:260px}
+.cmh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmh svg.fi{width:13px;height:13px}
+.cm button{display:block;width:100%;padding:7px 10px;border:0;border-radius:6px;background:transparent;text-align:left;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.cm button:hover{background:var(--hover)}
+.cm .cmdel{color:var(--bad)}
+.cm .cmdel.sure{background:#FEE2E2;font-weight:600}
+.cmsep{display:block;height:1px;background:var(--line);margin:4px 2px}
 </style>
 </head>
 <body>
@@ -3156,7 +3211,7 @@ document.addEventListener('click', function (e) {
   if (e.target.closest('[data-act]') !== b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, f = curFolder();
-  if (a === 'fgo') { S.fcur = b.dataset.id; S.fopen = S.fopen || {}; if (S.fcur && S.fcur !== 'mine') S.fopen[S.fcur] = true; UI.rec = null; UI.sp = null; save(); render(); return; }
+  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = b.dataset.id; S.fopen = S.fopen || {}; if (S.fcur && S.fcur !== 'mine') S.fopen[S.fcur] = true; UI.rec = null; UI.sp = null; save(); render(); return; }
   if (a === 'ftog') { S.fopen = S.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); S.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); save(); render(); return; }
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
@@ -3165,8 +3220,9 @@ document.addEventListener('click', function (e) {
     return;
   }
   if (a === 'toFolder') { var t = task(b.dataset.id); if (!t) return; t.folder = true; t.kids = t.kids || []; delete t.done; if (t.who) setLeads(t, [t.who]); M = null; save(); render(); toast('フォルダーに変えました'); return; }
-  if (a === 'dupF') { if (!f) return; var ov = document.getElementById('cpov'); if (!ov) { ov = document.createElement('div'); ov.id = 'cpov'; document.body.appendChild(ov); } ov.innerHTML = dupModal(f); ov.querySelector('#cpN').focus(); return; }
+  if (a === 'dupF') { UI.dupId = null; if (!f) return; var ov = document.getElementById('cpov'); if (!ov) { ov = document.createElement('div'); ov.id = 'cpov'; document.body.appendChild(ov); } ov.innerHTML = dupModal(f); ov.querySelector('#cpN').focus(); return; }
   if (a === 'dupGo') {
+    f = (UI.dupId && task(UI.dupId)) || f;
     var nm = val('cpN').trim(), d = val('cpD'); if (!f || !nm || !d) { toast('名前と開始日を入れてください'); return; }
     var delta = dayOf(d) - dayOf(f.start), par = parentOf(f);
     var c = { id: uid(par ? 'k' : 'pj'), who: '', leads: [], start: d, end: isoOf(dayOf(f.end) + delta), kind: f.kind || 'folder', purpose: f.purpose || '', place: f.place || '', unit: f.unit };
@@ -3222,7 +3278,7 @@ function fhead2() {
   var gantt = S.fmode === 'gantt';
   var over = f && nodesOf(f).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0) > dayOf(f.end);
   return '<div class="fh2">' + (f || mine ? path : '') +
-    '<div class="fh2r"><h2>' + (f ? FOLD : '') + esc(title) + '</h2>' +
+    '<div class="fh2r">' + backBtn() + '<h2>' + (f ? FOLD : '') + esc(title) + '</h2>' +
       (f ? '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>' + teamBtn(f, editSelf(f) ? '' : ' disabled', true) : '') +
       '<span class="sp"></span>' +
       (f ? '<button class="ib fhb' + (UI.rec === f.id ? ' on' : '') + '" data-act="rec" data-id="' + f.id + '" title="情報" aria-label="情報">' + INFO + '</button>' : '') +
@@ -3307,7 +3363,7 @@ function fhead2() {
   var title = mine ? '自分の担当' : f ? ttl(f) : 'すべて';
   var srt = sortOf(f), canSort = true;
   return '<div class="fh2">' + (f || mine ? path : '') +
-    '<div class="fh2r"><h2>' + (f ? FOLD : '') + '<span' + (ed ? ' class="ied" data-act="ied" data-f="t" data-id="' + f.id + '" title="タップで名前を編集"' : '') + '>' + esc(title) + '</span></h2>' +
+    '<div class="fh2r">' + backBtn() + '<h2>' + (f ? FOLD : '') + '<span' + (ed ? ' class="ied" data-act="ied" data-f="t" data-id="' + f.id + '" title="タップで名前を編集"' : '') + '>' + esc(title) + '</span></h2>' +
       (f ? '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>' + teamBtn(f, canAssign(f) ? '' : ' disabled', true) : '') +
       '<span class="sp"></span>' +
       (!mine && !gantt ? '<span class="srtw"><button class="ib fhb' + (srt !== 'manual' ? ' on' : '') + '" data-act="srt" title="並べ替え：' + SORTS.filter(function (x) { return x[0] === srt; })[0][1] + '" aria-label="並べ替え" aria-expanded="' + !!UI.srt + '">' + SORTI + '</button>' +
@@ -3407,6 +3463,116 @@ function decorateDone() {
   });
 }
 var _render11 = render; render = function () { _render11.apply(this, arguments); decorateDone(); };
+// ---------- ux12: 畳む・戻る・ガントは見るだけ＋編集ボタン・右クリック ----------
+function backBtn() {
+  var h = (UI.fhist || []).length;
+  return (S.ftreeC ? '<button class="ib fhb" data-act="ftreeTog" title="フォルダー一覧を開く" aria-label="フォルダー一覧を開く"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>' : '') +
+    (h ? '<button class="ib fhb fback" data-act="fback" title="戻る" aria-label="戻る">' + ic('back') + '</button>' : '');
+}
+var ftree12 = ftree;
+ftree = function () { return '<div class="ftbar"><span>フォルダー</span><button class="ib" data-act="ftreeTog" title="畳む" aria-label="フォルダー一覧を畳む"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>' + ftree12(); };
+function applyChrome12() {
+  document.body.classList.toggle('sidec', !!S.sideC);
+  document.body.classList.toggle('ftreec', !!S.ftreeC);
+  var br = document.querySelector('.brand');
+  if (br && !br.querySelector('.sideb')) br.insertAdjacentHTML('beforeend', '<button class="ib sideb" data-act="sideTog" aria-label="メニューを畳む・開く" title="メニューを畳む・開く"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>');
+}
+function popAt(el, html) {
+  var p = document.getElementById('gpop'); if (!p) { p = document.createElement('div'); p.id = 'gpop'; p.className = 'gpop'; document.body.appendChild(p); }
+  p.innerHTML = html; var r = el.getBoundingClientRect();
+  p.style.left = Math.min(window.innerWidth - 300, Math.max(8, r.left)) + 'px';
+  var below = window.innerHeight - r.bottom > 220; p.style.top = below ? (r.bottom + 6) + 'px' : ''; p.style.bottom = below ? '' : (window.innerHeight - r.top + 6) + 'px';
+}
+function closePop() { var p = document.getElementById('gpop'); if (p) p.remove(); }
+function whoPop(n) {
+  var tm = isFolder(n) ? teamOf(n) : (n.who ? [n.who] : []), ls = isFolder(n) ? leadsOf(n) : [];
+  return '<div class="gph">' + esc(ttl(n)) + '</div>' + (tm.length ? tm.map(function (id) { var m = member(id); return '<div class="gpi">' + av(id) + '<span>' + esc(m ? m.name : '') + '</span>' + (ls.indexOf(id) >= 0 ? CROWN : '') + '<small>' + esc(m ? (isOps(m) ? m.unit : (m.roles || []).join('・')) : '') + '</small></div>'; }).join('') : '<div class="gpi dim">担当未定</div>');
+}
+function taskPop(n) {
+  var w = member(n.who);
+  return '<div class="gph">' + esc(ttl(n)) + '</div><div class="gpm num">' + shortDate(n.start) + ' – ' + shortDate(n.end) + (n.done ? '・完了' : late(n) ? '・<span class="bad">期限切れ</span>' : '') + '</div>' +
+    '<div class="gpi">' + (w ? av(n.who) + '<span>' + esc(w.name) + '</span>' : '<span class="dim">担当未定</span>') + '</div>' +
+    (n.memo ? '<div class="gpmemo">' + linkify(n.memo) + '</div>' : '') +
+    ((editSelf(n) || n.who === S.me) ? '<div class="gpf"><button class="btn sm" data-act="edit" data-id="' + n.id + '">編集</button></div>' : '');
+}
+function decorateGantt12() {
+  if (S.view !== 'projects' || S.fmode !== 'gantt') return;
+  document.querySelectorAll('.gg .gr[data-row]').forEach(function (row) {
+    var n = task(row.dataset.row); if (!n || row.dataset.g12) return; row.dataset.g12 = '1';
+    var gl = row.querySelector('.gl'); if (!gl) return;
+    var ct = gl.querySelector('input.ct[data-c="t"]');
+    if (ct) ct.outerHTML = '<button class="gname" data-act="gname" data-id="' + n.id + '" title="' + esc(ttl(n)) + '">' + esc(ttl(n)) + '</button>';
+    gl.querySelectorAll('.tbtn, select.gsel, .fin, .ga').forEach(function (x) { x.remove(); });
+    var tm = isFolder(n) ? teamOf(n) : (n.who ? [n.who] : []);
+    var who = '<button class="gwho" data-act="gwho" data-id="' + n.id + '">' + (tm.length ? (isFolder(n) ? avStack(tm, leadsOf(n)) : av(n.who) + '<span>' + esc(member(n.who).name) + '</span>') : '<span class="dim">未定</span>') + '</button>';
+    var ed = (editSelf(n) || n.who === S.me) ? '<button class="gedit" data-act="edit" data-id="' + n.id + '" title="編集" aria-label="編集"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></button>' : '<span class="gedit ph"></span>';
+    var lwh = gl.querySelector('.lwh');
+    gl.insertAdjacentHTML('beforeend', who + ed);
+    if (lwh) gl.appendChild(lwh);
+  });
+}
+// 右クリック
+function cmItems(n) {
+  var f = isFolder(n), it = [];
+  var add = function (act, label, cls) { it.push('<button role="menuitem" data-cm="' + act + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + label + '</button>'); };
+  if (f) { add('open', '開く'); add('gantt', 'ガントで見る'); } else add('open', '詳細を見る');
+  if (editSelf(n) || (!f && n.who === S.me)) add('edit', '名前・担当・期間を編集');
+  if (f && manages(n)) { it.push('<i class="cmsep"></i>'); add('newF', '新しいフォルダー'); add('newT', '新しい業務'); }
+  if (!f && (editSelf(n) || n.who === S.me)) { it.push('<i class="cmsep"></i>'); add('done', n.done ? '未完了に戻す' : '完了にする'); add('toF', 'フォルダーに変える'); }
+  if (f && (editSelf(n) || isLead(n, S.me))) add('evt', isEvent(n) ? 'イベントの記録をやめる' : 'イベントとして記録');
+  if (f && manages(parentOf(n))) add('dup', '複製…');
+  if (editSelf(n)) { it.push('<i class="cmsep"></i>'); add('del', '削除', 'cmdel'); }
+  return it.join('');
+}
+function openCM(n, x, y) {
+  var m = document.getElementById('cm'); if (!m) { m = document.createElement('div'); m.id = 'cm'; m.className = 'cm'; m.setAttribute('role', 'menu'); document.body.appendChild(m); }
+  UI.cm = n.id; m.innerHTML = '<div class="cmh">' + (isFolder(n) ? FOLD : '') + '<span>' + esc(ttl(n)) + '</span></div>' + cmItems(n);
+  m.style.left = '0px'; m.style.top = '0px'; var w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.min(x, window.innerWidth - w - 8) + 'px'; m.style.top = Math.min(y, window.innerHeight - h - 8) + 'px';
+}
+function closeCM() { var m = document.getElementById('cm'); if (m) m.remove(); UI.cm = null; }
+document.addEventListener('contextmenu', function (e) {
+  var el = e.target.closest && e.target.closest('.ftn[data-id], .fcard[data-id], .gg .gr[data-row]'); if (!el) return;
+  var id = el.dataset.id || el.dataset.row, n = id && task(id); if (!n) return;
+  e.preventDefault(); closePop(); openCM(n, e.clientX, e.clientY);
+});
+function goFolder(id, mode) { if (id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = id; if (mode) S.fmode = mode; S.fopen = S.fopen || {}; S.fopen[id] = true; UI.sp = null; save(); render(); }
+document.addEventListener('click', function (e) {
+  var c = e.target.closest && e.target.closest('[data-cm]');
+  if (c) {
+    e.stopImmediatePropagation(); e.preventDefault();
+    var n = task(UI.cm), a = c.dataset.cm; if (!n) { closeCM(); return; }
+    if (a === 'del' && !c.classList.contains('sure')) { c.classList.add('sure'); c.textContent = 'もう一度押すと削除'; return; }
+    closeCM();
+    if (a === 'open') { if (isFolder(n)) goFolder(n.id); else { M = { m: 'edit', id: n.id }; renderModal(); } }
+    else if (a === 'gantt') goFolder(n.id, 'gantt');
+    else if (a === 'edit') { M = { m: 'edit', id: n.id }; renderModal(); }
+    else if (a === 'newF' || a === 'newT') { var k = a === 'newF' ? addFolder(n, '新しいフォルダー') : addUnder(n, '新しい業務'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
+    else if (a === 'done') { n.done = !n.done; if (n.done) reportUp(n); save(); render(); }
+    else if (a === 'toF') { n.folder = true; n.kids = n.kids || []; delete n.done; if (n.who) setLeads(n, [n.who]); save(); render(); toast('フォルダーに変えました'); }
+    else if (a === 'evt') { if (isEvent(n)) n.kind = 'folder'; else { n.kind = 'event'; if (!n.announce) n.announce = 'before'; if (n.reg == null) n.reg = 0; } save(); render(); }
+    else if (a === 'dup') { UI.dupId = n.id; var ov = document.getElementById('cpov'); if (!ov) { ov = document.createElement('div'); ov.id = 'cpov'; document.body.appendChild(ov); } ov.innerHTML = dupModal(n); ov.querySelector('#cpN').focus(); }
+    else if (a === 'del') {
+      snap(); var par = parentOf(n), cur = curFolder(), gone = cur && (cur === n || ancestors(cur).indexOf(n) >= 0);
+      removeNode(n); if (gone) S.fcur = par ? par.id : ''; save(); render(); toastUndo('「' + ttl(n) + '」を削除しました');
+    }
+    return;
+  }
+  if (document.getElementById('cm') && !(e.target.closest && e.target.closest('#cm'))) closeCM();
+  var b = e.target.closest && e.target.closest('[data-act="sideTog"],[data-act="ftreeTog"],[data-act="fback"],[data-act="gname"],[data-act="gwho"]');
+  if (!b) { if (document.getElementById('gpop') && !(e.target.closest && e.target.closest('#gpop'))) closePop(); return; }
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act;
+  if (a === 'sideTog') { S.sideC = !S.sideC; save(); render(); applyChrome12(); }
+  else if (a === 'ftreeTog') { S.ftreeC = !S.ftreeC; save(); render(); }
+  else if (a === 'fback') { var h = UI.fhist || []; if (!h.length) return; S.fcur = h.pop(); UI.sp = null; save(); render(); }
+  else if (a === 'gname') { var n = task(b.dataset.id); if (!n) return; closePop(); if (isFolder(n)) goFolder(n.id); else popAt(b, taskPop(n)); }
+  else if (a === 'gwho') { var n2 = task(b.dataset.id); if (!n2) return; popAt(b, whoPop(n2)); }
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCM(); closePop(); } });
+window.addEventListener('scroll', function () { closeCM(); closePop(); }, true);
+var _render12 = render; render = function () { closePop(); _render12.apply(this, arguments); applyChrome12(); decorateGantt12(); };
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
