@@ -854,6 +854,12 @@ svg.crown{width:13px;height:13px;flex:none;fill:#F59E0B;stroke:none}
 .cht{display:flex;align-items:center;gap:6px}
 .cc{font-size:11px;font-weight:600;color:var(--sub);background:var(--hover);border-radius:9px;padding:0 7px;line-height:18px}
 .cc.bad{color:#B91C1C;background:#FEE2E2}
+.dg1{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.dg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch}
+.dg3 .card{display:flex;flex-direction:column}
+.dg3 .card .cb{flex:1}
+.kpi.ghostk{visibility:hidden}
+@media (max-width:760px){ .dg3{grid-template-columns:minmax(0,1fr)} .kpi.ghostk{display:none} .kpis.k2{grid-template-columns:repeat(2,minmax(0,1fr))} }
 </style>
 </head>
 <body>
@@ -2387,54 +2393,65 @@ function viewDash() {
   var myFeed = feed.length ? feed.map(function (n) { return '<div class="li"><span class="t"><b style="white-space:normal">' + esc(n.text) + '</b><span>' + esc(n.sub || '') + '</span></span>' + (n.at ? '<span class="r num">' + esc(n.at) + '</span>' : '') + '</div>'; }).join('') : none;
   var self = '<section class="dsec"><h2>' + av(m.id) + esc(m.name) + '</h2><div class="dg2">' + card('自分の作業' + cnt(mineOpen.length) + cnt(mineLate && '期限切れ ' + mineLate, true), myTask) + card('通知' + cnt(feed.length), myFeed) + '</div></section>';
 
-  // 全体
+  // 動き（イベント・期限・対応）
   var ks = [], cards = [];
+  var sec = function (title, k, c, cols) { return (k.length || c.length) ? '<section class="dsec"><h2>' + title + '</h2>' + (k.length ? '<div class="kpis k' + cols + '">' + k.join('') + '</div>' : '') + (c.length ? '<div class="dg' + cols + '">' + c.join('') + '</div>' : '') + '</section>' : ''; };
   if (can('projects')) {
     var scope = isAdmin() ? all : all.filter(function (o) { return chainHas(o.k, m.id); });
     var lateN = scope.filter(function (o) { return late(o.k); }).length;
-    ks.push(kpi('進行中のイベント', (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); })).length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
+    var lv = (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); }));
+    ks.push(kpi('進行中のイベント', lv.length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
     var soon = scope.filter(function (o) { return !o.k.done && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
     cards.push(card('期限が近い作業', soon.length ? soon.map(function (o) {
       return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(o.p.name) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
     }).join('') : none, 'projects'));
-    var ps = (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); })).sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
+    var ps = lv.slice().sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
     cards.push(card('イベント', ps.length ? ps.map(function (p) {
       var g = progress(p);
       return '<button class="li" data-act="open" data-id="' + p.id + '"><span class="t"><b>' + esc(p.name) + '</b><span class="num">' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + '</span></span><span class="prog"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num muted" style="font-size:12px">' + g.d + '/' + g.n + '</span></span>' + (g.late ? '<span class="r bad num">!' + g.late + '</span>' : '') + '</button>';
     }).join('') : none, 'projects'));
   }
-  var todo = [];
-  if (can('board') && rep) todo.push(['board', '通報', rep]);
-  if (can('notices') && off) todo.push(['notices', '情報提供', off]);
-  if (can('notices')) { var dr = S.notices.filter(function (n) { return n.state === 'draft'; }).length; if (dr) todo.push(['notices', '下書きの告知', dr]); }
-  if (can('tracks')) { var td = S.tracks.filter(function (t) { return t.status === 'draft'; }).length; if (td) todo.push(['tracks', '下書きのトラック', td]); }
   if (can('board') || can('notices') || can('tracks')) {
-    ks.push(kpi('要対応', rep + off, rep ? 'board' : 'notices', rep + off > 0));
-    cards.push(card('要対応', todo.length ? todo.map(function (x) { return '<button class="li" data-act="go" data-view="' + x[0] + '"><span class="t"><b>' + x[1] + '</b></span><span class="r num">' + x[2] + '</span></button>'; }).join('') : none));
+    var todo = [];
+    if (can('board') && rep) todo.push(['board', '通報', rep]);
+    if (can('notices') && off) todo.push(['notices', '情報提供', off]);
+    if (can('notices')) { var dr = S.notices.filter(function (n) { return n.state === 'draft'; }).length; if (dr) todo.push(['notices', '下書きの告知', dr]); }
+    if (can('tracks')) { var td = S.tracks.filter(function (t) { return t.status === 'draft'; }).length; if (td) todo.push(['tracks', '下書きのトラック', td]); }
+    var tn = todo.reduce(function (a, x) { return a + x[2]; }, 0);
+    ks.push(kpi('要対応', tn, todo.length ? todo[0][0] : null, tn > 0));
+    if (!can('projects')) cards.push(card('要対応', todo.length ? todo.map(function (x) { return '<button class="li" data-act="go" data-view="' + x[0] + '"><span class="t"><b>' + x[1] + '</b></span><span class="r num">' + x[2] + '</span></button>'; }).join('') : none));
   }
-  if (can('tracks')) {
-    cards.push(card('教材', '<div class="hbs">' + S.tracks.map(function (t) {
-      var us = parse(t.text).units, n = us.length, d = us.filter(function (u) { return t.units[u.code] && (t.units[u.code].materials || []).length; }).length;
-      return '<div class="hb"><span class="l">' + esc(t.name) + '</span><span class="b"><i style="width:' + (n ? Math.round(d / n * 100) : 0) + '%"></i></span><span class="v">' + d + '/' + n + '</span></div>';
-    }).join('') + '</div>', 'tracks'));
-  }
+  if (ks.length === 1) ks.push('<div class="kpi ghostk" aria-hidden="true"></div>');
+  if (cards.length % 2) cards.push('<div class="card ghostc" aria-hidden="true"></div>');
+  var flow = sec('進行中', ks, cards, 2);
+
+  // 統計
+  var sk = [], sc = [];
   if (can('projects')) {
     var fin = S.projects.filter(function (p) { return isEvent(p) && ended(p); }).sort(function (a, b) { return dayOf(b.end) - dayOf(a.end); });
     var avg = fin.length ? Math.round(fin.reduce(function (n, p) { return n + pct(p); }, 0) / fin.length) : 0;
-    ks.push(kpi('参加率', avg + '%'));
-    cards.push('<div class="card"><div class="ch">参加率<button data-act="pstats" aria-label="参加率を開く" title="開く">' + GO + '</button></div><div class="cb"><div class="hbs">' +
-      fin.slice(0, 5).map(function (p) { return '<div class="hb"><span class="l">' + esc(p.name) + '</span><span class="b"><i style="width:' + pct(p) + '%"></i></span><span class="v">' + pct(p) + '%</span></div>'; }).join('') + '</div></div></div>');
+    sk.push(kpi('平均参加率', avg + '%'));
+    sc.push('<div class="card"><div class="ch"><span class="cht">参加率</span><button data-act="pstats" aria-label="参加率を開く" title="開く">' + GO + '</button></div><div class="cb"><div class="hbs">' +
+      (fin.length ? fin.slice(0, 5).map(function (p) { return '<div class="hb"><span class="l">' + esc(p.name) + '</span><span class="b"><i style="width:' + pct(p) + '%"></i></span><span class="v">' + pct(p) + '%</span></div>'; }).join('') : none) + '</div></div></div>');
+  }
+  if (can('tracks')) {
+    var U = 0, D = 0;
+    var tr = S.tracks.map(function (t) {
+      var us = parse(t.text).units, n = us.length, d = us.filter(function (u) { return t.units[u.code] && (t.units[u.code].materials || []).length; }).length; U += n; D += d;
+      return '<div class="hb"><span class="l">' + esc(t.name) + '</span><span class="b"><i style="width:' + (n ? Math.round(d / n * 100) : 0) + '%"></i></span><span class="v">' + d + '/' + n + '</span></div>';
+    }).join('');
+    sk.push(kpi('教材の登録', (U ? Math.round(D / U * 100) : 0) + '%', 'tracks'));
+    sc.push(card('教材の登録', '<div class="hbs">' + (tr || none) + '</div>', 'tracks'));
   }
   if (isAdmin()) {
-    ks.push(kpi('メンバー', S.members.length, 'perms'));
+    sk.push(kpi('メンバー', S.members.length, 'perms'));
     var roles = ['Innovator', 'Strategist', 'Negotiator', 'Advertiser', 'Engineer'], mx = 1;
-    var cnt = roles.map(function (r) { var c = pl.filter(function (x) { return (x.roles || []).indexOf(r) >= 0; }).length; mx = Math.max(mx, c); return c; });
-    cards.push(card('ロール', '<div class="hbs">' + roles.map(function (r, i) { return '<div class="hb"><span class="l">' + r + '</span><span class="b"><i style="width:' + Math.round(cnt[i] / mx * 100) + '%"></i></span><span class="v">' + cnt[i] + '</span></div>'; }).join('') + '</div>', 'perms'));
+    var rc = roles.map(function (r) { var c = pl.filter(function (x) { return (x.roles || []).indexOf(r) >= 0; }).length; mx = Math.max(mx, c); return c; });
+    sc.push(card('ロール', '<div class="hbs">' + roles.map(function (r, i) { return '<div class="hb"><span class="l">' + r + '</span><span class="b"><i style="width:' + Math.round(rc[i] / mx * 100) + '%"></i></span><span class="v">' + rc[i] + '</span></div>'; }).join('') + '</div>', 'perms'));
   }
-  if (cards.length % 2) cards.push('<div class="card ghostc" aria-hidden="true"></div>');
-  var whole = (ks.length || cards.length) ? '<section class="dsec"><h2>全体</h2>' + (ks.length ? '<div class="kpis k' + Math.min(ks.length, 5) + '">' + ks.join('') + '</div>' : '') + '<div class="dg2">' + cards.join('') + '</div></section>' : '';
+  var stats = sec('統計', sk, sc, Math.max(1, sc.length));
   var d0 = new Date(TODAY);
-  return top('ダッシュボード', '<span class="muted num" style="font-size:12px">' + (d0.getUTCMonth() + 1) + '/' + d0.getUTCDate() + '</span>') + '<div class="body dash">' + self + whole + '</div>';
+  return top('ダッシュボード', '<span class="muted num" style="font-size:12px">' + (d0.getUTCMonth() + 1) + '/' + d0.getUTCDate() + '</span>') + '<div class="body dash">' + self + flow + stats + '</div>';
 }
 
 // ---------- ux4: イベント追加は右下の＋ ----------
