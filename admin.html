@@ -1231,6 +1231,22 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
 .gx,.gy{width:26px;height:26px;border-radius:6px;border:1px solid var(--line2);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
 .gy{background:var(--text);border-color:var(--text);color:#fff}
 .gx svg.i,.gy svg.i{width:14px;height:14px}
+/* ---------- ux15 ---------- */
+.fh2r .tbtn,.fcf .tbtn,.gwho2 .tbtn{border:0 !important;background:transparent !important;box-shadow:none !important;padding:0 2px !important;height:auto !important;width:auto !important}
+.fh2r .tbtn:hover:not([disabled]) .avs .av,.fcf .tbtn:hover:not([disabled]) .avs .av{box-shadow:0 0 0 2px var(--line2)}
+.fh2r .tbtn:hover:not([disabled]) .avs .av.lead,.fcf .tbtn:hover:not([disabled]) .avs .av.lead{box-shadow:0 0 0 1px #F59E0B,0 0 0 3px #FDE68A}
+svg.fli{width:15px;height:15px;flex:none;color:#9CA3AF}
+.fct svg.fli{width:20px;height:20px}
+.fh2r h2 svg.fli{width:20px;height:20px;color:#9CA3AF}
+.fh2r h2.dn span{text-decoration:line-through;color:var(--muted)}
+.tck.big{width:28px;height:28px;flex:none}
+.istc .fct .tck{margin-left:6px}
+.fpage{max-width:860px}
+.fpm{min-height:300px;font-size:15px;line-height:1.85;color:var(--text);white-space:pre-wrap;word-break:break-word;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.fpm.ied:hover:not(.editing){outline:0;border-color:var(--line2)}
+.fpm.editing{outline:0 !important;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12) !important}
+.fpm.empty:not(.editing)::before{content:attr(data-ph);color:var(--dim)}
+.fpm a{color:var(--accent);text-decoration:underline;word-break:break-all}
 </style>
 </head>
 <body>
@@ -1725,7 +1741,7 @@ function nodeModal(n) {
     (root ? '<div class="two"><div class="fld"><label for="wU">担当部</label><select id="wU" class="input">' + ['教育部', '催事部', '外務部', '会計', '代表'].map(function (u) { return '<option' + (n.unit === u ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select></div>' +
       '<div class="fld"><label for="wA">告知</label><select id="wA" class="input"><option value="">—（業務）</option><option value="before"' + (isEvent(n) && n.announce !== 'done' ? ' selected' : '') + '>告知前</option><option value="done"' + (isEvent(n) && n.announce === 'done' ? ' selected' : '') + '>告知済み</option></select></div></div>' : '') +
     (leaf ? '<label style="display:flex;align-items:center;gap:8px"><input id="wD" type="checkbox" class="check"' + (n.done ? ' checked' : '') + '>完了</label>' : '<div class="muted" style="font-size:12px">下に ' + (nodesOf(n).length - 1) + ' 件の業務</div>');
-  return dlg(root ? 'イベント' : '業務', body,
+  return dlg(root ? 'イベント' : isFolder(n) ? 'フォルダー' : 'ファイル', body,
     (manages(par) ? '<button class="btn ghost danger" data-act="wDel">' + (M.del ? '下の業務ごと削除' : '削除') + '</button>' : '') + '<span class="sp"></span>' +
     (canEdit(n) ? '<button class="btn" data-act="addc" data-id="' + n.id + '">' + ic('plus') + '下に追加</button>' : '') + (editSelf(n) || canAssign(n) || n.who === S.me ? '<button class="btn primary" data-act="wSave">保存</button>' : ''));
 }
@@ -3149,12 +3165,12 @@ function ftree() {
   var cur = S.fcur || '', curN = curFolder(), anc = curN ? ancestors(curN).map(function (a) { return a.id; }).concat([curN.id]) : [];
   S.fopen = S.fopen || {};
   var row = function (n, d) {
-    if (!isFolder(n) || !visNode(n)) return '';
-    var ch = kids(n).filter(function (c) { return isFolder(c) && visNode(c); });
+    if (!visNode(n)) return '';
+    var ch = isFolder(n) ? kids(n).filter(visNode) : [];
     var open = S.fopen[n.id] != null ? S.fopen[n.id] : anc.indexOf(n.id) >= 0;
     return '<div class="ft' + (cur === n.id ? ' on' : '') + '" style="--d:' + d + '">' +
       (ch.length ? '<button class="ftc" data-act="ftog" data-id="' + n.id + '" aria-expanded="' + open + '" aria-label="開閉"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (open ? 'M7 10l5 5 5-5' : 'M10 7l5 5-5 5') + '"/></svg></button>' : '<span class="ftc"></span>') +
-      '<button class="ftn" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + '>' + FOLD + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
+      '<button class="ftn" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + '>' + (isFolder(n) ? FOLD : FILE) + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
       (open ? ch.map(function (c) { return row(c, d + 1); }).join('') : '');
   };
   return '<button class="ftop' + (cur === 'mine' ? ' on' : '') + '" data-act="fgo" data-id="mine">' + ic('users') + '<span>自分の担当</span></button>' +
@@ -3249,7 +3265,7 @@ document.addEventListener('click', function (e) {
   if (a === 'ftog') { S.fopen = S.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); S.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); save(); render(); return; }
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
-    var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しい業務');
+    var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル');
     save(); render(); M = { m: 'edit', id: n.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); }
     return;
   }
@@ -3298,8 +3314,8 @@ function fcard(n) {
     '</div>';
   }
   var w = member(n.who), can = editSelf(n) || n.who === S.me, lt = late(n) && !n.done;
-  return '<div class="fcard istc' + (n.done ? ' dn' : '') + (lt ? ' lt' : '') + '" data-act="edit" data-id="' + n.id + '" tabindex="0" role="button">' +
-    '<div class="fct"><button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span></div>' +
+  return '<div class="fcard istc' + (n.done ? ' dn' : '') + (lt ? ' lt' : '') + '" data-act="fgo" data-id="' + n.id + '" tabindex="0" role="button" aria-label="' + esc(ttl(n)) + 'を開く">' +
+    '<div class="fct">' + FILE + '<button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span></div>' +
     '<b class="fcn">' + esc(ttl(n)) + '</b>' +
     '<div class="fcm num' + (lt ? ' bad' : '') + '">' + shortDate(n.end) + (lt ? ' 期限切れ' : '') + '</div>' +
     '<div class="fcf">' + (w ? avStack([n.who]) + '<span class="fcw">' + esc(w.name) + '</span>' : '<span class="dim">担当未定</span>') + '</div>' +
@@ -3329,7 +3345,7 @@ viewWork = function () {
   } else {
     S.wtab = 'list';
     var f = curFolder(), list = visibleRoots();
-    var add = manages(f) && S.fcur !== 'mine' ? (UI.fadd ? '<div class="fcard fadd open"><button data-act="newF">' + FOLD + 'フォルダー</button>' + (f ? '<button data-act="newT"><span class="tci"></span>業務</button>' : '') + '</div>' : '<button class="fcard fadd" data-act="fadd" aria-label="追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>') : '';
+    var add = manages(f) && S.fcur !== 'mine' ? (UI.fadd ? '<div class="fcard fadd open"><button data-act="newF">' + FOLD + 'フォルダー</button>' + (f ? '<button data-act="newT">' + FILE + 'ファイル</button>' : '') + '</div>' : '<button class="fcard fadd" data-act="fadd" aria-label="追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>') : '';
     body = '<div class="body"><div class="fgrid">' + list.map(fcard).join('') + add + '</div>' + (!list.length && !add ? '<div class="empty big">まだ何もありません</div>' : '') + '</div>';
   }
   return top('業務') + '<div class="wk"><aside class="ftree" aria-label="フォルダー">' + ftree() + '</aside><div class="wkm">' + fhead2() + body + '</div></div>';
@@ -3381,8 +3397,8 @@ function fcard(n) {
     '</div>';
   }
   var can = ed || n.who === S.me, lt = late(n) && !n.done, canM = ed || n.who === S.me;
-  return '<div class="fcard istc' + (n.done ? ' dn' : '') + (lt ? ' lt' : '') + '" data-act="edit" data-id="' + n.id + '" tabindex="0" role="button">' +
-    '<div class="fct"><button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span><span class="fcm num' + (lt ? ' bad' : '') + '">' + shortDate(n.end) + '</span></div>' +
+  return '<div class="fcard istc' + (n.done ? ' dn' : '') + (lt ? ' lt' : '') + '" data-act="fgo" data-id="' + n.id + '" tabindex="0" role="button" aria-label="' + esc(ttl(n)) + 'を開く">' +
+    '<div class="fct">' + FILE + '<button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span><span class="fcm num' + (lt ? ' bad' : '') + '">' + shortDate(n.end) + '</span></div>' +
     nm +
     (n.memo || canM ? '<div class="fmemo' + (n.memo ? '' : ' empty') + (canM ? ' ied' : '') + '"' + (canM ? ' data-act="ied" data-f="memo" data-id="' + n.id + '"' : '') + ' data-ph="メモ（どこで・どうやって・結果など）">' + esc(n.memo || '') + '</div>' : '') +
     '<div class="fcf">' + (canAssign(n)
@@ -3550,9 +3566,9 @@ function decorateGantt12() {
 function cmItems(n) {
   var f = isFolder(n), it = [];
   var add = function (act, label, cls) { it.push('<button role="menuitem" data-cm="' + act + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + label + '</button>'); };
-  if (f) { add('open', '開く'); add('gantt', 'ガントで見る'); } else add('open', '詳細を見る');
+  add('open', '開く'); if (f) add('gantt', 'ガントで見る');
   if (editSelf(n) || (!f && n.who === S.me)) add('edit', '名前・担当・期間を編集');
-  if (f && manages(n)) { it.push('<i class="cmsep"></i>'); add('newF', '新しいフォルダー'); add('newT', '新しい業務'); }
+  if (f && manages(n)) { it.push('<i class="cmsep"></i>'); add('newF', '新しいフォルダー'); add('newT', '新しいファイル'); }
   if (!f && (editSelf(n) || n.who === S.me)) { it.push('<i class="cmsep"></i>'); add('done', n.done ? '未完了に戻す' : '完了にする'); add('toF', 'フォルダーに変える'); }
   if (f && (editSelf(n) || isLead(n, S.me))) add('evt', isEvent(n) ? 'イベントの記録をやめる' : 'イベントとして記録');
   if (f && manages(parentOf(n))) add('dup', '複製…');
@@ -3579,10 +3595,10 @@ document.addEventListener('click', function (e) {
     var n = task(UI.cm), a = c.dataset.cm; if (!n) { closeCM(); return; }
     if (a === 'del' && !c.classList.contains('sure')) { c.classList.add('sure'); c.textContent = 'もう一度押すと削除'; return; }
     closeCM();
-    if (a === 'open') { if (isFolder(n)) goFolder(n.id); else { M = { m: 'edit', id: n.id }; renderModal(); } }
+    if (a === 'open') goFolder(n.id);
     else if (a === 'gantt') goFolder(n.id, 'gantt');
     else if (a === 'edit') { M = { m: 'edit', id: n.id }; renderModal(); }
-    else if (a === 'newF' || a === 'newT') { var k = a === 'newF' ? addFolder(n, '新しいフォルダー') : addUnder(n, '新しい業務'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
+    else if (a === 'newF' || a === 'newT') { var k = a === 'newF' ? addFolder(n, '新しいフォルダー') : addUnder(n, '新しいファイル'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
     else if (a === 'done') { n.done = !n.done; if (n.done) reportUp(n); save(); render(); }
     else if (a === 'toF') { n.folder = true; n.kids = n.kids || []; delete n.done; if (n.who) setLeads(n, [n.who]); save(); render(); toast('フォルダーに変えました'); }
     else if (a === 'evt') { if (isEvent(n)) n.kind = 'folder'; else { n.kind = 'event'; if (!n.announce) n.announce = 'before'; if (n.reg == null) n.reg = 0; } save(); render(); }
@@ -3601,7 +3617,7 @@ document.addEventListener('click', function (e) {
   if (a === 'sideTog') { S.sideC = !S.sideC; save(); render(); applyChrome12(); }
   else if (a === 'ftreeTog') { S.ftreeC = !S.ftreeC; save(); render(); }
   else if (a === 'fback') { var h = UI.fhist || []; if (!h.length) return; S.fcur = h.pop(); UI.sp = null; save(); render(); }
-  else if (a === 'gname') { var n = task(b.dataset.id); if (!n) return; closePop(); if (isFolder(n)) goFolder(n.id); else popAt(b, taskPop(n)); }
+  else if (a === 'gname') { var n = task(b.dataset.id); if (!n) return; closePop(); goFolder(n.id); }
   else if (a === 'gwho') { var n2 = task(b.dataset.id); if (!n2) return; popAt(b, whoPop(n2)); }
 }, true);
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCM(); closePop(); } });
@@ -3707,6 +3723,28 @@ document.addEventListener('click', function (e) {
   p.innerHTML = '<div class="gph">期間</div><div class="two"><input id="pS" class="input num" type="date" value="' + f.start + '"><input id="pE" class="input num" type="date" value="' + f.end + '"></div>' + dslider(f, 'pS', 'pE') + '<div class="gpf"><button class="btn sm primary" data-act="perSave">保存</button></div>';
   var r = b.getBoundingClientRect(); p.style.left = Math.min(window.innerWidth - 340, r.left) + 'px'; p.style.top = (r.bottom + 6) + 'px';
 }, true);
+
+// ---------- ux15: 業務＝ファイル。開くとメモのページ ----------
+var FILE = '<svg class="i fli" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>';
+function filePage(n) {
+  var canM = editSelf(n) || n.who === S.me, lt = late(n) && !n.done, w = member(n.who);
+  var path = '<nav class="crumb" aria-label="場所"><button data-act="fgo" data-id="">すべて</button>' + ancestors(n).map(function (a) { return '<span class="cs">›</span><button data-act="fgo" data-id="' + a.id + '">' + esc(ttl(a)) + '</button>'; }).join('') + '</nav>';
+  var who = canAssign(n) ? '<span class="fwho">' + (n.who ? av(n.who) : '<span class="av nob"></span>') + '<select class="fsel" data-act="noop" data-fw="' + n.id + '" aria-label="担当">' + whoOpts(n) + '</select></span>'
+    : (w ? '<span class="fwho">' + av(n.who) + '<span class="fcw">' + esc(w.name) + '</span></span>' : '<span class="dim">担当未定</span>');
+  var head = '<div class="fh2">' + path + '<div class="fh2r">' + backBtn() +
+    '<button class="tck big" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (canM ? '' : ' disabled') + ' title="完了" aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button>' +
+    '<h2' + (n.done ? ' class="dn"' : '') + '>' + FILE + '<span' + (editSelf(n) ? ' class="ied" data-act="ied" data-f="t" data-id="' + n.id + '" title="タップで名前を編集"' : '') + '>' + esc(ttl(n)) + '</span></h2>' +
+    (editSelf(n) ? '<button class="fh2m fper num' + (lt ? ' bad' : '') + '" data-act="fper" title="期間を変更">' + shortDate(n.start) + ' – ' + shortDate(n.end) + '</button>' : '<span class="fh2m num' + (lt ? ' bad' : '') + '">' + shortDate(n.start) + ' – ' + shortDate(n.end) + '</span>') +
+    who + '<span class="sp"></span>' +
+    (editSelf(n) || n.who === S.me ? '<span class="srtw"><button class="ib fhb" data-act="fmenu" aria-label="その他" title="その他" aria-expanded="' + !!UI.fmn + '">' + ic('more') + '</button>' +
+      (UI.fmn ? '<div class="srtm" role="menu"><button role="menuitem" data-act="toFolder" data-id="' + n.id + '">フォルダーに変える</button>' + (editSelf(n) ? '<button role="menuitem" data-act="edit" data-id="' + n.id + '">名前・期間を編集</button>' : '') + '</div>' : '') + '</span>' : '') +
+    '</div></div>';
+  var memo = '<div class="body"><div class="fpage"><div class="fpm' + (n.memo ? '' : ' empty') + (canM ? ' ied' : '') + '"' + (canM ? ' data-act="ied" data-f="memo" data-id="' + n.id + '"' : '') + ' data-ph="' + (canM ? 'メモを書く（どこで・どうやって・結果・連絡先・資料URLなど）' : 'メモはありません') + '">' + (n.memo ? linkify(n.memo) : '') + '</div></div></div>';
+  return top('業務') + '<div class="wk"><aside class="ftree" aria-label="フォルダー">' + ftree() + '</aside><div class="wkm">' + head + memo + '</div></div>';
+}
+var viewWork15 = viewWork;
+viewWork = function () { var n = S.fcur && S.fcur !== 'mine' ? task(S.fcur) : null; if (n && !isFolder(n)) { S.wtab = 'list'; return filePage(n); } return viewWork15(); };
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-act="toFolder"]'); if (b) UI.fmn = false; }, true);
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
