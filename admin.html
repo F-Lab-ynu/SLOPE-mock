@@ -1010,6 +1010,73 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
   .fh .tbtn{max-width:160px}
   .fh .prog{display:none}
 }
+/* ---------- ux8 カード ---------- */
+.fh2{padding:16px 24px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.fh2 .crumb{padding:0}
+.fh2r{display:flex;align-items:center;gap:12px;min-width:0}
+.fh2r h2{display:flex;align-items:center;gap:8px;margin:0;font-size:20px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fh2r h2 svg.fi{width:22px;height:22px;color:#F59E0B}
+.fh2m{font-size:12px;color:var(--muted);white-space:nowrap}
+.fh2r .tbtn{width:auto;flex:none;height:30px}
+.fhb.on{border-color:var(--text);color:var(--text)}
+.vsw{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:#fff;flex:none}
+.vsw button{width:36px;height:30px;border:0;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer}
+.vsw button + button{border-left:1px solid var(--line2)}
+.vsw button[aria-pressed="true"]{background:var(--text);color:#fff}
+.vsw svg.i{width:16px;height:16px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-content:start}
+.fcard{position:relative;display:flex;flex-direction:column;gap:6px;min-height:150px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;cursor:pointer;transition:border-color .12s,box-shadow .12s,transform .12s;font:inherit;color:inherit}
+.fcard:hover{border-color:var(--line2);box-shadow:0 6px 18px rgba(17,24,39,.07);transform:translateY(-1px)}
+.fcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fct{display:flex;align-items:center;gap:6px;min-height:24px}
+.fct svg.fi{width:24px;height:24px;color:#F59E0B}
+.fcn{font-size:15px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fcm{font-size:12px;color:var(--muted)}
+.fcm.bad{color:var(--bad);font-weight:500}
+.fcb{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-top:auto}
+.fcb .b{flex:1;height:5px;border-radius:3px;background:var(--hover);overflow:hidden}
+.fcb .b i{display:block;height:100%;background:var(--text);border-radius:3px}
+.fcf{display:flex;align-items:center;gap:6px;min-height:22px}
+.fcw{font-size:12px;color:var(--sub)}
+.fcc{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.fcc svg.fi{width:13px;height:13px;color:var(--dim);margin-left:4px}
+.tci{display:inline-block;width:9px;height:9px;border:1.5px solid var(--dim);border-radius:3px;margin-left:4px}
+.fwarn{width:20px;height:20px;border-radius:50%;background:#FEE2E2;color:#B91C1C;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.fcx{position:absolute;right:8px;top:8px;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;opacity:0;cursor:pointer}
+.fcard:hover .fcx,.fcx:focus-visible{opacity:1}
+.fcx:hover{background:var(--hover);color:var(--text)}
+.fcard.isfc .fct .fwarn{margin-right:30px}
+.istc{min-height:130px;background:#FCFCFD}
+.istc .fcb{display:none}
+.istc .fcf{margin-top:auto}
+.tck{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line2);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:transparent}
+.tck svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4}
+.tck:hover:not([disabled]){border-color:#10B981;color:#10B981}
+.tck[aria-pressed="true"]{background:#10B981;border-color:#10B981;color:#fff}
+.tck[disabled]{cursor:default;opacity:.6}
+.fcard.dn .fcn{color:var(--muted);text-decoration:line-through}
+.fcard.lt{border-color:#FCA5A5}
+.fadd{align-items:center;justify-content:center;border-style:dashed;border-width:1.5px;background:transparent;color:var(--muted)}
+.fadd:hover{color:var(--text);border-color:var(--text);box-shadow:none}
+.fadd svg.i{width:26px;height:26px}
+.fadd.open{gap:8px;cursor:default;transform:none}
+.fadd.open button{display:flex;align-items:center;gap:8px;width:100%;height:40px;padding:0 14px;border:1px solid var(--line2);border-radius:8px;background:#fff;cursor:pointer;font:inherit;font-weight:500}
+.fadd.open button:hover{border-color:var(--text)}
+.fadd.open svg.fi{width:18px;height:18px;color:#F59E0B}
+.rfoot{display:flex;gap:8px;padding:12px 0 4px}
+.wkm > .tbar{padding-left:24px}
+@media (max-width:760px){
+  .fh2{padding:12px 14px 10px}
+  .fh2r{flex-wrap:wrap;gap:8px}
+  .fh2r h2{font-size:18px;flex-basis:100%}
+  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .fcard{min-height:128px;padding:12px}
+  .fcx{opacity:1}
+}
+.fh2r .sp,.fct .sp{flex:1}
+.fcard.isfc.dn .fcn{text-decoration:none;color:var(--sub)}
+.fcard.isfc.dn{background:#FAFAFB}
+.fcard.isfc.dn .fcb .b i{background:#10B981}
 </style>
 </head>
 <body>
@@ -3001,7 +3068,7 @@ document.addEventListener('change', function (e) {
 var nodeModal0 = nodeModal;
 nodeModal = function (n) {
   var h = nodeModal0(n);
-  if (!isFolder(n) && (editSelf(n) || n.who === S.me)) h = h.replace('<span class="sp"></span>', '<button class="btn" data-act="toFolder" data-id="' + n.id + '">' + FOLD + 'フォルダーに変える</button><span class="sp"></span>');
+  if (!isFolder(n) && (editSelf(n) || n.who === S.me)) { var k = h.lastIndexOf('<span class="sp"></span>'); if (k >= 0) h = h.slice(0, k) + '<button class="btn ghost" data-act="toFolder" data-id="' + n.id + '">' + FOLD + 'フォルダーに変える</button>' + h.slice(k); }
   return h;
 };
 function fabHTML() {
@@ -3018,15 +3085,15 @@ function dupModal(f) {
 }
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-act="fgo"],[data-act="ftog"],[data-act="newF"],[data-act="newT"],[data-act="toFolder"],[data-act="dupF"],[data-act="dupGo"]'); if (!b) return;
+  if (e.target.closest('[data-act]') !== b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, f = curFolder();
   if (a === 'fgo') { S.fcur = b.dataset.id; S.fopen = S.fopen || {}; if (S.fcur && S.fcur !== 'mine') S.fopen[S.fcur] = true; UI.rec = null; UI.sp = null; save(); render(); return; }
   if (a === 'ftog') { S.fopen = S.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); S.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); save(); render(); return; }
   if (a === 'newF' || a === 'newT') {
-    UI.fm = false; if (!manages(f)) return;
+    UI.fm = false; UI.fadd = false; if (!manages(f)) return;
     var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しい業務');
-    if (S.wtab !== 'list') S.wtab = 'list';
-    rerender({ id: n.id, c: 't' }); var el = document.querySelector('.cell[data-id="' + n.id + '"][data-c="t"]'); if (el) { el.select(); el.scrollIntoView({ block: 'center' }); }
+    save(); render(); M = { m: 'edit', id: n.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); }
     return;
   }
   if (a === 'toFolder') { var t = task(b.dataset.id); if (!t) return; t.folder = true; t.kids = t.kids || []; delete t.done; if (t.who) setLeads(t, [t.who]); M = null; save(); render(); toast('フォルダーに変えました'); return; }
@@ -3050,6 +3117,80 @@ function cloneKids(src, delta) {
   });
 }
 var _render7 = render; render = function () { _render7.apply(this, arguments); decorateFolders(); };
+
+// ---------- ux8: フォルダーはカード、ガントは切り替えて見る ----------
+var GRID = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>';
+var GANTT = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h8M7 12h10M10 18h10"/></svg>';
+var INFO = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>';
+function avStack(ids, ls) {
+  ls = ls || [];
+  return '<span class="avs">' + ids.slice(0, 3).map(function (id) { var m = member(id); return '<span class="av' + (ls.indexOf(id) >= 0 ? ' lead' : '') + '" title="' + esc(m ? m.name : '') + '">' + esc(m ? initials(m.name) : '?') + '</span>'; }).join('') + (ids.length > 3 ? '<span class="more num">+' + (ids.length - 3) + '</span>' : '') + '</span>';
+}
+function fcard(n) {
+  if (isFolder(n)) {
+    var g = progress(n), mx = nodesOf(n).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0), over = mx > dayOf(n.end);
+    var sub = kids(n).filter(visNode), nf = sub.filter(isFolder).length, nt = sub.length - nf;
+    return '<div class="fcard isfc' + (isDone(n) && g.n ? ' dn' : '') + '" data-act="fgo" data-id="' + n.id + '" tabindex="0" role="button" aria-label="' + esc(ttl(n)) + 'を開く">' +
+      '<div class="fct">' + FOLD + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '<span class="sp"></span>' + (g.late || over ? '<span class="fwarn" title="' + (g.late ? '遅れ ' + g.late : '期限超過') + '">!</span>' : '') + '</div>' +
+      '<b class="fcn">' + esc(ttl(n)) + '</b>' +
+      '<div class="fcm num">' + shortDate(n.start) + ' – ' + shortDate(n.end) + '</div>' +
+      '<div class="fcb"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num">' + g.d + '/' + g.n + '</span></div>' +
+      '<div class="fcf">' + (teamOf(n).length ? avStack(teamOf(n), leadsOf(n)) : '<span class="dim">担当未定</span>') + '<span class="fcc">' + (nf ? FOLD + nf : '') + (nt ? '<span class="tci"></span>' + nt : '') + '</span></div>' +
+      (editSelf(n) ? '<button class="fcx" data-act="edit" data-id="' + n.id + '" aria-label="編集" title="編集">' + ic('more') + '</button>' : '') +
+    '</div>';
+  }
+  var w = member(n.who), can = editSelf(n) || n.who === S.me, lt = late(n) && !n.done;
+  return '<div class="fcard istc' + (n.done ? ' dn' : '') + (lt ? ' lt' : '') + '" data-act="edit" data-id="' + n.id + '" tabindex="0" role="button">' +
+    '<div class="fct"><button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span></div>' +
+    '<b class="fcn">' + esc(ttl(n)) + '</b>' +
+    '<div class="fcm num' + (lt ? ' bad' : '') + '">' + shortDate(n.end) + (lt ? ' 期限切れ' : '') + '</div>' +
+    '<div class="fcf">' + (w ? avStack([n.who]) + '<span class="fcw">' + esc(w.name) + '</span>' : '<span class="dim">担当未定</span>') + '</div>' +
+  '</div>';
+}
+function fhead2() {
+  var f = curFolder(), mine = S.fcur === 'mine';
+  var path = '<nav class="crumb" aria-label="場所"><button data-act="fgo" data-id="">すべて</button>' + (f ? ancestors(f).map(function (a) { return '<span class="cs">›</span><button data-act="fgo" data-id="' + a.id + '">' + esc(ttl(a)) + '</button>'; }).join('') : '') + '</nav>';
+  var title = mine ? '自分の担当' : f ? ttl(f) : 'すべて';
+  var gantt = S.fmode === 'gantt';
+  var over = f && nodesOf(f).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0) > dayOf(f.end);
+  return '<div class="fh2">' + (f || mine ? path : '') +
+    '<div class="fh2r"><h2>' + (f ? FOLD : '') + esc(title) + '</h2>' +
+      (f ? '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>' + teamBtn(f, editSelf(f) ? '' : ' disabled', true) : '') +
+      '<span class="sp"></span>' +
+      (f ? '<button class="ib fhb' + (UI.rec === f.id ? ' on' : '') + '" data-act="rec" data-id="' + f.id + '" title="情報" aria-label="情報">' + INFO + '</button>' : '') +
+      '<span class="vsw" role="group" aria-label="表示"><button data-act="fmode" data-v="card" aria-pressed="' + !gantt + '" title="カード" aria-label="カード">' + GRID + '</button><button data-act="fmode" data-v="gantt" aria-pressed="' + gantt + '" title="ガント" aria-label="ガント">' + GANTT + '</button></span>' +
+    '</div></div>';
+}
+viewWork = function () {
+  curFolder();
+  var body;
+  if (S.fmode === 'gantt') {
+    S.wtab = 'gantt';
+    var h = viewWork0(); h = h.slice(h.indexOf('</div>') + 6).replace(/<div class="utabs">[\s\S]*?<\/div>/, '');
+    body = h;
+  } else {
+    var f = curFolder(), list = visibleRoots();
+    var add = manages(f) && S.fcur !== 'mine' ? (UI.fadd ? '<div class="fcard fadd open"><button data-act="newF">' + FOLD + 'フォルダー</button>' + (f ? '<button data-act="newT"><span class="tci"></span>業務</button>' : '') + '</div>' : '<button class="fcard fadd" data-act="fadd" aria-label="追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>') : '';
+    body = '<div class="body"><div class="fgrid">' + list.map(fcard).join('') + add + '</div>' + (!list.length && !add ? '<div class="empty big">まだ何もありません</div>' : '') + '</div>';
+  }
+  return top('業務') + '<div class="wk"><aside class="ftree" aria-label="フォルダー">' + ftree() + '</aside><div class="wkm">' + fhead2() + body + '</div></div>';
+};
+function fabHTML() { return ''; }
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="fmode"],[data-act="fadd"],[data-act="tdone"]'); if (!b) { if (UI.fadd && !(e.target.closest && e.target.closest('.fadd'))) { UI.fadd = false; render(); } return; }
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act;
+  if (a === 'fmode') { S.fmode = b.dataset.v; UI.sp = null; save(); render(); }
+  else if (a === 'fadd') { UI.fadd = true; render(); }
+  else if (a === 'tdone') { var n = task(b.dataset.id); if (!n || !(editSelf(n) || n.who === S.me)) return; n.done = !n.done; if (n.done) reportUp && reportUp(n); save(); render(); }
+}, true);
+document.addEventListener('keydown', function (e) { var c = e.target.classList && e.target.classList.contains('fcard') && e.target; if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); c.click(); } });
+var recHTML1 = recHTML;
+recHTML = function (p) {
+  var h = recHTML1(p), f = curFolder();
+  var foot = '<div class="rfoot">' + (editSelf(p) ? '<button class="btn sm" data-act="edit" data-id="' + p.id + '">名前・期間を編集</button>' : '') + (f && f.id === p.id && manages(parentOf(p)) ? '<button class="btn sm" data-act="dupF">複製</button>' : '') + '</div>';
+  return h.replace(/<\/div>$/, foot + '</div>');
+};
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
