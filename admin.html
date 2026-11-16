@@ -1574,8 +1574,8 @@ function mapSVG(g, sel, avail) {
     var k = TK[b.y] ? Math.max(0, TK[b.y].indexOf(a.x)) : 0, ym = Math.max(y1 + 14, y2 - ROW / 2 + 9 - k * 16), r = 8, dir = x2 > x1 ? 1 : -1;
     return 'M' + x1 + ' ' + y1 + ' V' + (ym - r) + ' Q' + x1 + ' ' + ym + ' ' + (x1 + dir * r) + ' ' + ym + ' H' + (x2 - dir * r) + ' Q' + x2 + ' ' + ym + ' ' + x2 + ' ' + (ym + r) + ' V' + y2;
   }
-  var TK = {}; g.edges.forEach(function (e) { var a = at[e.from], b = at[e.to]; if (!a || !b || a.x === b.x) return; (TK[b.y] = TK[b.y] || []); if (TK[b.y].indexOf(a.x) < 0) TK[b.y].push(a.x); });
-  Object.keys(TK).forEach(function (k) { TK[k].sort(function (p, q) { return p - q; }); });
+  var TK = {}, KEY = {}; g.edges.forEach(function (e) { var a = at[e.from], b = at[e.to]; if (!a || !b || a.x === b.x) return; var id = b.y + ':' + a.x; if (KEY[id] == null) { KEY[id] = b.x > a.x ? a.x : -a.x; (TK[b.y] = TK[b.y] || []).push(a.x); } });
+  Object.keys(TK).forEach(function (k) { TK[k].sort(function (p, q) { return KEY[k + ':' + p] - KEY[k + ':' + q]; }); });
   var out = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="路線図">';
   g.edges.forEach(function (e) {
     var a = at[e.from], b = at[e.to]; if (!a || !b) return;
