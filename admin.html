@@ -1123,6 +1123,31 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
 .fhmx{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:0;margin-top:2px}
 .gr[data-d="0"]:not(.g0):not(.gz) .gl{background:#fff}
 .gr[data-d="0"]:not(.g0).gz .gl{background:#FAFAFB}
+/* ---------- ux11 色を絞る ---------- */
+.gg .lvb{display:none}
+.gr .bar{background:#4B5563}
+.gr .bar.sum,.gr.g0 .bar.sum{background:#C4C8CF}
+.gr .bar.done,.gr .bar.sum.done,.gr.fdone .bar{background:#E5E7EB}
+.gr.hl .gl,.wcard .wr.hl > .wn{box-shadow:none}
+.bar.hlb{box-shadow:none}
+.gr.hl-late .gl{box-shadow:inset 3px 0 0 #DC2626}
+.bar.hlb-late{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #DC2626}
+.gband{background:rgba(17,24,39,.03);border-left-color:rgba(107,114,128,.45);border-right-color:rgba(107,114,128,.45)}
+.gbh{background:#9CA3AF}
+.avs .av.lead{border-color:#374151;box-shadow:0 0 0 1px #374151;background:#fff;color:var(--text)}
+svg.crown{fill:#374151}
+.tpi .lead[aria-pressed="true"]{background:#111827;border-color:#111827;color:#fff}
+.tpi .lead[aria-pressed="true"] svg.crown{fill:#fff;stroke:#fff}
+.fct svg.fi,.fh2r h2 svg.fi,.ft.on svg.fi,.fh svg.fi,.fadd.open svg.fi{color:#6B7280}
+.evd{background:#9CA3AF}
+.gr.fdone .ct{text-decoration:line-through;color:var(--muted)}
+.fck{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:#9CA3AF;flex:none}
+.fck svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:3}
+.fres{display:flex;align-items:baseline;gap:4px;font-size:13px;color:var(--sub)}
+.fres b{font-size:15px;padding:0 4px;border-radius:4px}
+.fhmt a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+.srtm{min-width:210px}
+.srtm button{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -2533,7 +2558,7 @@ function decorateWork() {
     if (v.dimDone && isDone(n)) row.classList.add('dndim');
     if (!f.length) return;
     var col = HLS.filter(function (h) { return h[0] === f[0]; })[0][2];
-    row.classList.add('hl'); row.style.setProperty('--hc', col);
+    row.classList.add('hl', 'hl-' + f[0]); row.style.setProperty('--hc', col);
     var chips = f.map(function (k) {
       var h = HLS.filter(function (x) { return x[0] === k; })[0], t = h[1];
       if (k === 'soon') { var dd = Math.round((dayOf(n.end) - TODAY) / DAY); t = dd === 0 ? '今日まで' : 'あと' + dd + '日'; }
@@ -2542,7 +2567,7 @@ function decorateWork() {
       return '<span class="hlc" style="--c:' + h[2] + '">' + t + '</span>';
     }).join('');
     if (gantt) {
-      var bar = row.querySelector('.bar'); if (bar) { bar.classList.add('hlb'); bar.style.setProperty('--hc', col); }
+      var bar = row.querySelector('.bar'); if (bar) { bar.classList.add('hlb', 'hlb-' + f[0]); bar.style.setProperty('--hc', col); }
       var ct = row.querySelector('.gl .ct'); if (ct) ct.insertAdjacentHTML('afterend', '<span class="hlcs">' + chips + '</span>');
     } else {
       var wtx = row.querySelector('.wtx'); if (wtx) wtx.insertAdjacentHTML('afterend', '<span class="hlcs">' + chips + '</span>');
@@ -3293,19 +3318,34 @@ function fhead2() {
       '<span class="sp"></span>' +
       (!mine && !gantt ? '<span class="srtw"><button class="ib fhb' + (srt !== 'manual' ? ' on' : '') + '" data-act="srt" title="並べ替え：' + SORTS.filter(function (x) { return x[0] === srt; })[0][1] + '" aria-label="並べ替え" aria-expanded="' + !!UI.srt + '">' + SORTI + '</button>' +
         (UI.srt ? '<div class="srtm" role="menu">' + SORTS.map(function (x) { return '<button role="menuitemradio" data-act="srtv" data-v="' + x[0] + '" aria-checked="' + (srt === x[0]) + '"' + (canSort ? '' : ' disabled') + '>' + x[1] + '</button>'; }).join('') + '</div>' : '') + '</span>' : '') +
-      (f ? '<button class="ib fhb' + (UI.rec === f.id ? ' on' : '') + '" data-act="rec" data-id="' + f.id + '" title="情報" aria-label="情報">' + INFO + '</button>' : '') +
       '<span class="vsw" role="group" aria-label="表示"><button data-act="fmode" data-v="card" aria-pressed="' + !gantt + '" title="カード" aria-label="カード">' + GRID + '</button><button data-act="fmode" data-v="gantt" aria-pressed="' + gantt + '" title="ガント" aria-label="ガント">' + GANTT + '</button></span>' +
-    '</div>' + fmemoHTML(f) + '</div>';
+      (f && (editSelf(f) || manages(parentOf(f)) || isLead(f, S.me)) ? '<span class="srtw"><button class="ib fhb" data-act="fmenu" aria-label="その他" title="その他" aria-expanded="' + !!UI.fmn + '">' + ic('more') + '</button>' +
+        (UI.fmn ? '<div class="srtm" role="menu">' + (editSelf(f) ? '<button role="menuitem" data-act="edit" data-id="' + f.id + '">名前・期間を編集</button>' : '') + (manages(parentOf(f)) ? '<button role="menuitem" data-act="dupF">複製</button>' : '') + (editSelf(f) || isLead(f, S.me) ? '<button role="menuitem" data-act="fEvt">' + (isEvent(f) ? 'イベントの記録をやめる' : 'イベントとして記録（参加数）') + '</button>' : '') + '</div>' : '') + '</span>' : '') +
+    '</div>' + (f && isEvent(f) ? fresHTML(f) : '') + fmemoHTML(f) + '</div>';
 }
+function fresHTML(f) {
+  var can = editSelf(f) || isLead(f, S.me);
+  return '<div class="fres">参加 <b class="num' + (can ? ' ied' : '') + '"' + (can ? ' data-act="ied" data-f="reg" data-id="' + f.id + '" title="タップで入力"' : '') + '>' + (f.reg || 0) + '</b><span class="muted num"> / ' + (S.club || 150) + '人・' + pct(f) + '%</span></div>';
+}
+function linkify(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>'); }
 function fmemoHTML(f) {
   if (!f) return '';
   var can = editSelf(f) || isLead(f, S.me), m = f.memo || '';
   if (!m && !UI.fmNew) return can ? '<button class="fhadd" data-act="fmNew">＋ メモ</button>' : '';
   var long = m.split('\n').length > 3 || m.length > 160, open = UI.fmx === f.id;
-  return '<div class="fhm' + (long && !open ? ' clamp' : '') + '"><div class="fhmt' + (can ? ' ied' : '') + (m ? '' : ' empty') + '"' + (can ? ' data-act="ied" data-f="memo" data-id="' + f.id + '"' : '') + ' data-ph="メモ（目的・決まったこと・引き継ぎなど）">' + esc(m) + '</div>' +
+  return '<div class="fhm' + (long && !open ? ' clamp' : '') + '"><div class="fhmt' + (can ? ' ied' : '') + (m ? '' : ' empty') + '"' + (can ? ' data-act="ied" data-f="memo" data-id="' + f.id + '"' : '') + ' data-ph="メモ（目的・決まったこと・引き継ぎ・資料URLなど）">' + linkify(m) + '</div>' +
     (long ? '<button class="fhmx" data-act="fmx">' + (open ? '閉じる' : '…詳細を表示') + '</button>' : '') + '</div>';
 }
 document.addEventListener('click', function (e) {
+  var m = e.target.closest && e.target.closest('[data-act="fmenu"],[data-act="fEvt"]');
+  if (!m) { if (UI.fmn && !(e.target.closest && e.target.closest('.srtw'))) { UI.fmn = false; render(); } }
+  else {
+    e.stopImmediatePropagation(); e.preventDefault();
+    if (m.dataset.act === 'fmenu') { UI.fmn = !UI.fmn; render(); return; }
+    var f0 = curFolder(); UI.fmn = false; if (!f0) return;
+    if (isEvent(f0)) f0.kind = 'folder'; else { f0.kind = 'event'; if (!f0.announce) f0.announce = 'before'; if (f0.reg == null) f0.reg = 0; }
+    save(); render(); return;
+  }
   var b = e.target.closest && e.target.closest('[data-act="fmNew"],[data-act="fmx"]'); if (!b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   if (b.dataset.act === 'fmx') { var f = curFolder(); UI.fmx = UI.fmx === (f && f.id) ? null : f && f.id; render(); return; }
@@ -3316,6 +3356,7 @@ function iedSave(el) {
   var n = task(el.dataset.id); if (!n) return;
   var v = el.innerText.replace(/ /g, ' ');
   if (el.dataset.f === 't') { v = v.replace(/\s+/g, ' ').trim(); if (v && v !== ttl(n)) setTitle(n, v); }
+  else if (el.dataset.f === 'reg') { n.reg = Math.max(0, parseInt(v.replace(/[^0-9]/g, ''), 10) || 0); }
   else { v = v.replace(/\n{3,}/g, '\n\n').trim(); n.memo = v; }
   save(); render();
 }
@@ -3329,6 +3370,7 @@ document.addEventListener('click', function (e) {
   if (a === 'srt') { UI.srt = !UI.srt; render(); return; }
   if (a === 'srtv') { var f = curFolder(); UI.sorts = UI.sorts || {}; UI.sorts[f ? f.id : '_'] = t.dataset.v; UI.srt = false; render(); return; }
   if (t.isContentEditable) return;
+  if (e.target.closest('a')) { window.open(e.target.closest('a').href, '_blank', 'noopener'); return; }
   t.setAttribute('contenteditable', 'plaintext-only'); if (!t.isContentEditable) t.setAttribute('contenteditable', 'true');
   t.classList.add('editing'); t.focus();
   var r = document.createRange(); r.selectNodeContents(t); if (t.dataset.f === 'memo') r.collapse(false); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
@@ -3359,6 +3401,18 @@ document.addEventListener('click', function (e) {
   var n = task(M.id), m = document.getElementById('wM'); if (n && m && !m.disabled) n.memo = m.value.trim();
 }, true);
 
+// ---------- ux11: 色を絞る・完了したフォルダーも線で消す ----------
+function decorateWork2() { if (S.view === 'projects' && S.wtab === 'stats') S.wtab = 'list'; }
+function decorateDone() {
+  if (S.view !== 'projects' || S.fmode !== 'gantt') return;
+  document.querySelectorAll('.gg .gr[data-row]').forEach(function (row) {
+    var n = task(row.dataset.row); if (!n || !isFolder(n)) return;
+    var g = progress(n); if (!(g.n && g.d === g.n)) return;
+    row.classList.add('fdone');
+    var ph = row.querySelector('.gl .ckph'); if (ph) ph.outerHTML = '<span class="wck fck" title="すべて完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></span>';
+  });
+}
+var _render11 = render; render = function () { _render11.apply(this, arguments); decorateDone(); };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
