@@ -860,6 +860,50 @@ svg.crown{width:13px;height:13px;flex:none;fill:#F59E0B;stroke:none}
 .dg3 .card .cb{flex:1}
 .kpi.ghostk{visibility:hidden}
 @media (max-width:760px){ .dg3{grid-template-columns:minmax(0,1fr)} .kpi.ghostk{display:none} .kpis.k2{grid-template-columns:repeat(2,minmax(0,1fr))} }
+/* ---------- ux5 ---------- */
+.pfil{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pseg{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;background:#fff}
+.pseg button{height:28px;padding:0 10px;border:0;background:#fff;font-size:12px;color:var(--sub);cursor:pointer}
+.pseg button + button{border-left:1px solid var(--line2)}
+.pseg button[aria-pressed="true"]{background:var(--text);color:#fff}
+.input.sm{height:30px;font-size:12px;padding:0 8px;width:auto}
+.vend{display:none !important}
+.recb{flex:none;width:26px;height:26px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;vertical-align:middle;margin-left:4px}
+.recb svg.i{width:15px;height:15px}
+.recb:hover,.recb.on{color:var(--text);border-color:var(--line2);background:#fff}
+body.recon .wcards > .wh,body.recon .wcard .wr{grid-template-columns:minmax(0,1fr) 140px 84px 84px 0 56px}
+body.recon .wcard .wp,body.recon .wcards > .wh > div:nth-child(5){visibility:hidden;overflow:hidden}
+.wm .recb{width:22px;height:22px;margin-left:6px}
+.rec{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;background:#fff;border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(17,24,39,.08);z-index:60;display:flex;flex-direction:column}
+.rec .rh{display:flex;align-items:flex-start;gap:8px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.rec .rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rec .rt small{font-size:11px;color:var(--muted)}
+.rec .rt b{font-size:16px}
+.rec .rb{flex:1;overflow:auto;padding:4px 16px 24px}
+.rec section{padding:14px 0;border-bottom:1px solid var(--line)}
+.rec section:last-child{border-bottom:0}
+.rec h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;margin:0 0 10px}
+.rec .rf{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;min-width:0}
+.rec .rf label{font-size:12px;color:var(--sub)}
+.rec .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rec .rv{min-height:34px;display:flex;align-items:center;gap:6px;font-size:13px}
+.rec textarea.input{height:auto;padding:8px;resize:vertical;line-height:1.5}
+.rec .rl{display:flex;flex-direction:column;gap:6px}
+.rec .rli{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}
+.rec .rli a{color:var(--accent);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec .mfield .tbtn{border-color:var(--line2);height:36px;background:#fff}
+body.recon .main{margin-right:400px}
+body.recon .efabw{right:428px}
+@media (max-width:1100px){ body.recon .main{margin-right:0} }
+@media (max-width:760px){ .rec{width:100vw;top:0;z-index:70} body.recon .efabw{display:none} .pfil{width:100%} }
+.efabw{position:fixed;right:28px;bottom:28px;z-index:50;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.efabw .efab{position:static}
+.efabw.open .efab svg{transform:rotate(45deg)}
+.efab svg{transition:transform .15s}
+.fmenu{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(17,24,39,.14);padding:4px;min-width:210px}
+.fmenu button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:0;border-radius:6px;background:transparent;text-align:left;font-size:13px;cursor:pointer}
+.fmenu button:hover{background:var(--hover)}
+@media (max-width:760px){ .efabw{right:16px;bottom:76px} }
 </style>
 </head>
 <body>
@@ -1235,9 +1279,9 @@ function statusCell(n) {
 }
 function whoCell(n) { var w = member(n.who); return w ? '<span class="whoc">' + av(n.who) + esc(w.name) + '</span>' : '<span class="dim">未定</span>'; }
 function viewWork() {
-  if (!S.wtab) S.wtab = 'list';
+  if (!S.wtab || S.wtab === 'stats') S.wtab = 'list';
   var right = '';
-  var head = top('業務', right) + utabs('wtab', [['list', 'リスト'], ['gantt', 'ガント'], ['stats', '参加率']]);
+  var head = top('業務', right) + utabs('wtab', [['list', 'リスト'], ['gantt', 'ガント']]);
   if (S.wtab === 'stats') return head + '<div class="body">' + projStats() + '</div>';
   var tbar = '<div class="tbar"><span class="muted" style="font-size:12px">表示</span><span class="seg" role="group" aria-label="表示する細かさ">' + LEVELS.map(function (l) {
       return '<button data-act="depth" data-v="' + l[0] + '" aria-pressed="' + (String(S.depth || 2) === l[0] && !Object.keys(S.fold || {}).length) + '"><i class="lvd" style="background:' + LVC[LEVELS.indexOf(l)] + '"></i>' + l[1] + '</button>'; }).join('') + '</span>' + (S.wtab === 'gantt' ? '<span class="zoom"><button class="ib" data-act="zoom" data-v="-1" aria-label="縮小">−</button><button class="ib" data-act="zoom" data-v="1" aria-label="拡大">＋</button></span>' : '') +
@@ -2465,6 +2509,173 @@ document.addEventListener('click', function (e) {
   rerender({ id: ev.id, c: 't' });
   var el = document.querySelector('.cell[data-id="' + ev.id + '"][data-c="t"]'); if (el) { el.select(); el.scrollIntoView({ block: 'center' }); }
 }, true);
+
+// ---------- ux5: 業務＝全体ガントで俯瞰、イベントの記録は右のパネル ----------
+function seriesOf(p) { return String(p.name || '').replace(/\s*(19|20)\d{2}\s*/g, ' ').trim() || p.name; }
+function fyOf(p) { var d = new Date(dayOf(p.start)); return d.getUTCMonth() < 3 ? d.getUTCFullYear() - 1 : d.getUTCFullYear(); }
+function pf() { if (!S.pf) S.pf = { st: 'now', fy: '', ser: '' }; return S.pf; }
+function visibleRoots() {
+  var f = pf();
+  var a = S.projects.filter(function (r) {
+    if (!(isAdmin() || involved(r, S.me))) return false;
+    if (f.st === 'now' && ended(r)) return false;
+    if (f.st === 'end' && !ended(r)) return false;
+    if (f.fy && String(fyOf(r)) !== f.fy) return false;
+    if (f.ser && seriesOf(r) !== f.ser) return false;
+    return true;
+  });
+  return S.manualOrder ? a : a.sort(byStart);
+}
+function filterBar() {
+  var f = pf(), ps = S.projects.filter(function (r) { return isAdmin() || involved(r, S.me); });
+  var fys = [], sers = [];
+  ps.forEach(function (p) { var y = String(fyOf(p)), s = seriesOf(p); if (fys.indexOf(y) < 0) fys.push(y); if (sers.indexOf(s) < 0) sers.push(s); });
+  fys.sort().reverse(); sers.sort();
+  var seg = [['now', '進行中・予定'], ['end', '終了'], ['all', 'すべて']].map(function (x) { return '<button data-pf="st" data-v="' + x[0] + '" aria-pressed="' + (f.st === x[0]) + '">' + x[1] + '</button>'; }).join('');
+  return '<span class="pfil"><span class="seg pseg" role="group" aria-label="期間">' + seg + '</span>' +
+    '<select class="input sm" data-pfs="fy" aria-label="年度"><option value="">全年度</option>' + fys.map(function (y) { return '<option value="' + y + '"' + (f.fy === y ? ' selected' : '') + '>' + y + '年度</option>'; }).join('') + '</select>' +
+    '<select class="input sm" data-pfs="ser" aria-label="種類"><option value="">全種類</option>' + sers.map(function (s) { return '<option' + (f.ser === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></span>';
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-pf]'); if (!b) return;
+  e.stopImmediatePropagation(); pf()[b.dataset.pf] = b.dataset.v; save(); render();
+}, true);
+document.addEventListener('change', function (e) {
+  var el = e.target; if (!el.dataset || !el.dataset.pfs) return;
+  e.stopImmediatePropagation(); pf()[el.dataset.pfs] = el.value; save(); render();
+}, true);
+
+var DOC = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>';
+function decorateWork2() {
+  if (S.view !== 'projects') return;
+  if (S.wtab === 'stats') S.wtab = 'list';
+  var tb = document.querySelector('.tbar');
+  if (tb && !tb.querySelector('.pfil')) { var vb = tb.querySelector('.vbtn'); (vb || tb.firstChild) ? (vb || tb.firstChild).insertAdjacentHTML('afterend', filterBar()) : tb.insertAdjacentHTML('afterbegin', filterBar()); }
+  document.querySelectorAll('.wcard .wr.head[data-row] .wm, .gg .gr.g0[data-row] .gl').forEach(function (box) {
+    if (box.querySelector('.recb')) return;
+    var id = box.closest('[data-row]').dataset.row, on = UI.rec === id;
+    var html = '<button class="recb' + (on ? ' on' : '') + '" data-act="rec" data-id="' + id + '" title="イベントの記録" aria-label="イベントの記録">' + DOC + '</button>';
+    if (box.classList.contains('gl')) { var ct = box.querySelector('.ct'); if (ct) ct.insertAdjacentHTML('afterend', html); }
+    else box.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+// ----- 右のパネル（イベントの記録・参加率）
+function recOK(p) { return isAdmin() || isLead(p, S.me); }
+function recHTML(p) {
+  var ok = recOK(p), dis = ok ? '' : ' disabled', g = progress(p), lk = p.links || [];
+  var f = function (label, inner) { return '<div class="rf"><label>' + label + '</label>' + inner + '</div>'; };
+  return '<div class="rh"><div class="rt"><small>' + esc(seriesOf(p)) + '・' + fyOf(p) + '年度</small><b>' + esc(p.name) + '</b></div><button class="ib" data-act="recClose" aria-label="閉じる">' + ic('x') + '</button></div>' +
+    '<div class="rb">' +
+    '<section><h3>概要</h3>' +
+      f('目的', '<textarea class="input" rows="2" data-rf="purpose"' + dis + ' placeholder="何のためのイベントか">' + esc(p.purpose || '') + '</textarea>') +
+      '<div class="two">' + f('日程', '<div class="rv num">' + shortDate(p.start) + ' – ' + shortDate(p.end) + '</div>') + f('場所', '<input class="input" data-rf="place"' + dis + ' value="' + esc(p.place || '') + '">') + '</div>' +
+      '<div class="two">' + f('担当部', '<select class="input" data-rf="unit"' + dis + '>' + ['教育部', '催事部', '外務部', '会計', '代表'].map(function (u) { return '<option' + (p.unit === u ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select>') +
+        f('告知', '<select class="input" data-rf="announce"' + dis + '><option value="before"' + (p.announce !== 'done' ? ' selected' : '') + '>告知前</option><option value="done"' + (p.announce === 'done' ? ' selected' : '') + '>告知済み</option></select>') + '</div>' +
+    '</section>' +
+    '<section><h3>体制</h3>' + f('リーダー・メンバー', '<div class="mfield">' + teamBtn(p, editSelf(p) ? '' : ' disabled') + '</div>') +
+      '<div class="rv muted">業務 ' + g.n + '件・完了 ' + g.d + (g.late ? '・<span class="bad">遅れ ' + g.late + '</span>' : '') + '</div></section>' +
+    '<section><h3>結果</h3>' +
+      '<div class="two">' + f('参加数', '<input class="input num" type="number" min="0" data-rf="reg"' + dis + ' value="' + (p.reg || 0) + '">') + f('参加率', '<div class="rv num">' + pct(p) + '%<small class="muted">（部員 ' + (S.club || 150) + '）</small></div>') + '</div>' +
+      f('振り返り', '<textarea class="input" rows="4" data-rf="review"' + dis + ' placeholder="良かったこと・次回への改善">' + esc(p.review || '') + '</textarea>') +
+      f('資料', '<div class="rl">' + lk.map(function (u, i) { return '<div class="rli"><a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(host(u) || u) + ' ↗</a>' + (ok ? '<button class="ib" data-act="recLinkDel" data-i="' + i + '" aria-label="削除">' + ic('x') + '</button>' : '') + '</div>'; }).join('') +
+        (ok ? '<input class="input" data-rlink="1" placeholder="URL を貼って Enter" autocomplete="off">' : (lk.length ? '' : '<span class="dim">—</span>')) + '</div>') +
+    '</section></div>';
+}
+function statsHTML() { return '<div class="rh"><div class="rt"><b>イベント参加率</b></div><button class="ib" data-act="recClose" aria-label="閉じる">' + ic('x') + '</button></div><div class="rb">' + projStats() + '</div>'; }
+function drawRec() {
+  var d = document.getElementById('rec');
+  var p = UI.rec && UI.rec !== 'stats' ? task(UI.rec) : null;
+  if (!UI.rec || (UI.rec !== 'stats' && !p)) { if (d) d.remove(); document.body.classList.remove('recon'); UI.rec = null; return; }
+  if (!d) { d = document.createElement('aside'); d.id = 'rec'; d.className = 'rec'; d.setAttribute('aria-label', 'イベントの記録'); document.body.appendChild(d); }
+  var a = document.activeElement, keep = a && d.contains(a) && a.dataset ? (a.dataset.rf || (a.dataset.rlink ? 'rlink' : '')) : '';
+  d.innerHTML = UI.rec === 'stats' ? statsHTML() : recHTML(p);
+  document.body.classList.add('recon');
+  if (keep) { var el = d.querySelector(keep === 'rlink' ? '[data-rlink]' : '[data-rf="' + keep + '"]'); if (el) el.focus(); }
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="rec"],[data-act="recClose"],[data-act="recLinkDel"],[data-act="pstats"]'); if (!b) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act;
+  if (a === 'rec') UI.rec = UI.rec === b.dataset.id ? null : b.dataset.id;
+  else if (a === 'pstats') UI.rec = 'stats';
+  else if (a === 'recClose') UI.rec = null;
+  else if (a === 'recLinkDel') { var p = task(UI.rec); if (p && p.links) { p.links.splice(+b.dataset.i, 1); save(); } }
+  render();
+}, true);
+document.addEventListener('input', function (e) {
+  var el = e.target; if (!el.dataset || !el.dataset.rf || el.tagName === 'SELECT') return;
+  var p = task(UI.rec); if (!p || !recOK(p)) return;
+  p[el.dataset.rf] = el.dataset.rf === 'reg' ? Math.max(0, +el.value || 0) : el.value; save();
+  if (el.dataset.rf === 'reg') { var v = el.closest('.two').querySelectorAll('.rv')[0]; if (v) v.firstChild.textContent = pct(p) + '%'; }
+}, true);
+document.addEventListener('change', function (e) {
+  var el = e.target; if (!el.dataset || !el.dataset.rf) return;
+  var p = task(UI.rec); if (!p || !recOK(p)) return; e.stopImmediatePropagation();
+  if (el.tagName === 'SELECT') { p[el.dataset.rf] = el.value; if (el.dataset.rf === 'announce') p.kind = 'event'; save(); render(); }
+  else if (el.dataset.rf === 'reg') render();
+}, true);
+document.addEventListener('keydown', function (e) {
+  var el = e.target;
+  if (el.dataset && el.dataset.rlink && e.key === 'Enter') {
+    e.preventDefault(); var v = el.value.trim(), p = task(UI.rec); if (!v || !p) return;
+    if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+    (p.links = p.links || []).push(v); save(); render(); return;
+  }
+  if (e.key === 'Escape' && UI.rec && !document.getElementById('tp')) { UI.rec = null; render(); }
+});
+
+// ----- ＋：新しいイベント／過去のイベントから作る
+function cloneKids(src, delta) {
+  return kids(src).map(function (k) {
+    var c = { id: uid('k'), title: k.title || k.name, who: '', start: isoOf(dayOf(k.start) + delta), end: isoOf(dayOf(k.end) + delta), done: false };
+    var ch = cloneKids(k, delta); if (ch.length) { c.kids = ch; delete c.done; }
+    return c;
+  });
+}
+function nextName(n) { return /(19|20)\d{2}/.test(n) ? n.replace(/(19|20)\d{2}/, function (y) { return String(+y + 1); }) : n + '（コピー）'; }
+function copyModal() {
+  var src = S.projects.slice().sort(function (a, b) { return dayOf(b.start) - dayOf(a.start); });
+  var pick = src.filter(function (p) { return nodesOf(p).length > 1; })[0] || src[0];
+  return dlg('過去のイベントから作る',
+    '<div class="fld"><label for="cpS">元にするイベント</label><select id="cpS" class="input">' + src.map(function (p) { return '<option value="' + p.id + '"' + (p === pick ? ' selected' : '') + '>' + esc(p.name) + '（' + shortDate(p.start) + '・業務 ' + (nodesOf(p).length - 1) + '件）</option>'; }).join('') + '</select></div>' +
+    '<div class="two"><div class="fld"><label for="cpN">名前</label><input id="cpN" class="input" value="' + esc(pick ? nextName(pick.name) : '') + '"></div><div class="fld"><label for="cpD">開始日</label><input id="cpD" class="input num" type="date" value="' + (pick ? isoOf(dayOf(pick.start) + 364 * DAY) : isoOf(TODAY)) + '"></div></div>' +
+    '<div class="muted" style="font-size:12px">業務の構成と期間の長さをコピーします。担当者・完了・結果はコピーしません。</div>',
+    '<span class="sp"></span><button class="btn" data-act="close">やめる</button><button class="btn primary" data-act="cpGo">作成</button>');
+}
+document.addEventListener('change', function (e) {
+  if (e.target.id !== 'cpS') return; var p = task(e.target.value); if (!p) return;
+  document.getElementById('cpN').value = nextName(p.name); document.getElementById('cpD').value = isoOf(dayOf(p.start) + 364 * DAY);
+}, true);
+function fabHTML() {
+  if (S.view !== 'projects' || !isAdmin()) return '';
+  return '<div class="efabw' + (UI.fm ? ' open' : '') + '">' + (UI.fm ? '<div class="fmenu" role="menu"><button role="menuitem" data-act="addEvent">' + ic('plus') + '新しいイベント</button><button role="menuitem" data-act="copyEvent">' + DOC + '過去のイベントから作る</button></div>' : '') +
+    '<button class="efab" data-act="fabMenu" title="イベントを追加" aria-label="イベントを追加" aria-expanded="' + !!UI.fm + '"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
+}
+function placeFab() { var f = document.querySelector('.efabw'); if (f) f.remove(); var h = fabHTML(); if (h) document.body.insertAdjacentHTML('beforeend', h); }
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="fabMenu"],[data-act="copyEvent"],[data-act="cpGo"]');
+  if (!b) { if (UI.fm && !(e.target.closest && e.target.closest('.efabw'))) { UI.fm = false; placeFab(); } return; }
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act;
+  if (a === 'fabMenu') { UI.fm = !UI.fm; placeFab(); return; }
+  if (a === 'copyEvent') { UI.fm = false; placeFab(); renderCopy(); return; }
+  if (a === 'cpGo') {
+    var src = task(val('cpS')), nm = val('cpN').trim(), d = val('cpD'); if (!src || !nm || !d) { toast('名前と開始日を入れてください'); return; }
+    var delta = dayOf(d) - dayOf(src.start);
+    var ev = { id: uid('pj'), name: nm, kind: src.kind || 'event', announce: 'before', reg: 0, unit: src.unit, who: '', start: d, end: isoOf(dayOf(src.end) + delta), tasks: cloneKids(src, delta), purpose: src.purpose || '', place: src.place || '' };
+    S.projects.push(ev); closeCopy(); pf().st = 'all'; pf().fy = ''; pf().ser = ''; UI.rec = ev.id; save(); render(); toast('「' + nm + '」を作りました');
+  }
+}, true);
+function renderCopy() { var o = document.getElementById('cpov'); if (!o) { o = document.createElement('div'); o.id = 'cpov'; document.body.appendChild(o); } o.innerHTML = copyModal(); var f = o.querySelector('#cpN'); if (f) f.focus(); }
+function closeCopy() { var o = document.getElementById('cpov'); if (o) o.remove(); }
+document.addEventListener('click', function (e) {
+  var o = document.getElementById('cpov'); if (!o || !o.contains(e.target)) return;
+  var b = e.target.closest('[data-act]'); if (!b) return;
+  if (b.dataset.act === 'close') { e.stopImmediatePropagation(); if (!b.classList.contains('ov') || e.target === b) closeCopy(); }
+}, true);
+
+var _render4 = render; render = function () { _render4.apply(this, arguments); decorateWork2(); drawRec(); };
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
