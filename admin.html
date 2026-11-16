@@ -1308,6 +1308,39 @@ svg.bki{width:16px;height:16px;flex:none;color:#9CA3AF}
 .depadd.dsel:hover{border-color:var(--text)}
 .ud{display:block}
 @media (max-width:1500px){ body.recon .tkboth{grid-template-columns:minmax(0,1fr)} }
+/* ---------- ux20 差し色を最小に ---------- */
+.fct svg.fi,.fh2r h2 svg.fi,.ft svg.fi,.ft.on svg.fi,.fh svg.fi,.fadd.open svg.fi,.dash .li .t > svg.fi{color:#9CA3AF !important}
+.ft.on svg.fi{color:#374151 !important}
+.evd{background:#9CA3AF !important}
+.avs .av.lead{border-color:#374151 !important;box-shadow:0 0 0 1px #374151 !important;background:#fff !important;color:var(--text) !important}
+.fh2r .tbtn:hover:not([disabled]) .avs .av.lead,.fcf .tbtn:hover:not([disabled]) .avs .av.lead{box-shadow:0 0 0 1px #374151,0 0 0 3px #E5E7EB !important}
+svg.crown{fill:#374151}
+.tpi .lead[aria-pressed="true"]{background:#111827;border-color:#111827;color:#fff}
+.tpi .lead[aria-pressed="true"] svg.crown{fill:#fff;stroke:#fff}
+[data-d="0"] .lvb,[data-d="1"] .lvb,[data-d="2"] .lvb,[data-d="3"] .lvb{background:#D1D5DB !important}
+[data-d="0"] .lvb{background:#6B7280 !important}
+.bar.hlb{box-shadow:none !important}
+.bar.hlb-late,.bar.hlb-over{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #DC2626 !important}
+.fcard.isfc.dn .fcb .b i{background:#9CA3AF}
+.tck[aria-pressed="true"]{background:#111827;border-color:#111827}
+.tck:hover:not([disabled]){border-color:#111827;color:#111827}
+.vdots i{background:#9CA3AF !important}
+svg.bki,.tki[aria-pressed="true"] svg.bki,.tkh0 > svg.bki{color:#9CA3AF !important}
+.tki[aria-pressed="true"]{background:#F3F4F6 !important;box-shadow:inset 3px 0 0 #111827 !important}
+.ur.ufix .ufl{color:#6B7280 !important}
+.tkboth .tktab .ph::before,.tkboth .tkmap .ph::before{display:none}
+.tkst.pub{color:var(--text) !important;border-color:var(--line2) !important;background:#fff !important}
+.uc{color:#374151}
+.ur .uc.num,.ur input.uc{color:#374151;font-weight:600}
+.fh2r h2 .ied:hover:not(.editing)::after{opacity:.7}
+.fhm{margin-top:6px}
+.fhmt.empty:not(.editing){border:1px dashed var(--line);border-radius:8px;padding:6px 10px;margin-left:0;min-height:0}
+.gnote{max-width:420px;margin:60px auto;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--sub)}
+.gnote svg.i{width:36px;height:36px;color:#9CA3AF}
+.gnote b{font-size:16px;color:var(--text)}
+.gnote span{font-size:13px;line-height:1.6}
+.fhm,.fhmt{text-align:left}
+.fhm{width:100%;max-width:820px}
 </style>
 </head>
 <body>
@@ -1578,15 +1611,35 @@ function mapSVG(g, sel, avail) {
   Object.keys(TK).forEach(function (k) { TK[k].sort(function (p, q) { return KEY[k + ':' + p] - KEY[k + ':' + q]; }); });
   var out = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="路線図">';
   var HS = [], VS = [];
+  var OCC = g.nodes.map(function (n) { return at[n.id]; }), KIND = {}; g.nodes.forEach(function (n) { KIND[n.id] = n.kind; });
+  var blocked = function (x, ya, yb) { return OCC.some(function (p) { return p.x === x && p.y > ya && p.y < yb; }); };
+  var pathOf = function (P) {
+    var d = 'M' + P[0][0] + ' ' + P[0][1];
+    for (var i = 1; i < P.length - 1; i++) {
+      var a = P[i - 1], c = P[i], n = P[i + 1];
+      var r = Math.min(8, Math.abs(c[0] - a[0] + c[1] - a[1]) / 2, Math.abs(n[0] - c[0] + n[1] - c[1]) / 2);
+      var sx = Math.sign(c[0] - a[0]), sy = Math.sign(c[1] - a[1]), tx = Math.sign(n[0] - c[0]), ty = Math.sign(n[1] - c[1]);
+      d += ' L' + (c[0] - sx * r) + ' ' + (c[1] - sy * r) + ' Q' + c[0] + ' ' + c[1] + ' ' + (c[0] + tx * r) + ' ' + (c[1] + ty * r);
+    }
+    var L = P[P.length - 1]; return d + ' L' + L[0] + ' ' + L[1];
+  };
   g.edges.forEach(function (e) {
     var a = at[e.from], b = at[e.to]; if (!a || !b) return;
     var hot = sel && (e.from === sel || e.to === sel), st = { c: hot ? '#2563EB' : '#98A2B3', w: hot ? 2.2 : 1.6, d: e.ext };
-    out += '<path d="' + seg(a, b) + '" fill="none" stroke="' + st.c + '" stroke-width="' + st.w + '"' + (e.ext ? ' stroke-dasharray="3 5"' : '') + ' stroke-linecap="round"/>';
     var x1 = a.x, y1 = a.y + 9, x2 = b.x, y2 = b.y - 9;
-    if (x1 === x2) { VS.push({ x: x1, y1: y1, y2: y2, e: e }); return; }
-    var k = TK[b.y] ? Math.max(0, TK[b.y].indexOf(a.x)) : 0, ym = Math.max(y1 + 14, y2 - ROW / 2 + 9 - k * 16);
-    VS.push({ x: x1, y1: y1, y2: ym, e: e }); VS.push({ x: x2, y1: ym, y2: y2, e: e });
-    HS.push({ y: ym, x1: Math.min(x1, x2), x2: Math.max(x1, x2), e: e, st: st });
+    var k = TK[b.y] ? Math.max(0, TK[b.y].indexOf(a.x)) : 0, ym = Math.max(y1 + 14, y2 - ROW / 2 + 9 - k * 16), ys = a.y + ROW / 2 + 2;
+    var b1 = blocked(x1, a.y, b.y), b2 = blocked(x2, a.y, b.y), P;
+    if (KIND[e.to] === 'goal' && b1) return;
+    if (x1 === x2 && !b1) P = [[x1, y1], [x2, y2]];
+    else if (!b1) P = [[x1, y1], [x1, ym], [x2, ym], [x2, y2]];
+    else if (!b2 && x1 !== x2) P = [[x1, y1], [x1, ys], [x2, ys], [x2, y2]];
+    else { var gx = Math.min(x1, x2) + COL - 14; P = [[x1, y1], [x1, ys], [gx, ys], [gx, ym], [x2, ym], [x2, y2]]; }
+    out += '<path d="' + pathOf(P) + '" fill="none" stroke="' + st.c + '" stroke-width="' + st.w + '"' + (e.ext ? ' stroke-dasharray="3 5"' : '') + ' stroke-linecap="round"/>';
+    for (var i = 0; i < P.length - 1; i++) {
+      var p0 = P[i], p1 = P[i + 1];
+      if (p0[0] === p1[0]) VS.push({ x: p0[0], y1: Math.min(p0[1], p1[1]), y2: Math.max(p0[1], p1[1]), e: e });
+      else HS.push({ y: p0[1], x1: Math.min(p0[0], p1[0]), x2: Math.max(p0[0], p1[0]), e: e, st: st });
+    }
   });
   var M = 12, G = 5;
   HS.forEach(function (h) {
@@ -3339,7 +3392,7 @@ document.addEventListener('click', function (e) {
   if (e.target.closest('[data-act]') !== b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, f = curFolder();
-  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = b.dataset.id; UI.rec = null; UI.sp = null; save(); render(); return; }
+  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } UI.fopen = {}; S.fcur = b.dataset.id; UI.rec = null; UI.sp = null; save(); render(); return; }
   if (a === 'ftog') { UI.fopen = UI.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); UI.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); render(); return; }
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
@@ -3416,7 +3469,10 @@ function fhead2() {
 viewWork = function () {
   curFolder();
   var body;
-  if (S.fmode === 'gantt') {
+  if (S.fmode === 'gantt' && window.innerWidth < 760) {
+    S.wtab = 'list';
+    body = '<div class="body"><div class="gnote">' + GANTT + '<b>ガントチャートはPCで表示できます</b><span>スマホでは画面が狭いため表示できません。PCで開いてください。</span><button class="btn" data-act="fmode" data-v="card">カードで見る</button></div></div>';
+  } else if (S.fmode === 'gantt') {
     S.wtab = 'gantt';
     var h = viewWork0(); h = h.slice(h.indexOf('</div>') + 6).replace(/<div class="utabs">[\s\S]*?<\/div>/, '');
     body = h;
@@ -3510,7 +3566,7 @@ function linkify(t) { return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$
 function fmemoHTML(f) {
   if (!f) return '';
   var can = editSelf(f) || isLead(f, S.me), m = f.memo || '';
-  if (!m && !UI.fmNew) return can ? '<button class="fhadd" data-act="fmNew">＋ メモ</button>' : '';
+  if (!m && !can) return '';
   var long = m.split('\n').length > 3 || m.length > 160, open = UI.fmx === f.id;
   return '<div class="fhm' + (long && !open ? ' clamp' : '') + '"><div class="fhmt' + (can ? ' ied' : '') + (m ? '' : ' empty') + '"' + (can ? ' data-act="ied" data-f="memo" data-id="' + f.id + '"' : '') + ' data-ph="メモ（目的・決まったこと・引き継ぎ・資料URLなど）">' + linkify(m) + '</div>' +
     (long ? '<button class="fhmx" data-act="fmx">' + (open ? '閉じる' : '…詳細を表示') + '</button>' : '') + '</div>';
@@ -3665,7 +3721,7 @@ document.addEventListener('contextmenu', function (e) {
   var id = el.dataset.id || el.dataset.row, n = id && task(id); if (!n) return;
   e.preventDefault(); closePop(); openCM(n, e.clientX, e.clientY);
 });
-function goFolder(id, mode) { if (id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = id; if (mode) S.fmode = mode; UI.sp = null; save(); render(); }
+function goFolder(id, mode) { if (id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } UI.fopen = {}; S.fcur = id; if (mode) S.fmode = mode; UI.sp = null; save(); render(); }
 document.addEventListener('click', function (e) {
   var c = e.target.closest && e.target.closest('[data-cm]');
   if (c) {
@@ -3694,7 +3750,7 @@ document.addEventListener('click', function (e) {
   var a = b.dataset.act;
   if (a === 'sideTog') { S.sideC = !S.sideC; save(); render(); applyChrome12(); }
   else if (a === 'ftreeTog') { S.ftreeC = !S.ftreeC; save(); render(); }
-  else if (a === 'fback') { var h = UI.fhist || []; if (!h.length) return; S.fcur = h.pop(); UI.sp = null; save(); render(); }
+  else if (a === 'fback') { var h = UI.fhist || []; if (!h.length) return; S.fcur = h.pop(); UI.fopen = {}; UI.sp = null; save(); render(); }
   else if (a === 'gname') { var n = task(b.dataset.id); if (!n) return; closePop(); goFolder(n.id); }
   else if (a === 'gwho') { var n2 = task(b.dataset.id); if (!n2) return; popAt(b, whoPop(n2)); }
 }, true);
@@ -3840,9 +3896,9 @@ document.addEventListener('click', function (e) {
 LEVELS = [['1', '1段'], ['2', '2段'], ['3', '3段'], ['9', 'すべて']];
 HLS = [
   ['late', '期限切れ', '#DC2626'],
-  ['soon', '期限が近い', '#D97706'],
-  ['over', '中身が期限を超えたフォルダー', '#B91C1C'],
-  ['nobody', '担当未定', '#6B7280'],
+  ['soon', '期限が近い', '#6B7280'],
+  ['over', '中身が期限を超えたフォルダー', '#DC2626'],
+  ['nobody', '担当未定', '#D1D5DB'],
   ['active', '進行中', '#2563EB'],
   ['mine', '自分の担当', '#111827']
 ];
