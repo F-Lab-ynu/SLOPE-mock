@@ -1380,6 +1380,12 @@ svg.crown{fill:#F59E0B}
 .tpill .tpn.none{color:#D97706;font-weight:500}
 .tpill .more{flex:none}
 .tpill .avs .av{width:22px;height:22px}
+/* ファイルの担当もフォルダーと同じ（顔だけ） */
+.fwho:has(.fsel){border-color:transparent !important;background:transparent !important;padding:0 !important}
+.fwho:has(.fsel):hover .av{box-shadow:0 0 0 2px var(--line2)}
+.fwho .fwn,.fwho .fwc,.fwho .fcw{display:none}
+.fwho .av{width:24px;height:24px}
+.fwho .av.nob{border:1.5px dashed #D97706;box-shadow:none;background:#fff}
 </style>
 </head>
 <body>
@@ -3600,7 +3606,7 @@ function fcard(n) {
       '<div class="fcm num">' + shortDate(n.start) + ' – ' + shortDate(n.end) + '</div>' +
       (n.memo ? '<div class="fmemo sm">' + esc(n.memo) + '</div>' : '') +
       '<div class="fcb"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num">' + g.d + '/' + g.n + '</span></div>' +
-      '<div class="fcf">' + teamPill(n, canAssign(n) ? '' : ' disabled') + '<span class="fcc">' + (nf ? FOLD + nf : '') + (nt ? '<span class="tci"></span>' + nt : '') + '</span></div>' +
+      '<div class="fcf">' + teamBtn(n, canAssign(n) ? '' : ' disabled', true) + '<span class="fcc">' + (nf ? FOLD + nf : '') + (nt ? '<span class="tci"></span>' + nt : '') + '</span></div>' +
       (ed ? '<button class="fcx" data-act="edit" data-id="' + n.id + '" aria-label="編集" title="編集">' + ic('more') + '</button>' : '') +
     '</div>';
   }
@@ -3623,7 +3629,7 @@ function fhead2() {
   var srt = sortOf(f), canSort = true;
   return '<div class="fh2">' + (f || mine ? path : '') +
     '<div class="fh2r">' + backBtn() + '<h2>' + (f ? FOLD : '') + '<span' + (ed ? ' class="ied" data-act="ied" data-f="t" data-id="' + f.id + '" title="タップで名前を編集"' : '') + '>' + esc(title) + '</span></h2>' +
-      (f ? (editSelf(f) ? '<button class="fh2m fper num' + (over ? ' bad' : '') + '" data-act="fper" title="期間を変更">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</button>' : '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>') + teamPill(f, canAssign(f) ? '' : ' disabled') : '') +
+      (f ? (editSelf(f) ? '<button class="fh2m fper num' + (over ? ' bad' : '') + '" data-act="fper" title="期間を変更">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</button>' : '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>') + teamBtn(f, canAssign(f) ? '' : ' disabled', true) : '') +
       '<span class="sp"></span>' +
       (!mine && !gantt ? '<span class="srtw"><button class="ib fhb' + (srt !== 'manual' ? ' on' : '') + '" data-act="srt" title="並べ替え：' + SORTS.filter(function (x) { return x[0] === srt; })[0][1] + '" aria-label="並べ替え" aria-expanded="' + !!UI.srt + '">' + SORTI + '</button>' +
         (UI.srt ? '<div class="srtm" role="menu">' + SORTS.map(function (x) { return '<button role="menuitemradio" data-act="srtv" data-v="' + x[0] + '" aria-checked="' + (srt === x[0]) + '"' + (canSort ? '' : ' disabled') + '>' + x[1] + '</button>'; }).join('') + '</div>' : '') + '</span>' : '') +
