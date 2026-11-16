@@ -1204,6 +1204,33 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
 .gr.isf .gname:hover{background:transparent;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .gr:not(.isf) .gname{cursor:default}
 .gr:not(.isf) .gname:hover{background:rgba(17,24,39,.05)}
+/* ---------- ux14 ---------- */
+.fh2r h2{overflow:visible;padding:2px 0}
+.fh2r h2 .ied{padding:0 6px;margin-left:-6px}
+.ied.editing{box-shadow:none !important;outline:2px solid var(--accent) !important;outline-offset:1px;background:#fff}
+.fh2r h2 .ied.editing::after{display:none}
+.fper{border:0;background:transparent;font:inherit;font-size:12px;color:var(--muted);padding:3px 6px;border-radius:6px;cursor:pointer}
+.fper:hover{background:var(--hover);color:var(--text)}
+.perpop{width:320px}
+.perpop .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 4px}
+.dsl{position:relative;padding:14px 4px 4px}
+.dslt{position:relative;height:6px;border-radius:3px;background:var(--hover);margin:0 8px}
+.dslf{position:absolute;top:0;bottom:0;background:var(--text);border-radius:3px}
+.dsl input[type=range]{position:absolute;left:4px;right:4px;top:6px;width:calc(100% - 8px);margin:0;height:22px;background:transparent;pointer-events:none;-webkit-appearance:none;appearance:none}
+.dsl input[type=range]::-webkit-slider-runnable-track{background:transparent;height:22px}
+.dsl input[type=range]::-moz-range-track{background:transparent}
+.dsl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--text);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:grab;margin-top:2px}
+.dsl input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--text);cursor:grab}
+.dsll{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);padding:8px 4px 0}
+.gr.gediting .gl{background:#EFF6FF !important}
+.gin{flex:1;min-width:0;height:28px;border:1px solid var(--accent);border-radius:6px;padding:0 8px;font:inherit;background:#fff;outline:0}
+.gsel2{flex:0 0 96px;width:96px;height:28px;border:1px solid var(--line2);border-radius:6px;font:inherit;font-size:12px;background:#fff}
+.gwho2{flex:0 0 96px;width:96px;display:flex}
+.gwho2 .tbtn{width:100%;border-color:var(--line2);background:#fff}
+.gok{display:flex;gap:2px;flex:none}
+.gx,.gy{width:26px;height:26px;border-radius:6px;border:1px solid var(--line2);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
+.gy{background:var(--text);border-color:var(--text);color:#fff}
+.gx svg.i,.gy svg.i{width:14px;height:14px}
 </style>
 </head>
 <body>
@@ -3286,7 +3313,7 @@ function fhead2() {
   var over = f && nodesOf(f).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0) > dayOf(f.end);
   return '<div class="fh2">' + (f || mine ? path : '') +
     '<div class="fh2r">' + backBtn() + '<h2>' + (f ? FOLD : '') + esc(title) + '</h2>' +
-      (f ? '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>' + teamBtn(f, editSelf(f) ? '' : ' disabled', true) : '') +
+      (f ? (editSelf(f) ? '<button class="fh2m fper num' + (over ? ' bad' : '') + '" data-act="fper" title="期間を変更">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</button>' : '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>') + teamBtn(f, editSelf(f) ? '' : ' disabled', true) : '') +
       '<span class="sp"></span>' +
       (f ? '<button class="ib fhb' + (UI.rec === f.id ? ' on' : '') + '" data-act="rec" data-id="' + f.id + '" title="情報" aria-label="情報">' + INFO + '</button>' : '') +
       '<span class="vsw" role="group" aria-label="表示"><button data-act="fmode" data-v="card" aria-pressed="' + !gantt + '" title="カード" aria-label="カード">' + GRID + '</button><button data-act="fmode" data-v="gantt" aria-pressed="' + gantt + '" title="ガント" aria-label="ガント">' + GANTT + '</button></span>' +
@@ -3300,6 +3327,7 @@ viewWork = function () {
     var h = viewWork0(); h = h.slice(h.indexOf('</div>') + 6).replace(/<div class="utabs">[\s\S]*?<\/div>/, '');
     body = h;
   } else {
+    S.wtab = 'list';
     var f = curFolder(), list = visibleRoots();
     var add = manages(f) && S.fcur !== 'mine' ? (UI.fadd ? '<div class="fcard fadd open"><button data-act="newF">' + FOLD + 'フォルダー</button>' + (f ? '<button data-act="newT"><span class="tci"></span>業務</button>' : '') + '</div>' : '<button class="fcard fadd" data-act="fadd" aria-label="追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>') : '';
     body = '<div class="body"><div class="fgrid">' + list.map(fcard).join('') + add + '</div>' + (!list.length && !add ? '<div class="empty big">まだ何もありません</div>' : '') + '</div>';
@@ -3371,7 +3399,7 @@ function fhead2() {
   var srt = sortOf(f), canSort = true;
   return '<div class="fh2">' + (f || mine ? path : '') +
     '<div class="fh2r">' + backBtn() + '<h2>' + (f ? FOLD : '') + '<span' + (ed ? ' class="ied" data-act="ied" data-f="t" data-id="' + f.id + '" title="タップで名前を編集"' : '') + '>' + esc(title) + '</span></h2>' +
-      (f ? '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>' + teamBtn(f, canAssign(f) ? '' : ' disabled', true) : '') +
+      (f ? (editSelf(f) ? '<button class="fh2m fper num' + (over ? ' bad' : '') + '" data-act="fper" title="期間を変更">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</button>' : '<span class="fh2m num' + (over ? ' bad' : '') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + '</span>') + teamBtn(f, canAssign(f) ? '' : ' disabled', true) : '') +
       '<span class="sp"></span>' +
       (!mine && !gantt ? '<span class="srtw"><button class="ib fhb' + (srt !== 'manual' ? ' on' : '') + '" data-act="srt" title="並べ替え：' + SORTS.filter(function (x) { return x[0] === srt; })[0][1] + '" aria-label="並べ替え" aria-expanded="' + !!UI.srt + '">' + SORTI + '</button>' +
         (UI.srt ? '<div class="srtm" role="menu">' + SORTS.map(function (x) { return '<button role="menuitemradio" data-act="srtv" data-v="' + x[0] + '" aria-checked="' + (srt === x[0]) + '"' + (canSort ? '' : ' disabled') + '>' + x[1] + '</button>'; }).join('') + '</div>' : '') + '</span>' : '') +
@@ -3579,6 +3607,106 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCM(); closePop(); } });
 window.addEventListener('scroll', function () { closeCM(); closePop(); }, true);
 var _render12 = render; render = function () { closePop(); _render12.apply(this, arguments); applyChrome12(); decorateGantt12(); };
+
+// ---------- ux14: ガントの行内編集（✕／✓）・日付スライダー ----------
+var CHK = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+function geditRow(row, n) {
+  var gl = row.querySelector('.gl'); if (!gl) return;
+  var d = UI.gdraft;
+  var nm = gl.querySelector('.gname'); if (nm) nm.outerHTML = '<input class="gin" data-gin="1" value="' + esc(d.name) + '" aria-label="名前" autocomplete="off">';
+  var who = gl.querySelector('.gwho');
+  if (who) who.outerHTML = isFolder(n) ? '<span class="gwho2">' + teamBtn(n, canAssign(n) ? '' : ' disabled', true) + '</span>'
+    : '<select class="gsel2" data-gsel="1"' + (canAssign(n) ? '' : ' disabled') + ' aria-label="担当">' + whoOpts(n).replace(' selected', '').replace('value="' + d.who + '"', 'value="' + d.who + '" selected') + '</select>';
+  var ed = gl.querySelector('.gedit'); if (ed) ed.outerHTML = '<span class="gok"><button class="gx" data-act="gcancel" title="キャンセル" aria-label="キャンセル">' + ic('x') + '</button><button class="gy" data-act="gsave" title="保存" aria-label="保存">' + CHK + '</button></span>';
+  row.classList.add('gediting');
+}
+var decorateGantt12b = decorateGantt12;
+decorateGantt12 = function () {
+  decorateGantt12b();
+  if (!UI.gedit || S.fmode !== 'gantt') return;
+  var row = document.querySelector('.gg .gr[data-row="' + UI.gedit + '"]'), n = task(UI.gedit);
+  if (!row || !n) { UI.gedit = null; return; }
+  geditRow(row, n);
+  var inp = row.querySelector('.gin'); if (inp && UI.gfocus !== false) { inp.focus(); var L = inp.value.length; inp.setSelectionRange(L, L); }
+};
+function gStart(n) { UI.gedit = n.id; UI.gfocus = true; UI.gdraft = { name: ttl(n), who: n.who || '', team: (n.team || []).slice(), leads: leadsOf(n).slice(), ow: n.who || '' }; render(); }
+function gEnd(saveIt) {
+  var n = task(UI.gedit), d = UI.gdraft; UI.gedit = null; if (!n || !d) { render(); return; }
+  if (saveIt) {
+    var v = (d.name || '').replace(/\s+/g, ' ').trim(); if (v && v !== ttl(n)) setTitle(n, v);
+    if (!isFolder(n) && d.who !== (n.who || '') && canAssign(n)) { n.who = d.who; if (d.who) { window.notify(d.who, '「' + ttl(n) + '」の担当になりました', ttl(rootOf(n))); toast(member(d.who).name + 'に通知しました'); } }
+  } else if (isFolder(n)) { n.team = d.team; n.leads = d.leads; n.who = d.ow; }
+  closeTeam(); save(); render();
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="gsave"],[data-act="gcancel"],.gedit[data-act="edit"]'); if (!b) return;
+  if (b.classList.contains('gedit')) { if (!(S.view === 'projects' && S.fmode === 'gantt')) return; e.stopImmediatePropagation(); e.preventDefault(); var n = task(b.dataset.id); if (!n) return; if (UI.gedit) gEnd(true); gStart(n); return; }
+  e.stopImmediatePropagation(); e.preventDefault(); gEnd(b.dataset.act === 'gsave');
+}, true);
+document.addEventListener('input', function (e) { if (e.target.dataset && e.target.dataset.gin && UI.gdraft) UI.gdraft.name = e.target.value; }, true);
+document.addEventListener('change', function (e) { if (e.target.dataset && e.target.dataset.gsel && UI.gdraft) { e.stopImmediatePropagation(); UI.gdraft.who = e.target.value; } }, true);
+document.addEventListener('keydown', function (e) {
+  if (!UI.gedit) return;
+  if (e.target.dataset && (e.target.dataset.gin || e.target.dataset.gsel)) {
+    if (e.key === 'Enter') { e.preventDefault(); gEnd(true); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); gEnd(false); }
+  }
+}, true);
+// チーム選択の再描画でも入力中の名前を保つ
+var teamChanged14 = teamChanged;
+teamChanged = function (n, added) { if (UI.gedit) UI.gfocus = false; teamChanged14(n, added); UI.gfocus = true; };
+
+// 日付スライダー
+function dsRange(n) {
+  var p = parentOf(n), lo = p ? dayOf(p.start) : dayOf(n.start) - 60 * DAY, hi = p ? dayOf(p.end) : dayOf(n.end) + 60 * DAY;
+  lo = Math.min(lo, dayOf(n.start)); hi = Math.max(hi, dayOf(n.end));
+  if (hi - lo < 14 * DAY) hi = lo + 14 * DAY;
+  return { lo: lo, hi: hi };
+}
+function dslider(n, sid, eid) {
+  var r = dsRange(n), max = Math.round((r.hi - r.lo) / DAY), a = Math.round((dayOf(n.start) - r.lo) / DAY), b = Math.round((dayOf(n.end) - r.lo) / DAY);
+  return '<div class="dsl" data-lo="' + r.lo + '" data-s="' + sid + '" data-e="' + eid + '"><div class="dslt"><i class="dslf" style="left:' + (a / max * 100) + '%;right:' + (100 - b / max * 100) + '%"></i></div>' +
+    '<input type="range" class="dsa" min="0" max="' + max + '" value="' + a + '" aria-label="開始"><input type="range" class="dsb" min="0" max="' + max + '" value="' + b + '" aria-label="期限">' +
+    '<div class="dsll num"><span>' + shortDate(isoOf(r.lo)) + '</span><span>' + shortDate(isoOf(r.hi)) + '</span></div></div>';
+}
+function dsSync(w, from) {
+  var A = w.querySelector('.dsa'), B = w.querySelector('.dsb'), lo = +w.dataset.lo, max = +A.max;
+  if (+A.value > +B.value) { if (from === 'a') B.value = A.value; else A.value = B.value; }
+  w.querySelector('.dslf').style.left = (A.value / max * 100) + '%'; w.querySelector('.dslf').style.right = (100 - B.value / max * 100) + '%';
+  var s = document.getElementById(w.dataset.s), e = document.getElementById(w.dataset.e);
+  if (s) { s.value = isoOf(lo + A.value * DAY); s.dispatchEvent(new Event('input', { bubbles: true })); }
+  if (e) { e.value = isoOf(lo + B.value * DAY); e.dispatchEvent(new Event('input', { bubbles: true })); }
+}
+document.addEventListener('input', function (e) {
+  var t = e.target; if (!t.classList) return;
+  if (t.classList.contains('dsa') || t.classList.contains('dsb')) { dsSync(t.closest('.dsl'), t.classList.contains('dsa') ? 'a' : 'b'); return; }
+  if (t.id === 'wS' || t.id === 'wE' || t.id === 'pS' || t.id === 'pE') {
+    var w = document.querySelector('.dsl[data-s="' + (t.id[0] + 'S') + '"]'); if (!w || !t.value) return;
+    var lo = +w.dataset.lo, k = Math.round((dayOf(t.value) - lo) / DAY), inp = w.querySelector(t.id[1] === 'S' ? '.dsa' : '.dsb');
+    if (k >= 0 && k <= +inp.max && +inp.value !== k) { inp.value = k; var A = w.querySelector('.dsa'), B = w.querySelector('.dsb'), max = +A.max; w.querySelector('.dslf').style.left = (A.value / max * 100) + '%'; w.querySelector('.dslf').style.right = (100 - B.value / max * 100) + '%'; }
+  }
+}, true);
+var nodeModal2 = nodeModal;
+nodeModal = function (n) {
+  var h = nodeModal2(n); if (!editSelf(n)) return h;
+  var k = h.indexOf('<div class="two"><div class="fld"><label for="wS">'); if (k < 0) return h;
+  var end = h.indexOf('</div></div>', k) + 12;
+  return h.slice(0, end) + dslider(n, 'wS', 'wE') + h.slice(end);
+};
+// 見出しの期間を押すとスライダー
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="fper"],[data-act="perSave"]');
+  if (!b) { var pp = document.getElementById('perpop'); if (pp && !pp.contains(e.target)) pp.remove(); return; }
+  e.stopImmediatePropagation(); e.preventDefault();
+  var f = curFolder(); if (!f) return;
+  if (b.dataset.act === 'perSave') {
+    var s = val('pS'), en = val('pE'); if (!s || !en || en < s) { toast('期間を確認してください'); return; }
+    f.start = s; f.end = en; var pp2 = document.getElementById('perpop'); if (pp2) pp2.remove(); save(); render(); toast('期間を変更しました'); return;
+  }
+  var p = document.getElementById('perpop'); if (p) { p.remove(); return; }
+  p = document.createElement('div'); p.id = 'perpop'; p.className = 'gpop perpop'; document.body.appendChild(p);
+  p.innerHTML = '<div class="gph">期間</div><div class="two"><input id="pS" class="input num" type="date" value="' + f.start + '"><input id="pE" class="input num" type="date" value="' + f.end + '"></div>' + dslider(f, 'pS', 'pE') + '<div class="gpf"><button class="btn sm primary" data-act="perSave">保存</button></div>';
+  var r = b.getBoundingClientRect(); p.style.left = Math.min(window.innerWidth - 340, r.left) + 'px'; p.style.top = (r.bottom + 6) + 'px';
+}, true);
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
