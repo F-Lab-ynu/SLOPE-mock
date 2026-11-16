@@ -1123,23 +1123,15 @@ svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
 .fhmx{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:0;margin-top:2px}
 .gr[data-d="0"]:not(.g0):not(.gz) .gl{background:#fff}
 .gr[data-d="0"]:not(.g0).gz .gl{background:#FAFAFB}
-/* ---------- ux11 色を絞る ---------- */
-.gg .lvb{display:none}
-.gr .bar{background:#4B5563}
-.gr .bar.sum,.gr.g0 .bar.sum{background:#C4C8CF}
-.gr .bar.done,.gr .bar.sum.done,.gr.fdone .bar{background:#E5E7EB}
-.gr.hl .gl,.wcard .wr.hl > .wn{box-shadow:none}
-.bar.hlb{box-shadow:none}
-.gr.hl-late .gl{box-shadow:inset 3px 0 0 #DC2626}
-.bar.hlb-late{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #DC2626}
-.gband{background:rgba(17,24,39,.03);border-left-color:rgba(107,114,128,.45);border-right-color:rgba(107,114,128,.45)}
-.gbh{background:#9CA3AF}
-.avs .av.lead{border-color:#374151;box-shadow:0 0 0 1px #374151;background:#fff;color:var(--text)}
-svg.crown{fill:#374151}
-.tpi .lead[aria-pressed="true"]{background:#111827;border-color:#111827;color:#fff}
-.tpi .lead[aria-pressed="true"] svg.crown{fill:#fff;stroke:#fff}
-.fct svg.fi,.fh2r h2 svg.fi,.ft.on svg.fi,.fh svg.fi,.fadd.open svg.fi{color:#6B7280}
-.evd{background:#9CA3AF}
+/* ---------- ux11 ガント：帯は控えめ、名前欄は白 ---------- */
+.gband{background:rgba(17,24,39,.025);border-left:1px dashed #CBD5E1;border-right:1px dashed #CBD5E1}
+.gbh{background:#CBD5E1}
+.gr.gz .gl,.gr[data-d="0"]:not(.g0).gz .gl,.gr[data-d="0"]:not(.g0):not(.gz) .gl{background:#fff}
+.gr .gl{background:#fff}
+.gr.g0 .gl,.gr.gz.g0 .gl{background:#F3F4F6}
+.gr:hover .gl{background:#F9FAFB}
+.gr.g0:hover .gl{background:#ECEEF1}
+.gr.fdone .bar{background:#E5E7EB}
 .gr.fdone .ct{text-decoration:line-through;color:var(--muted)}
 .fck{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:#9CA3AF;flex:none}
 .fck svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:3}
@@ -1148,6 +1140,8 @@ svg.crown{fill:#374151}
 .fhmt a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
 .srtm{min-width:210px}
 .srtm button{white-space:nowrap}
+.gr[data-row]:not(.isf) .gl{background:#fff !important}
+.gr[data-row]:not(.isf):hover .gl{background:#F9FAFB !important}
 </style>
 </head>
 <body>
