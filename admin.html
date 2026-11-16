@@ -1577,10 +1577,26 @@ function mapSVG(g, sel, avail) {
   var TK = {}, KEY = {}; g.edges.forEach(function (e) { var a = at[e.from], b = at[e.to]; if (!a || !b || a.x === b.x) return; var id = b.y + ':' + a.x; if (KEY[id] == null) { KEY[id] = b.x > a.x ? a.x : -a.x; (TK[b.y] = TK[b.y] || []).push(a.x); } });
   Object.keys(TK).forEach(function (k) { TK[k].sort(function (p, q) { return KEY[k + ':' + p] - KEY[k + ':' + q]; }); });
   var out = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="路線図">';
+  var HS = [], VS = [];
   g.edges.forEach(function (e) {
     var a = at[e.from], b = at[e.to]; if (!a || !b) return;
-    var hot = sel && (e.from === sel || e.to === sel);
-    out += '<path d="' + seg(a, b) + '" fill="none" stroke="' + (hot ? '#2563EB' : (e.ext ? '#98A2B3' : '#98A2B3')) + '" stroke-width="' + (hot ? 2.2 : 1.6) + '"' + (e.ext ? ' stroke-dasharray="3 5"' : '') + ' stroke-linecap="round"/>';
+    var hot = sel && (e.from === sel || e.to === sel), st = { c: hot ? '#2563EB' : '#98A2B3', w: hot ? 2.2 : 1.6, d: e.ext };
+    out += '<path d="' + seg(a, b) + '" fill="none" stroke="' + st.c + '" stroke-width="' + st.w + '"' + (e.ext ? ' stroke-dasharray="3 5"' : '') + ' stroke-linecap="round"/>';
+    var x1 = a.x, y1 = a.y + 9, x2 = b.x, y2 = b.y - 9;
+    if (x1 === x2) { VS.push({ x: x1, y1: y1, y2: y2, e: e }); return; }
+    var k = TK[b.y] ? Math.max(0, TK[b.y].indexOf(a.x)) : 0, ym = Math.max(y1 + 14, y2 - ROW / 2 + 9 - k * 16);
+    VS.push({ x: x1, y1: y1, y2: ym, e: e }); VS.push({ x: x2, y1: ym, y2: y2, e: e });
+    HS.push({ y: ym, x1: Math.min(x1, x2), x2: Math.max(x1, x2), e: e, st: st });
+  });
+  var M = 12, G = 5;
+  HS.forEach(function (h) {
+    VS.forEach(function (v) {
+      if (v.e === h.e || v.e.from === h.e.from || v.e.to === h.e.to) return;
+      if (v.x > h.x1 + M && v.x < h.x2 - M && h.y > v.y1 + M && h.y < v.y2 - M) {
+        out += '<line x1="' + v.x + '" y1="' + (h.y - G) + '" x2="' + v.x + '" y2="' + (h.y + G) + '" stroke="#fff" stroke-width="5"/>' +
+          '<line x1="' + (v.x - G - 2) + '" y1="' + h.y + '" x2="' + (v.x + G + 2) + '" y2="' + h.y + '" stroke="' + h.st.c + '" stroke-width="' + h.st.w + '"' + (h.st.d ? ' stroke-dasharray="3 5"' : '') + '/>';
+      }
+    });
   });
   var maxChars = Math.floor((COL - 34) / 13);
   g.nodes.forEach(function (n) {
