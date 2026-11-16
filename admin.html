@@ -1386,6 +1386,17 @@ svg.crown{fill:#F59E0B}
 .fwho .fwn,.fwho .fwc,.fwho .fcw{display:none}
 .fwho .av{width:24px;height:24px}
 .fwho .av.nob{border:1.5px dashed #D97706;box-shadow:none;background:#fff}
+/* ---------- ux23 教材のトラック一覧を区切る ---------- */
+.tkside .tkl{position:static;gap:6px}
+.tkside .tkl #tq{margin:0 2px 4px}
+.body.tkb{min-width:0}
+.tkside .tkadd{margin:4px 2px 0}
+@media (min-width:761px){ body.tkc .tkwk{grid-template-columns:minmax(0,1fr)} body.tkc .tkside{display:none} }
+@media (max-width:760px){
+  .tkwk{display:block}
+  .tkside{display:block !important;border-right:0;border-bottom:1px solid var(--line);padding:10px 12px}
+  .tkside .ftbar{display:none}
+}
 </style>
 </head>
 <body>
@@ -3275,7 +3286,7 @@ function viewTracks() {
     '<div class="tkbar">' + seg + '<span class="muted num" style="font-size:12px">単元 <span id="unitCount">' + tl(t).length + '</span></span></div>';
   var main = '<div class="tkboth" data-tv="' + tv + '"><div class="pane tktab"><div class="ph">単元<span class="muted num" style="font-weight:400">' + tl(t).length + '</span></div><div class="usheet" id="units">' + unitsHTML(t) + '</div></div>' +
     '<div class="pane tkmap"><div class="ph">路線図</div><div class="map-wrap" id="map"></div><div class="warn" id="warn"></div></div></div>';
-  return top('教材') + '<div class="body tk">' + tkList() + '<div class="tkm">' + head + main + '</div></div>' +
+  return top('教材') + '<div class="wk tkwk"><aside class="ftree tkside" aria-label="トラック"><div class="ftbar"><span>トラック</span><button class="ib" data-act="tkTog" title="畳む" aria-label="トラック一覧を畳む"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>' + tkList() + '</aside><div class="wkm"><div class="body tkb"><div class="tkm">' + head + main + '</div></div></div></div>' +
     '<aside class="rec udr" id="udr"><div id="detail"></div></aside>';
 }
 function renderDetail(g) {
@@ -4135,7 +4146,7 @@ var viewTracks18 = viewTracks;
 viewTracks = function () {
   var h = viewTracks18(), t = track();
   h = h.replace(/<div class="tkh1">[\s\S]*?<\/div>/, '<div class="tkh1"><label class="tkf"><span>担当</span><select id="tOwner" class="input sm" data-bind="owner">' + S.members.filter(function (m) { return hasPerm(m, 'tracks'); }).map(function (m) { return '<option' + (m.name === t.owner ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('') + '</select></label><span class="dim num tkup" title="最終更新">' + esc(t.updated) + '</span></div>');
-  h = h.replace('<input id="tName" class="tkname"', BOOK + '<input id="tName" class="tkname"');
+  h = h.replace('<input id="tName" class="tkname"', (S.tkC ? '<button class="ib fhb" data-act="tkTog" title="トラック一覧を開く" aria-label="トラック一覧を開く"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>' : '') + BOOK + '<input id="tName" class="tkname"');
   h = h.replace('<select id="tStatus"', '<button class="ib tdel" data-act="tDel" title="このトラックを削除" aria-label="このトラックを削除"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button><select id="tStatus"');
   h = h.replace(/<button class="tki" data-act="track" data-id="([^"]+)" aria-pressed="(true|false)"><span class="tkn">/g, '<button class="tki" data-act="track" data-id="$1" aria-pressed="$2">' + BOOK + '<span class="tkn">');
   return h;
@@ -4154,6 +4165,8 @@ function teamPill(n, dis) {
     '<span class="tpn' + (ls.length ? '' : ' none') + '">' + esc(label) + '</span>' + (rest > 0 ? '<span class="more num">+' + rest + '</span>' : '') +
     (dis ? '' : '<svg class="i fwc" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4"/></svg>') + '</button>';
 }
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-act="tkTog"]'); if (!b) return; e.stopImmediatePropagation(); e.preventDefault(); S.tkC = !S.tkC; save(); render(); }, true);
+var _render23 = render; render = function () { _render23.apply(this, arguments); document.body.classList.toggle('tkc', !!S.tkC); };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
