@@ -904,6 +904,62 @@ body.recon .efabw{right:428px}
 .fmenu button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:0;border-radius:6px;background:transparent;text-align:left;font-size:13px;cursor:pointer}
 .fmenu button:hover{background:var(--hover)}
 @media (max-width:760px){ .efabw{right:16px;bottom:76px} }
+/* ---------- ux6 教材 ---------- */
+.body.tk{display:grid;grid-template-columns:220px minmax(0,1fr);gap:20px;align-items:start}
+.tkl{position:sticky;top:0;display:flex;flex-direction:column;gap:8px}
+.tkl #tq{height:32px;font-size:13px}
+.tkls{display:flex;flex-direction:column;gap:2px}
+.tki{display:flex;align-items:center;gap:6px;width:100%;height:34px;padding:0 10px;border:0;border-radius:6px;background:transparent;text-align:left;cursor:pointer;color:var(--sub)}
+.tki:hover{background:var(--hover)}
+.tki[aria-pressed="true"]{background:#E5E7EB;color:var(--text);font-weight:600}
+.tki .tkn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tki .drf{margin:0}
+.tki .tkr{font-size:11px;color:var(--muted);font-weight:400}
+.tkadd{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px dashed var(--line2);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px}
+.tkadd:hover{color:var(--text);border-color:var(--text)}
+.tkadd svg.i{width:14px;height:14px}
+.tkres{display:flex;flex-direction:column;gap:2px;max-height:70vh;overflow:auto}
+.tkh{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 10px;border:0;border-radius:6px;background:transparent;text-align:left;cursor:pointer}
+.tkh:hover{background:var(--hover)}
+.tkh small{font-size:11px;color:var(--muted)}
+.tkh em{font-style:normal;font-size:11px;color:var(--muted)}
+.tkm{min-width:0;display:flex;flex-direction:column;gap:12px}
+.tkh0{display:flex;align-items:center;gap:10px}
+.tkname{flex:1;min-width:0;font:inherit;font-size:20px;font-weight:600;border:1px solid transparent;border-radius:6px;padding:4px 8px;margin-left:-8px;background:transparent;color:var(--text)}
+.tkname:hover{border-color:var(--line2)}
+.tkname:focus{border-color:var(--text);outline:0;background:#fff}
+.tkst{width:auto}
+.tkst.pub{color:#047857;border-color:#A7F3D0;background:#ECFDF5}
+.tkh1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tkf{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.tkf.grow{flex:1;min-width:160px}
+.tkf.grow .input{flex:1;width:auto}
+.tkarrow{color:var(--muted)}
+.tkup{font-size:11px;margin-left:auto}
+.tkbar{display:flex;align-items:center;gap:12px;padding-top:4px;border-top:1px solid var(--line);padding-top:12px}
+.tkmap .map-wrap{height:calc(100vh - 290px);min-height:360px}
+.udr{transform:translateX(100%);transition:transform .18s ease;visibility:hidden}
+.udr.open{transform:none;visibility:visible}
+.udr #detail{display:flex;flex-direction:column;height:100%;min-height:0}
+.udr .mat{display:flex;align-items:center;gap:6px;padding:4px 0}
+.udr .mat .t{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.udr .mat .t .cell{width:100%}
+.udr .mat .t a{font-size:11px;color:var(--muted);text-decoration:none;padding-left:8px}
+.udeps select.input.sm{width:72px !important}
+.udr .matnew{margin-top:6px}
+.udeps{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.udeps .chip{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line2);border-radius:12px;padding:0 4px 0 8px;font-size:12px;background:#fff}
+.udeps .chip button{border:0;background:transparent;cursor:pointer;color:var(--muted);padding:2px 4px;font:inherit}
+.udeps .chip .dj{color:var(--accent);font-weight:600;padding:2px 0}
+@media (max-width:760px){
+  .body.tk{grid-template-columns:minmax(0,1fr)}
+  .tkl{position:static}
+  .tkls{flex-direction:row;overflow-x:auto;gap:4px}
+  .tki{width:auto;flex:none}
+  .tkadd{display:none}
+  .tkmap .map-wrap{height:auto;max-height:none}
+  .tkup{display:none}
+}
 </style>
 </head>
 <body>
@@ -2586,7 +2642,7 @@ function statsHTML() { return '<div class="rh"><div class="rt"><b>イベント�
 function drawRec() {
   var d = document.getElementById('rec');
   var p = UI.rec && UI.rec !== 'stats' ? task(UI.rec) : null;
-  if (!UI.rec || (UI.rec !== 'stats' && !p)) { if (d) d.remove(); document.body.classList.remove('recon'); UI.rec = null; return; }
+  if (!UI.rec || (UI.rec !== 'stats' && !p)) { if (d) d.remove(); if (!(S.view === 'tracks' && S.sel)) document.body.classList.remove('recon'); UI.rec = null; return; }
   if (!d) { d = document.createElement('aside'); d.id = 'rec'; d.className = 'rec'; d.setAttribute('aria-label', 'イベントの記録'); document.body.appendChild(d); }
   var a = document.activeElement, keep = a && d.contains(a) && a.dataset ? (a.dataset.rf || (a.dataset.rlink ? 'rlink' : '')) : '';
   d.innerHTML = UI.rec === 'stats' ? statsHTML() : recHTML(p);
@@ -2676,6 +2732,97 @@ document.addEventListener('click', function (e) {
 }, true);
 
 var _render4 = render; render = function () { _render4.apply(this, arguments); decorateWork2(); drawRec(); };
+
+// ---------- ux6: 教材＝左にトラック一覧、中央に路線図、右に単元ページ ----------
+function regRate(t) { var us = parse(t.text).units, n = us.length, d = us.filter(function (u) { return t.units[u.code] && (t.units[u.code].materials || []).length; }).length; return { n: n, d: d }; }
+function tkList() {
+  var q = (UI.tq || '').trim(), cur = track();
+  var list = S.tracks.map(function (x) { var r = regRate(x); return '<button class="tki" data-act="track" data-id="' + x.id + '" aria-pressed="' + (x.id === cur.id) + '"><span class="tkn">' + esc(x.name) + '</span>' + (x.status === 'draft' ? '<i class="drf" title="下書き"></i>' : '') + '<span class="tkr num">' + r.d + '/' + r.n + '</span></button>'; }).join('');
+  var res = '';
+  if (q) {
+    var hits = [];
+    S.tracks.forEach(function (x) {
+      tl(x).forEach(function (u) {
+        var d = x.units[u.code] || {}, mats = (d.materials || []);
+        var hay = [u.code, u.title, d.goal, d.practice, d.milestone].concat(mats.map(function (m) { return (m.memo || '') + ' ' + (m.url || '') + ' ' + (m.type || ''); })).join(' ').toLowerCase();
+        if (hay.indexOf(q.toLowerCase()) >= 0) hits.push('<button class="tkh" data-act="tqPick" data-t="' + x.id + '" data-c="' + esc(u.code) + '"><small>' + esc(x.name) + '・' + esc(u.code) + '</small><span>' + esc(u.title) + '</span>' + (mats.length ? '<em class="num">教材 ' + mats.length + '</em>' : '') + '</button>');
+      });
+    });
+    res = '<div class="tkres">' + (hits.length ? hits.join('') : '<div class="empty sm">見つかりません</div>') + '</div>';
+  }
+  return '<aside class="tkl"><input id="tq" class="input" type="search" placeholder="単元・教材を探す" value="' + esc(UI.tq || '') + '" aria-label="単元・教材を探す" autocomplete="off">' +
+    (q ? res : '<div class="tkls">' + list + '</div><button class="tkadd" data-act="newTrack">' + ic('plus') + 'トラック</button>') + '</aside>';
+}
+function viewTracks() {
+  var t = track(); tl(t);
+  if (!UI.tv) UI.tv = 'map';
+  var tv = tl(t).length ? UI.tv : 'table';
+  var owners = S.members.filter(function (m) { return hasPerm(m, 'tracks'); }).map(function (m) { return '<option' + (m.name === t.owner ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join('');
+  var seg = '<span class="pseg" role="group" aria-label="表示">' + [['map', '路線図'], ['table', '表']].map(function (x) { return '<button data-act="tv" data-v="' + x[0] + '" aria-pressed="' + (tv === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</span>';
+  var head = '<div class="tkh0">' +
+      '<input id="tName" class="tkname" data-bind="name" value="' + esc(t.name) + '" aria-label="トラック名" autocomplete="off">' +
+      '<select id="tStatus" class="input sm tkst' + (t.status === 'pub' ? ' pub' : '') + '" data-act="tStatus" aria-label="状態"><option value="draft"' + (t.status === 'draft' ? ' selected' : '') + '>下書き</option><option value="pub"' + (t.status === 'pub' ? ' selected' : '') + '>公開</option></select>' +
+    '</div>' +
+    '<div class="tkh1">' +
+      '<label class="tkf"><span>担当</span><select id="tOwner" class="input sm" data-bind="owner">' + owners + '</select></label>' +
+      '<label class="tkf grow"><span>始点</span><input id="tStart" class="input sm" data-bind="start" value="' + esc(t.start) + '"></label>' +
+      '<span class="tkarrow">→</span>' +
+      '<label class="tkf grow"><span>終点</span><input id="tGoal" class="input sm" data-bind="goal" value="' + esc(t.goal) + '"></label>' +
+      '<span class="dim num tkup" title="最終更新">' + esc(t.updated) + '</span>' +
+    '</div>' +
+    '<div class="tkbar">' + seg + '<span class="muted num" style="font-size:12px">単元 <span id="unitCount">' + tl(t).length + '</span></span></div>';
+  var main = tv === 'map'
+    ? '<div class="pane tkmap"><div class="map-wrap" id="map"></div><div class="warn" id="warn"></div></div><div id="units" hidden>' + unitsHTML(t) + '</div>'
+    : '<div class="pane"><div class="usheet" id="units">' + unitsHTML(t) + '</div><div class="warn" id="warn"></div></div><div id="map" hidden></div>';
+  return top('教材') + '<div class="body tk">' + tkList() + '<div class="tkm">' + head + main + '</div></div>' +
+    '<aside class="rec udr" id="udr"><div id="detail"></div></aside>';
+}
+function renderDetail(g) {
+  var el = document.getElementById('detail'), dr = document.getElementById('udr'); if (!el) return;
+  var t = track(); g = g || layout(t);
+  var u = S.sel && g.by[S.sel];
+  if (!u) { el.innerHTML = ''; if (dr) dr.classList.remove('open'); document.body.classList.remove('recon'); return; }
+  if (dr) dr.classList.add('open'); document.body.classList.add('recon');
+  var d = unitData(t, u.code);
+  var mats = (d.materials || []).map(function (m, i) {
+    return '<div class="mat" data-li="' + i + '"><span class="dh" data-ldrag="mats" title="ドラッグで並べ替え"><svg viewBox="0 0 10 16" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="7" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="7" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="7" cy="13" r="1.3"/></svg></span>' +
+      '<span class="tag">' + esc(m.type) + '</span>' +
+      '<span class="t"><input class="cell" data-m="memo" data-i="' + i + '" value="' + esc(m.memo) + '" placeholder="' + esc(m.url) + '" aria-label="タイトル" autocomplete="off"><a href="' + esc(m.url) + '" target="_blank" rel="noopener">' + esc(host(m.url)) + ' ↗</a></span>' +
+      '<button class="ib" data-act="matDel" data-i="' + i + '" aria-label="削除">' + ic('x') + '</button></div>';
+  }).join('');
+  var others = tl(t).filter(function (x) { return x.code !== u.code && x.title && u.deps.indexOf(x.code) < 0; });
+  var deps = u.deps.map(function (c) { var x = tl(t)[unitIdx(t, c)]; return '<span class="chip"><button class="dj" data-act="pick" data-code="' + esc(c) + '" title="' + esc(x ? x.title : c) + '">' + esc(c) + '</button><button data-act="uDepX" data-code="' + esc(u.code) + '" data-dep="' + esc(c) + '" aria-label="前提 ' + esc(c) + ' を外す">×</button></span>'; }).join('');
+  el.innerHTML = '<div class="rh"><div class="rt"><small>' + esc(t.name) + '・<span class="num">' + esc(u.code) + '</span>' + (u.tags.length ? '・' + esc(u.tags.join('・')) : '') + '</small><b>' + esc(u.title) + '</b></div><button class="ib" data-act="uClose" aria-label="閉じる">' + ic('x') + '</button></div>' +
+    '<div class="rb">' +
+      '<section><h3>目標</h3><textarea class="input" rows="2" data-ubind="goal" placeholder="この単元で何ができるようになるか">' + esc(d.goal || '') + '</textarea></section>' +
+      '<section><h3>教材</h3><div data-list="mats">' + mats + '</div><div class="matnew"><input id="mUrl" class="input" placeholder="URLを貼り付けて Enter" aria-label="教材のURL" autocomplete="off"></div></section>' +
+      '<section><h3>演習</h3><textarea id="uPractice" class="input" rows="3" data-ubind="practice">' + esc(d.practice || '') + '</textarea></section>' +
+      '<section><h3>マイルストーン</h3><input id="uMile" class="input" data-ubind="milestone" value="' + esc(d.milestone || '') + '"></section>' +
+      '<section><h3>前提</h3><div class="udeps">' + (deps || '<span class="dim">なし</span>') +
+        (others.length ? '<select class="input sm" data-udep="' + esc(u.code) + '" aria-label="前提を追加"><option value="">＋</option>' + others.map(function (x) { return '<option value="' + esc(x.code) + '">' + esc(x.code + ' ' + x.title) + '</option>'; }).join('') + '</select>' : '') + '</div></section>' +
+    '</div>';
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="tv"],[data-act="uClose"],[data-act="tqPick"]'); if (!b) return;
+  e.stopImmediatePropagation();
+  var a = b.dataset.act;
+  if (a === 'tv') { UI.tv = b.dataset.v; render(); }
+  else if (a === 'uClose') { S.sel = null; save(); render(); }
+  else if (a === 'tqPick') { S.cur = b.dataset.t; S.sel = b.dataset.c; UI.tq = ''; save(); render(); }
+}, true);
+document.addEventListener('input', function (e) {
+  if (e.target.id !== 'tq') return; UI.tq = e.target.value;
+  var l = document.querySelector('.tkl'); if (!l) return;
+  var pos = e.target.selectionStart; l.outerHTML = tkList(); var q = document.getElementById('tq'); q.focus(); q.setSelectionRange(pos, pos);
+}, true);
+document.addEventListener('change', function (e) {
+  var el = e.target; if (!el.dataset || !el.dataset.udep) return; e.stopImmediatePropagation();
+  if (el.value) toggleDep(el.dataset.udep, el.value); renderDetail();
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.view === 'tracks' && S.sel && !document.getElementById('pp')) { S.sel = null; save(); render(); } });
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-act="go"][data-view="tracks"]'); if (b) S.sel = null; }, true);
+if (S && S.sel) S.sel = null;
+var _render5 = render; render = function () { if (S.view !== 'tracks' && S.view !== 'projects') document.body.classList.remove('recon'); _render5.apply(this, arguments); if (S.view === 'projects' && !UI.rec) document.body.classList.remove('recon'); };
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
