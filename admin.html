@@ -960,6 +960,56 @@ body.recon .efabw{right:428px}
   .tkmap .map-wrap{height:auto;max-height:none}
   .tkup{display:none}
 }
+/* ---------- ux7 フォルダー ---------- */
+.wk{flex:1;min-height:0;display:grid;grid-template-columns:240px minmax(0,1fr)}
+.ftree{border-right:1px solid var(--line);overflow:auto;padding:12px 8px;display:flex;flex-direction:column;gap:2px;background:#FCFCFD}
+.ftop{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:0;border-radius:6px;background:transparent;text-align:left;cursor:pointer;color:var(--sub);font-weight:500}
+.ftop svg.i{width:16px;height:16px}
+.ftop:hover{background:var(--hover)}
+.ftop.on{background:#E5E7EB;color:var(--text)}
+.ftl{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:1px}
+.ft{display:flex;align-items:center;padding-left:calc(var(--d) * 14px);border-radius:6px}
+.ft:hover{background:var(--hover)}
+.ft.on{background:#E5E7EB}
+.ftc{width:22px;height:28px;flex:none;border:0;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;padding:0}
+.ftc svg.i{width:14px;height:14px}
+.ftn{flex:1;min-width:0;display:flex;align-items:center;gap:6px;height:28px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--sub);padding:0 6px 0 0;font-size:13px}
+.ftn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ft.on .ftn{color:var(--text);font-weight:600}
+svg.fi{width:15px;height:15px;flex:none;color:#9CA3AF}
+.ft.on svg.fi,.fh svg.fi{color:#F59E0B}
+.evd{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.wkm{min-width:0;min-height:0;display:flex;flex-direction:column}
+.wkm > .utabs{padding-left:20px}
+.crumb{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:12px 20px 0;font-size:12px;color:var(--muted)}
+.crumb button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:4px;font:inherit}
+.crumb button:hover{color:var(--text);background:var(--hover)}
+.crumb b{color:var(--text);font-weight:600;padding:2px 4px}
+.crumb .cs{color:var(--dim)}
+.fh{display:flex;align-items:center;gap:12px;padding:8px 20px 4px;flex-wrap:wrap}
+.fhn{display:flex;align-items:center;gap:8px;font-size:18px}
+.fhn svg.fi{width:20px;height:20px}
+.fh .tbtn{width:auto;max-width:260px;border-color:var(--line2);background:#fff}
+.fhd{font-size:12px;color:var(--sub)}
+.fh .prog{width:160px}
+.fhb{width:30px;height:30px;border:1px solid var(--line2);border-radius:6px;background:#fff}
+.wr.isf svg.fi,.gr.isf svg.fi{margin-right:-2px}
+.wcard .wr .wn svg.fi{align-self:center}
+.fin{flex:none;width:24px;height:24px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;opacity:.0;transition:opacity .1s}
+.wr:hover .fin,.gr:hover .fin,.fin:focus-visible{opacity:1}
+.fin:hover{border-color:var(--line2);background:#fff;color:var(--text)}
+.fin svg.i{width:14px;height:14px}
+.ovr{position:absolute;top:14px;height:12px;background:repeating-linear-gradient(45deg,#FCA5A5 0 4px,#FEE2E2 4px 8px);border-radius:0 3px 3px 0;z-index:1;pointer-events:none}
+.rec .evt{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px}
+@media (hover:none){ .fin{opacity:1} }
+@media (max-width:760px){
+  .wk{grid-template-columns:minmax(0,1fr)}
+  .ftree{display:none}
+  .crumb{padding:10px 12px 0;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}
+  .fh{padding:6px 12px 2px;gap:8px}
+  .fh .tbtn{max-width:160px}
+  .fh .prog{display:none}
+}
 </style>
 </head>
 <body>
@@ -1347,19 +1397,19 @@ function viewWork() {
   var opts = function (sel) { return '<option value="">未定</option>' + S.members.map(function (m) { return '<option value="' + m.id + '"' + (sel === m.id ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join(''); };
   var row = function (r) {
     if (r.ghost) return ghost(r.parent.id, r.d - 1, r.d === 1 ? '＋ 業務を追加' : '＋ 追加', r.d);
-    var n = r.n, root = r.d === 0, parent = kids(n).length > 0 || !!n.tasks, g = parent ? progress(n) : null;
+    var n = r.n, root = r.d === 0 && isFolder(n), parent = isFolder(n), g = parent ? progress(n) : null;
     var ed = editSelf(n) ? '' : ' disabled', as = canAssign(n) ? '' : ' disabled';
     var meta = root ? [esc(n.unit || '')].concat(isEvent(n) ? [n.announce === 'done' ? '告知済み・参加 ' + (n.reg || 0) + '/' + S.club : '告知前'] : []).join('<span class="dot">・</span>') : '';
     var st = g ? '<span class="prog"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num">' + g.d + '/' + g.n + '</span>' + (g.late ? '<span class="bad num">遅れ ' + g.late + '</span>' : '') + '</span>'
       : n.done ? '<span class="ok2">完了</span>' : late(n) ? '<span class="bad">期限切れ</span>' : '';
-    var w = member(n.who), tm = teamOf(n), sub = [isGroup(r.d) ? (tm.length ? (leadsOf(n).length ? '👑' + leadsOf(n).map(function (id) { var x = member(id); return x ? x.name : ''; }).join('・') : '👑?') + (tm.length > leadsOf(n).length ? ' +' + (tm.length - leadsOf(n).length) : '') : 'メンバー未定') : w ? w.name : '担当未定', fmtDate(n.start) + '–' + fmtDate(n.end)].concat(g ? [g.d + '/' + g.n] : []).join('・');
+    var w = member(n.who), tm = teamOf(n), sub = [isFolder(n) ? (tm.length ? (leadsOf(n).length ? '👑' + leadsOf(n).map(function (id) { var x = member(id); return x ? x.name : ''; }).join('・') : '👑?') + (tm.length > leadsOf(n).length ? ' +' + (tm.length - leadsOf(n).length) : '') : 'メンバー未定') : w ? w.name : '担当未定', fmtDate(n.start) + '–' + fmtDate(n.end)].concat(g ? [g.d + '/' + g.n] : []).join('・');
     return '<div data-d="' + r.d + '" class="wr lv' + lv(r.d) + (root ? ' head' : '') + (r.ctx ? ' ctx' : '') + (isDone(n) && !root ? ' done' : '') + '" data-row="' + n.id + '" style="--d:' + Math.max(0, r.d - 1) + ';--lc:' + LVC[lv(r.d)] + '">' +
       '<div class="wn">' + (canMove(n) ? '<span class="dh" data-drag="' + n.id + '" title="ドラッグで移動（Alt+↑↓でも可）" aria-label="移動"><svg viewBox="0 0 10 16" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="7" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="7" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="7" cy="13" r="1.3"/></svg></span>' : '<span class="dh ph"></span>') + caret(r) +
         (root ? '' : !parent ? '<input type="checkbox" class="check wck" data-c="done" data-id="' + n.id + '"' + (n.done ? ' checked' : '') + (editSelf(n) || n.who === S.me ? '' : ' disabled') + ' aria-label="完了">' : '<span class="wck ckph"></span>') +
         '<i class="lvb"></i><div class="wtx"><textarea class="cell ct" rows="1" data-c="t" data-id="' + n.id + '"' + ed + ' aria-label="業務名" spellcheck="false">' + esc(ttl(n)) + '</textarea>' +
         (root ? '<div class="wm">' + meta + '</div>' : '<div class="ws">' + esc(sub) + '</div>') + '</div>' +
         '</div>' +
-      '<div class="ww">' + (isGroup(r.d) ? teamBtn(n, as) : '<select class="cell" data-c="w" data-id="' + n.id + '"' + as + ' aria-label="担当">' + whoOpts(n) + '</select>') + '</div>' +
+      '<div class="ww">' + (isFolder(n) ? teamBtn(n, as) : '<select class="cell" data-c="w" data-id="' + n.id + '"' + as + ' aria-label="担当">' + whoOpts(n) + '</select>') + '</div>' +
       '<div class="wdd"><input type="date" class="cell num" data-c="s" data-id="' + n.id + '" value="' + n.start + '"' + ed + ' aria-label="開始"></div>' +
       '<div class="wdd"><input type="date" class="cell num' + (late(n) ? ' bad' : '') + '" data-c="e" data-id="' + n.id + '" value="' + n.end + '"' + ed + ' aria-label="期限"></div>' +
       '<div class="wp">' + st + '</div>' +
@@ -1405,15 +1455,15 @@ function ganttOf(rows) {
   rows.forEach(function (r, idx) {
     if (!r.ghost && r.d === 0 && idx > 0) body += '<div class="gr gsp" style="' + cols + '"><div class="gl"></div><div class="gt"></div></div>';
     if (r.ghost) { body += gghost(r.parent.id, r.d, r.d === 1 ? '＋ 業務を追加' : '＋ 追加', r.d); return; }
-    var n = r.n, parent = kids(n).length > 0 || !!n.tasks, w = member(n.who), dn = isDone(n);
+    var n = r.n, parent = isFolder(n), w = member(n.who), dn = isDone(n);
     var cls = parent ? ' sum' + (r.d === 0 ? ' root' : '') + (dn ? ' done' : '') : (n.done ? ' done' : (!n.who ? ' none' : ''));
     var bar = '<div class="bar' + cls + (late(n) ? ' late' : '') + (editSelf(n) ? '' : ' lock') + '" data-bar="' + n.id + '" style="left:' + x(n.start) + 'px;width:' + Math.max(PX, x(n.end) - x(n.start) + PX) + 'px" title="' + esc(ttl(n) + '  ' + fmtDate(n.start) + '–' + fmtDate(n.end) + (w ? '  ' + w.name : '')) + '">' +
       (parent ? '' : '<span class="lb">' + esc(n.done ? '完了' : w ? w.name : '未定') + '</span>') + (editSelf(n) ? '<span class="hd" data-hd="1"></span>' : '') + '</div>';
     var ed = editSelf(n) ? '' : ' disabled';
     body += '<div data-d="' + r.d + '" class="gr lv' + lv(r.d) + (r.d === 0 ? ' g0' : '') + (r.ctx ? ' gctx' : '') + (dn && !parent ? ' gdone' : '') + '" data-row="' + n.id + '" style="' + cols + ';--lc:' + LVC[lv(r.d)] + '"><div class="gl" style="padding-left:' + (narrow ? 2 + r.d * 8 : 8 + r.d * 14) + 'px">' + (canMove(n) ? '<span class="dh" data-drag="' + n.id + '" title="ドラッグで移動（Alt+↑↓でも可）" aria-label="移動"><svg viewBox="0 0 10 16" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="7" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="7" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="7" cy="13" r="1.3"/></svg></span>' : '<span class="dh ph"></span>') + caret(r) +
-        (r.d === 0 ? '' : !parent ? '<input type="checkbox" class="check wck" data-c="done" data-id="' + n.id + '"' + (n.done ? ' checked' : '') + (editSelf(n) || n.who === S.me ? '' : ' disabled') + ' aria-label="完了">' : '<span class="wck ckph"></span>') +
+        (r.d === 0 && isFolder(n) ? '' : !parent ? '<input type="checkbox" class="check wck" data-c="done" data-id="' + n.id + '"' + (n.done ? ' checked' : '') + (editSelf(n) || n.who === S.me ? '' : ' disabled') + ' aria-label="完了">' : '<span class="wck ckph"></span>') +
         '<i class="lvb"></i><input class="cell ct" data-c="t" data-id="' + n.id + '" value="' + esc(ttl(n)) + '" title="' + esc(ttl(n)) + '"' + ed + ' aria-label="業務名" autocomplete="off">' + (late(n) ? '<span class="lt" title="期限切れ"></span>' : '') +
-        (isGroup(r.d) ? teamBtn(n, canAssign(n) ? '' : ' disabled', true) : '<select class="cell gsel" data-c="w" data-id="' + n.id + '"' + (canAssign(n) ? '' : ' disabled') + ' aria-label="担当">' + whoOpts(n) + '</select>') +
+        (isFolder(n) ? teamBtn(n, canAssign(n) ? '' : ' disabled', true) : '<select class="cell gsel" data-c="w" data-id="' + n.id + '"' + (canAssign(n) ? '' : ' disabled') + ' aria-label="担当">' + whoOpts(n) + '</select>') +
         '<button class="ib ga" data-act="edit" data-id="' + n.id + '" aria-label="詳細">' + ic('more') + '</button></div>' +
       '<div class="gt">' + bar + '</div></div>';
   });
@@ -1426,7 +1476,7 @@ function ganttOf(rows) {
     '<div class="gr ghead" style="' + cols + '"><div class="gl">業務</div><div class="gt">' + hd + '</div></div>' + body + addRow + fill + '</div></div>').replace(/(<div class="gl"[^>]*>)/g, '$1' + LWH);
 }
 function projStats() {
-  var ev = S.projects.filter(isEvent), fin = ev.filter(ended).sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
+  var ev = allEvents(), fin = ev.filter(ended).sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
   var open = ev.filter(function (p) { return !ended(p) && p.announce === 'done'; }), before = ev.filter(function (p) { return !ended(p) && p.announce !== 'done'; });
   var avg = fin.length ? Math.round(fin.reduce(function (n, p) { return n + pct(p); }, 0) / fin.length) : 0;
   var hi = fin.slice().sort(function (a, b) { return pct(b) - pct(a); })[0], lo = fin.slice().sort(function (a, b) { return pct(a) - pct(b); })[0];
@@ -1446,7 +1496,7 @@ function nodeModal(n) {
   var opts = '<option value="">未定</option>' + S.members.map(function (m) { return '<option value="' + m.id + '"' + (n.who === m.id ? ' selected' : '') + '>' + esc(m.name) + '（' + esc(m.unit === '—' ? (m.roles || []).join('・') || 'プレイヤー' : m.unit) + '）</option>'; }).join('');
   var body = (par ? '<div class="muted" style="font-size:12px">' + esc(ttl(rootOf(n))) + (par !== rootOf(n) ? ' ／ … ／ ' + esc(ttl(par)) : '') + '</div>' : '') +
     '<div class="fld"><label for="wT">名前</label><input id="wT" class="input" value="' + esc(ttl(n)) + '"' + (editSelf(n) ? '' : ' disabled') + '></div>' +
-    (isGroup(depthOf(n)) ? '<div class="fld"><label>メンバー</label><div class="mfield">' + teamBtn(n, canAssign(n) ? '' : ' disabled') + '</div></div>' : '<div class="fld"><label for="wW">担当</label><select id="wW" class="input"' + (canAssign(n) ? '' : ' disabled') + '>' + whoOpts(n) + '</select></div>') +
+    (isFolder(n) ? '<div class="fld"><label>メンバー</label><div class="mfield">' + teamBtn(n, canAssign(n) ? '' : ' disabled') + '</div></div>' : '<div class="fld"><label for="wW">担当</label><select id="wW" class="input"' + (canAssign(n) ? '' : ' disabled') + '>' + whoOpts(n) + '</select></div>') +
     '<div class="two"><div class="fld"><label for="wS">開始</label><input id="wS" class="input num" type="date" value="' + n.start + '"' + (editSelf(n) ? '' : ' disabled') + '></div><div class="fld"><label for="wE">期限</label><input id="wE" class="input num" type="date" value="' + n.end + '"' + (editSelf(n) ? '' : ' disabled') + '></div></div>' +
     (root ? '<div class="two"><div class="fld"><label for="wU">担当部</label><select id="wU" class="input">' + ['教育部', '催事部', '外務部', '会計', '代表'].map(function (u) { return '<option' + (n.unit === u ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select></div>' +
       '<div class="fld"><label for="wA">告知</label><select id="wA" class="input"><option value="">—（業務）</option><option value="before"' + (isEvent(n) && n.announce !== 'done' ? ' selected' : '') + '>告知前</option><option value="done"' + (isEvent(n) && n.announce === 'done' ? ' selected' : '') + '>告知済み</option></select></div></div>' : '') +
@@ -1632,8 +1682,8 @@ function myTasks(id) { var r = []; S.projects.forEach(function (p) { nodesOf(p).
 window.notify = function (to, text, sub) { if (!S.notifs) S.notifs = []; S.notifs.unshift({ to: to, text: text, sub: sub, at: nowLabel() }); };
 function viewDash() {
   var m = me(), ops = S.members.filter(isOps), pl = S.members.filter(function (x) { return !isOps(x); });
-  var live = S.projects.filter(function (p) { return dayOf(p.end) >= TODAY; });
-  var all = []; S.projects.forEach(function (p) { leavesOf(p).forEach(function (k) { all.push({ k: k, p: p }); }); });
+  var live = allEvents().filter(function (p) { return dayOf(p.end) >= TODAY; });
+  var all = []; S.projects.forEach(function (p) { leavesOf(p).forEach(function (k) { all.push({ k: k, p: evOf(k) }); }); });
   var mine = myTasks(m.id), mineOpen = mine.filter(function (o) { return !isDone(o.k); });
   var mineLate = mineOpen.filter(function (o) { return late(o.k); }).length;
   var rep = S.posts.filter(function (x) { return x.reports > 0 && x.state === 'ok'; }).length;
@@ -1656,8 +1706,8 @@ function viewDash() {
   left.push('<div class="card o1"><div class="ch">自分の作業</div>' + (mine.length ? mine.map(function (o) {
     var k = o.k, parent = kids(k).length > 0 || !!k.tasks;
     if (!parent && k.done) return '<div class="li" style="color:var(--muted)"><span class="t"><b>' + esc(ttl(k)) + '</b><span>報告済み</span></span><button class="btn sm ghost" data-act="undo" data-id="' + k.id + '">取り消す</button></div>';
-    if (parent) { var g = progress(k); return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(o.p.name)) + '・下に ' + (nodesOf(k).length - 1) + ' 件（完了 ' + g.d + '/' + g.n + '）</span></span><span class="r">期限 ' + fmtDate(k.end) + '</span><button class="btn sm" data-act="open" data-id="' + k.id + '">分担する</button></div>'; }
-    return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(o.p.name) + '</span></span><span class="r' + (late(k) ? ' bad' : '') + '">' + (late(k) ? '期限切れ ' : '期限 ') + fmtDate(k.end) + '</span><button class="btn sm primary" data-act="done" data-id="' + k.id + '">完了</button></div>';
+    if (parent) { var g = progress(k); return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(ttl(o.p))) + '・下に ' + (nodesOf(k).length - 1) + ' 件（完了 ' + g.d + '/' + g.n + '）</span></span><span class="r">期限 ' + fmtDate(k.end) + '</span><button class="btn sm" data-act="open" data-id="' + k.id + '">分担する</button></div>'; }
+    return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r' + (late(k) ? ' bad' : '') + '">' + (late(k) ? '期限切れ ' : '期限 ') + fmtDate(k.end) + '</span><button class="btn sm primary" data-act="done" data-id="' + k.id + '">完了</button></div>';
   }).join('') : '<div class="empty sm">担当中の作業はありません</div>') + '</div>');
   var ns = (S.notifs || []).filter(function (n) { return n.to === m.id; }).slice(0, 6);
   var alerts = mineOpen.filter(function (o) { return !late(o.k) && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」の期限まであと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
@@ -1671,7 +1721,7 @@ function viewDash() {
       (soon.length ? soon.map(function (o) {
         var w = member(o.k.who);
         return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av" style="background:#fff;box-shadow:inset 0 0 0 1px var(--line2)"></span>') +
-          '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(o.p.name) + '・' + (w ? esc(w.name) : '担当未定') + '</span></span>' +
+          '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(ttl(o.p)) + '・' + (w ? esc(w.name) : '担当未定') + '</span></span>' +
           '<span class="r' + (late(o.k) ? ' bad' : '') + '">' + (late(o.k) ? '期限切れ ' : '') + fmtDate(o.k.end) + '</span></button>';
       }).join('') : '<div class="empty">なし</div>') + '</div>');
     var ps = (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); })).sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
@@ -1696,7 +1746,7 @@ function viewDash() {
     }).join('') + '</div></div>');
   }
   if (isAdmin() || can('projects')) {
-    var fin = S.projects.filter(function (p) { return isEvent(p) && ended(p); }).sort(function (a, b) { return dayOf(b.end) - dayOf(a.end); });
+    var fin = allEvents().filter(function (p) { return isEvent(p) && ended(p); }).sort(function (a, b) { return dayOf(b.end) - dayOf(a.end); });
     var avg = fin.length ? Math.round(fin.reduce(function (n, p) { return n + pct(p); }, 0) / fin.length) : 0;
     right.push('<div class="card"><div class="ch">イベント参加率<button data-act="pstats">統計</button></div><div class="hb" style="padding:12px 14px 6px"><span style="font-size:24px;font-weight:600" class="num">' + avg + '%</span><span class="muted" style="font-size:12px">直近 ' + fin.length + ' 件の平均</span></div><div style="padding:0 0 6px">' +
       fin.slice(0, 4).map(function (p) { return '<div class="hb"><span class="l">' + esc(p.name) + '</span><span class="b"><i style="width:' + pct(p) + '%"></i></span><span class="v" style="width:36px">' + pct(p) + '%</span></div>'; }).join('') + '</div></div>');
@@ -2469,8 +2519,8 @@ function teamBtn(n, dis, compact) {
 var GO = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7l5 5-5 5"/></svg>';
 function viewDash() {
   var m = me(), pl = S.members.filter(function (x) { return !isOps(x); });
-  var live = S.projects.filter(function (p) { return dayOf(p.end) >= TODAY; });
-  var all = []; S.projects.forEach(function (p) { leavesOf(p).forEach(function (k) { all.push({ k: k, p: p }); }); });
+  var live = allEvents().filter(function (p) { return dayOf(p.end) >= TODAY; });
+  var all = []; S.projects.forEach(function (p) { leavesOf(p).forEach(function (k) { all.push({ k: k, p: evOf(k) }); }); });
   var mine = myTasks(m.id), mineOpen = mine.filter(function (o) { return !isDone(o.k); });
   var mineLate = mineOpen.filter(function (o) { return late(o.k); }).length;
   var rep = S.posts.filter(function (x) { return x.reports > 0 && x.state === 'ok'; }).length;
@@ -2487,8 +2537,8 @@ function viewDash() {
   var myTask = mine.length ? mine.map(function (o) {
     var k = o.k, parent = kids(k).length > 0 || !!k.tasks;
     if (!parent && k.done) return '<div class="li dn"><span class="t"><b>' + esc(ttl(k)) + '</b></span><button class="ib" data-act="undo" data-id="' + k.id + '" title="完了を取り消す" aria-label="完了を取り消す"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/></svg></button></div>';
-    if (parent) { var g = progress(k); return '<button class="li" data-act="open" data-id="' + k.id + '"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(o.p.name)) + '</span></span><span class="r num">' + g.d + '/' + g.n + '</span><span class="r num">' + fmtDate(k.end) + '</span></button>'; }
-    return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(o.p.name) + '</span></span><span class="r num' + (late(k) ? ' bad' : '') + '">' + fmtDate(k.end) + '</span><button class="ib ok" data-act="done" data-id="' + k.id + '" title="完了" aria-label="完了"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></button></div>';
+    if (parent) { var g = progress(k); return '<button class="li" data-act="open" data-id="' + k.id + '"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(ttl(o.p))) + '</span></span><span class="r num">' + g.d + '/' + g.n + '</span><span class="r num">' + fmtDate(k.end) + '</span></button>'; }
+    return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(k) ? ' bad' : '') + '">' + fmtDate(k.end) + '</span><button class="ib ok" data-act="done" data-id="' + k.id + '" title="完了" aria-label="完了"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></button></div>';
   }).join('') : none;
   var myFeed = feed.length ? feed.map(function (n) { return '<div class="li"><span class="t"><b style="white-space:normal">' + esc(n.text) + '</b><span>' + esc(n.sub || '') + '</span></span>' + (n.at ? '<span class="r num">' + esc(n.at) + '</span>' : '') + '</div>'; }).join('') : none;
   var self = '<section class="dsec"><h2>' + av(m.id) + esc(m.name) + '</h2><div class="dg2">' + card('自分の作業' + cnt(mineOpen.length) + cnt(mineLate && '期限切れ ' + mineLate, true), myTask) + card('通知' + cnt(feed.length), myFeed) + '</div></section>';
@@ -2503,7 +2553,7 @@ function viewDash() {
     ks.push(kpi('進行中のイベント', lv.length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
     var soon = scope.filter(function (o) { return !o.k.done && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
     cards.push(card('期限が近い作業', soon.length ? soon.map(function (o) {
-      return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(o.p.name) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
+      return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
     }).join('') : none, 'projects'));
     var ps = lv.slice().sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
     cards.push(card('イベント', ps.length ? ps.map(function (p) {
@@ -2528,7 +2578,7 @@ function viewDash() {
   // 統計
   var sk = [], sc = [];
   if (can('projects')) {
-    var fin = S.projects.filter(function (p) { return isEvent(p) && ended(p); }).sort(function (a, b) { return dayOf(b.end) - dayOf(a.end); });
+    var fin = allEvents().filter(function (p) { return isEvent(p) && ended(p); }).sort(function (a, b) { return dayOf(b.end) - dayOf(a.end); });
     var avg = fin.length ? Math.round(fin.reduce(function (n, p) { return n + pct(p); }, 0) / fin.length) : 0;
     sk.push(kpi('平均参加率', avg + '%'));
     sc.push('<div class="card"><div class="ch"><span class="cht">参加率</span><button data-act="pstats" aria-label="参加率を開く" title="開く">' + GO + '</button></div><div class="cb"><div class="hbs">' +
@@ -2823,6 +2873,183 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.
 document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-act="go"][data-view="tracks"]'); if (b) S.sel = null; }, true);
 if (S && S.sel) S.sel = null;
 var _render5 = render; render = function () { if (S.view !== 'tracks' && S.view !== 'projects') document.body.classList.remove('recon'); _render5.apply(this, arguments); if (S.view === 'projects' && !UI.rec) document.body.classList.remove('recon'); };
+
+// ---------- ux7: 業務＝フォルダー（ファイルアプリ型） ----------
+var FOLD = '<svg class="i fi" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+var ENTER = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7l5 5-5 5"/></svg>';
+function isFolder(n) { return !!(n && (n.tasks || n.folder || kids(n).length)); }
+function leavesOf(n) { var c = kids(n); if (!c.length) return isFolder(n) ? [] : [n]; var r = []; c.forEach(function (x) { r = r.concat(leavesOf(x)); }); return r; }
+function allNodes() { var r = []; S.projects.forEach(function (p) { r = r.concat(nodesOf(p)); }); return r; }
+function allEvents() { return allNodes().filter(isEvent); }
+function evOf(k) { reindex(); var x = IX[k.id] && IX[k.id].par; while (x) { if (isEvent(x)) return x; x = IX[x.id] && IX[x.id].par; } return parentOf(k) || k; }
+function myTasks(id) { var r = []; allNodes().forEach(function (k) { if (inTeam(k, id) && (!isDone(k) || k.id === S.justDone)) r.push({ k: k, p: evOf(k) }); }); return r.sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }); }
+function migrateFolders(st) {
+  if (!st || st.fv || !st.projects) return st;
+  var by = {};
+  st.projects.forEach(function (p) { var d = new Date(dayOf(p.start)), y = d.getUTCMonth() < 3 ? d.getUTCFullYear() - 1 : d.getUTCFullYear(); (by[y] = by[y] || []).push(p); });
+  var adm = (st.members || []).filter(function (m) { return m.perms && m.perms.indexOf('all') >= 0; })[0];
+  st.projects = Object.keys(by).sort().map(function (y) { return { id: 'fy' + y, name: y + '起業部', kind: 'folder', who: adm ? adm.id : '', leads: adm ? [adm.id] : [], start: y + '-04-01', end: (+y + 1) + '-03-31', tasks: by[y] }; });
+  st.fv = 1; st.fcur = 'fy' + (function () { var d = new Date(TODAY); return d.getUTCMonth() < 3 ? d.getUTCFullYear() - 1 : d.getUTCFullYear(); })();
+  st.manualOrder = true; return st;
+}
+var _sample7 = sample; sample = function () { return migrateFolders(_sample7()); };
+if (S) { migrateFolders(S); }
+
+function curFolder() { var f = S.fcur && S.fcur !== 'mine' ? task(S.fcur) : null; if (S.fcur && S.fcur !== 'mine' && !f) S.fcur = ''; return f; }
+function ancestors(n) { reindex(); var a = [], x = IX[n.id] && IX[n.id].par; while (x) { a.unshift(x); x = IX[x.id] && IX[x.id].par; } return a; }
+function visibleRoots() {
+  if (S.fcur === 'mine') return allNodes().filter(function (n) { return inTeam(n, S.me) && !ancestors(n).some(function (a) { return inTeam(a, S.me); }); });
+  var f = curFolder();
+  return (f ? kids(f) : S.projects).filter(visNode);
+}
+function rowsOf(all, ghosts) {
+  var out = [];
+  (function each(list, d) {
+    list.forEach(function (n) {
+      if (!visNode(n)) return;
+      var c = kids(n).filter(visNode), slot = ghosts && isFolder(n) && canEdit(n);
+      var open = all ? true : isOpen(n, d);
+      out.push({ n: n, d: d, has: c.length > 0 || slot, open: open, ctx: !(canEdit(n) || editSelf(n) || inTeam(n, S.me)) });
+      if (open) { each(c, d + 1); if (slot) out.push({ ghost: true, parent: n, d: d + 1 }); }
+    });
+  })(visibleRoots(), 0);
+  return out;
+}
+function addFolder(par, name) {
+  if (!par) { var y = new Date(TODAY).getUTCFullYear(); var r = { id: uid('pj'), name: name, kind: 'folder', who: '', leads: [], start: isoOf(TODAY), end: isoOf(TODAY + 90 * DAY), tasks: [] }; S.projects.push(r); return r; }
+  var n = newNode(par, name); delete n.done; n.folder = true; n.kids = [];
+  if (!par.tasks) { if (!par.kids) par.kids = []; delete par.done; }
+  kids(par).push(n); expandTo(par.id); return n;
+}
+function ftree() {
+  var cur = S.fcur || '', curN = curFolder(), anc = curN ? ancestors(curN).map(function (a) { return a.id; }).concat([curN.id]) : [];
+  S.fopen = S.fopen || {};
+  var row = function (n, d) {
+    if (!isFolder(n) || !visNode(n)) return '';
+    var ch = kids(n).filter(function (c) { return isFolder(c) && visNode(c); });
+    var open = S.fopen[n.id] != null ? S.fopen[n.id] : anc.indexOf(n.id) >= 0;
+    return '<div class="ft' + (cur === n.id ? ' on' : '') + '" style="--d:' + d + '">' +
+      (ch.length ? '<button class="ftc" data-act="ftog" data-id="' + n.id + '" aria-expanded="' + open + '" aria-label="開閉"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (open ? 'M7 10l5 5 5-5' : 'M10 7l5 5-5 5') + '"/></svg></button>' : '<span class="ftc"></span>') +
+      '<button class="ftn" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + '>' + FOLD + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
+      (open ? ch.map(function (c) { return row(c, d + 1); }).join('') : '');
+  };
+  return '<button class="ftop' + (cur === 'mine' ? ' on' : '') + '" data-act="fgo" data-id="mine">' + ic('users') + '<span>自分の担当</span></button>' +
+    '<button class="ftop' + (!cur ? ' on' : '') + '" data-act="fgo" data-id="">' + FOLD + '<span>すべて</span></button>' +
+    '<div class="ftl">' + S.projects.map(function (n) { return row(n, 0); }).join('') + '</div>';
+}
+function crumbs() {
+  var f = curFolder();
+  var parts = ['<button data-act="fgo" data-id="">すべて</button>'];
+  if (S.fcur === 'mine') parts.push('<b>自分の担当</b>');
+  else if (f) { ancestors(f).forEach(function (a) { parts.push('<button data-act="fgo" data-id="' + a.id + '">' + esc(ttl(a)) + '</button>'); }); parts.push('<b>' + esc(ttl(f)) + '</b>'); }
+  return '<nav class="crumb" aria-label="場所">' + parts.join('<span class="cs">›</span>') + '</nav>';
+}
+function fhead() {
+  var f = curFolder(); if (!f) return '';
+  var g = progress(f), up = parentOf(f);
+  var mx = nodesOf(f).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0), over = mx > dayOf(f.end);
+  return '<div class="fh">' +
+    '<span class="fhn">' + FOLD + '<b>' + esc(ttl(f)) + '</b>' + (isEvent(f) ? '<i class="evd" title="イベント"></i>' : '') + '</span>' +
+    teamBtn(f, editSelf(f) ? '' : ' disabled') +
+    '<span class="fhd num' + (over ? ' bad' : '') + '" title="' + (over ? '中身が期限を超えています' : '期間') + '">' + shortDate(f.start) + ' – ' + shortDate(f.end) + (over ? ' ⚠' : '') + '</span>' +
+    (g.n ? '<span class="prog"><span class="b"><i style="width:' + Math.round(g.d / g.n * 100) + '%"></i></span><span class="num muted" style="font-size:12px">' + g.d + '/' + g.n + '</span></span>' : '') +
+    '<span class="sp"></span>' +
+    '<button class="ib fhb" data-act="rec" data-id="' + f.id + '" title="情報" aria-label="情報">' + DOC + '</button>' +
+    (manages(up) ? '<button class="ib fhb" data-act="dupF" title="複製" aria-label="複製"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>' : '') +
+    (editSelf(f) ? '<button class="ib fhb" data-act="edit" data-id="' + f.id + '" title="編集" aria-label="編集">' + ic('more') + '</button>' : '') +
+  '</div>';
+}
+var viewWork0 = viewWork;
+viewWork = function () {
+  curFolder();
+  var h = viewWork0(), i = h.indexOf('</div>');
+  var rest = h.slice(i + 6);
+  return top('業務') + '<div class="wk"><aside class="ftree" aria-label="フォルダー">' + ftree() + '</aside><div class="wkm">' + crumbs() + fhead() + rest + '</div></div>';
+};
+function filterBar() { return ''; }
+function decorateFolders() {
+  if (S.view !== 'projects') return;
+  var gg = document.querySelector('.gg'), PX = gg ? +gg.dataset.px : 0, LO = gg ? +gg.dataset.lo : 0;
+  var X = function (t) { return Math.round(Math.round((t - LO) / DAY) * PX); };
+  document.querySelectorAll('.wcard .wr[data-row], .gg .gr[data-row]').forEach(function (row) {
+    var n = task(row.dataset.row); if (!n || !isFolder(n) || row.querySelector('.fin')) return;
+    row.classList.add('isf');
+    var lvb = row.querySelector('.lvb'); if (lvb) lvb.insertAdjacentHTML('afterend', FOLD);
+    var btn = '<button class="fin" data-act="fgo" data-id="' + n.id + '" title="このフォルダーを開く" aria-label="開く">' + ENTER + '</button>';
+    var ct = row.querySelector('.gl .ct') || row.querySelector('.wtx'); if (ct) ct.insertAdjacentHTML('afterend', btn);
+    if (gg && row.classList.contains('gr')) {
+      var mx = nodesOf(n).slice(1).reduce(function (m, x) { return Math.max(m, dayOf(x.end)); }, 0);
+      if (mx > dayOf(n.end)) { var gt = row.querySelector('.gt'); if (gt) gt.insertAdjacentHTML('beforeend', '<div class="ovr" title="期限超過" style="left:' + X(dayOf(n.end) + DAY) + 'px;width:' + Math.max(PX, X(mx) - X(dayOf(n.end))) + 'px"></div>'); }
+    }
+  });
+}
+var recHTML0 = recHTML;
+recHTML = function (p) {
+  var had = 'name' in p; if (!had) p.name = ttl(p);
+  var h = recHTML0(p); if (!had) delete p.name;
+  var ok = recOK(p);
+  h = h.replace('<section><h3>概要</h3>', '<section><h3>概要</h3><label class="evt"><input type="checkbox" class="check" data-evt="1"' + (isEvent(p) ? ' checked' : '') + (ok ? '' : ' disabled') + '>イベント（参加数を記録して統計に入れる）</label>');
+  if (!isEvent(p)) h = h.replace(/<div class="two"><div class="rf"><label>担当部[\s\S]*?<\/select><\/div><\/div>/, '').replace(/<section><h3>結果<\/h3><div class="two">[\s\S]*?<\/div><\/div>/, '<section><h3>結果</h3>');
+  return h;
+};
+document.addEventListener('change', function (e) {
+  if (!e.target.dataset || !e.target.dataset.evt) return; e.stopImmediatePropagation();
+  var p = task(UI.rec); if (!p || !recOK(p)) return;
+  if (e.target.checked) { p.kind = 'event'; if (!p.announce) p.announce = 'before'; if (p.reg == null) p.reg = 0; } else p.kind = 'folder';
+  save(); render();
+}, true);
+var nodeModal0 = nodeModal;
+nodeModal = function (n) {
+  var h = nodeModal0(n);
+  if (!isFolder(n) && (editSelf(n) || n.who === S.me)) h = h.replace('<span class="sp"></span>', '<button class="btn" data-act="toFolder" data-id="' + n.id + '">' + FOLD + 'フォルダーに変える</button><span class="sp"></span>');
+  return h;
+};
+function fabHTML() {
+  if (S.view !== 'projects' || S.fcur === 'mine') return '';
+  var f = curFolder(); if (!manages(f)) return '';
+  return '<div class="efabw' + (UI.fm ? ' open' : '') + '">' + (UI.fm ? '<div class="fmenu" role="menu"><button role="menuitem" data-act="newF">' + FOLD + 'フォルダー</button>' + (f ? '<button role="menuitem" data-act="newT"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 12l2 2 4-4"/></svg>業務</button>' : '') + '</div>' : '') +
+    '<button class="efab" data-act="fabMenu" title="追加" aria-label="追加" aria-expanded="' + !!UI.fm + '"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
+}
+function dupModal(f) {
+  return dlg('フォルダーを複製',
+    '<div class="two"><div class="fld"><label for="cpN">名前</label><input id="cpN" class="input" value="' + esc(nextName(ttl(f))) + '"></div><div class="fld"><label for="cpD">開始日</label><input id="cpD" class="input num" type="date" value="' + isoOf(dayOf(f.start) + 364 * DAY) + '"></div></div>' +
+    '<div class="muted" style="font-size:12px">中のフォルダーと業務の構成・期間をコピーします。担当者・完了・結果はコピーしません。</div>',
+    '<span class="sp"></span><button class="btn" data-act="close">やめる</button><button class="btn primary" data-act="dupGo">複製</button>');
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="fgo"],[data-act="ftog"],[data-act="newF"],[data-act="newT"],[data-act="toFolder"],[data-act="dupF"],[data-act="dupGo"]'); if (!b) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act, f = curFolder();
+  if (a === 'fgo') { S.fcur = b.dataset.id; S.fopen = S.fopen || {}; if (S.fcur && S.fcur !== 'mine') S.fopen[S.fcur] = true; UI.rec = null; UI.sp = null; save(); render(); return; }
+  if (a === 'ftog') { S.fopen = S.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); S.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); save(); render(); return; }
+  if (a === 'newF' || a === 'newT') {
+    UI.fm = false; if (!manages(f)) return;
+    var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しい業務');
+    if (S.wtab !== 'list') S.wtab = 'list';
+    rerender({ id: n.id, c: 't' }); var el = document.querySelector('.cell[data-id="' + n.id + '"][data-c="t"]'); if (el) { el.select(); el.scrollIntoView({ block: 'center' }); }
+    return;
+  }
+  if (a === 'toFolder') { var t = task(b.dataset.id); if (!t) return; t.folder = true; t.kids = t.kids || []; delete t.done; if (t.who) setLeads(t, [t.who]); M = null; save(); render(); toast('フォルダーに変えました'); return; }
+  if (a === 'dupF') { if (!f) return; var ov = document.getElementById('cpov'); if (!ov) { ov = document.createElement('div'); ov.id = 'cpov'; document.body.appendChild(ov); } ov.innerHTML = dupModal(f); ov.querySelector('#cpN').focus(); return; }
+  if (a === 'dupGo') {
+    var nm = val('cpN').trim(), d = val('cpD'); if (!f || !nm || !d) { toast('名前と開始日を入れてください'); return; }
+    var delta = dayOf(d) - dayOf(f.start), par = parentOf(f);
+    var c = { id: uid(par ? 'k' : 'pj'), who: '', leads: [], start: d, end: isoOf(dayOf(f.end) + delta), kind: f.kind || 'folder', purpose: f.purpose || '', place: f.place || '', unit: f.unit };
+    if (isEvent(f)) { c.announce = 'before'; c.reg = 0; }
+    if (par) { c.title = nm; c.folder = true; c.kids = cloneKids(f, delta); kids(par).push(c); } else { c.name = nm; c.tasks = cloneKids(f, delta); S.projects.push(c); }
+    cloneMark(c);
+    closeCopy(); S.fcur = c.id; save(); render(); toast('「' + nm + '」を作りました'); return;
+  }
+}, true);
+function cloneMark(c) { kids(c).forEach(function (k) { if (k.kids && k.kids.length) k.folder = true; cloneMark(k); }); }
+function cloneKids(src, delta) {
+  return kids(src).map(function (k) {
+    var c = { id: uid('k'), title: ttl(k), who: '', start: isoOf(dayOf(k.start) + delta), end: isoOf(dayOf(k.end) + delta), done: false };
+    if (isFolder(k)) { c.folder = true; c.kids = cloneKids(k, delta); delete c.done; if (isEvent(k)) { c.kind = 'event'; c.announce = 'before'; c.reg = 0; } }
+    return c;
+  });
+}
+var _render7 = render; render = function () { _render7.apply(this, arguments); decorateFolders(); };
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
