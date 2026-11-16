@@ -1273,8 +1273,8 @@ svg.fli{width:15px;height:15px;flex:none;color:#9CA3AF}
 .gr.hl .gl,.gr.hl-late .gl,.wcard .wr.hl > .wn{box-shadow:none !important}
 .gl .lt{display:none}
 .hldot{flex:none;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px #fff}
-.ur.ufix{background:#FFFBEB}
-.ur.ufix .ufl{font-size:11px;font-weight:700;color:#B45309;letter-spacing:.04em;padding-left:2px}
+.ur.ufix{background:transparent}
+.ur.ufix .ufl{font-size:11px;font-weight:700;color:#D97706;letter-spacing:.04em;padding-left:2px}
 .ur.ufix .ut{font-weight:500}
 .ur.ghost .uc{color:var(--accent)}
 .ur.ghost .uc::placeholder{color:var(--dim);font-weight:400}
@@ -1292,6 +1292,15 @@ svg.bki{width:16px;height:16px;flex:none;color:#9CA3AF}
 .udr .rt small{color:var(--accent)}
 .tkboth .ph{justify-content:flex-start}
 .tkboth .ph > span{margin-left:auto}
+/* ---------- ux19 表の詰まり ---------- */
+.tkboth .uh,.tkboth .ur{grid-template-columns:16px 44px minmax(110px,1fr) 104px minmax(90px,190px) 24px;column-gap:8px}
+.tkboth .ur{min-height:44px;padding-top:4px;padding-bottom:4px}
+.utg{display:flex;gap:6px;align-items:center}
+.ud{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:2px 0}
+.tgl{height:24px;padding:0 8px;font-size:11px}
+.ud .chip{height:24px}
+.depadd{height:24px;min-width:26px}
+.ur.ufix .ufin{grid-column:3 / 6}
 </style>
 </head>
 <body>
@@ -1555,9 +1564,11 @@ function mapSVG(g, sel, avail) {
   function seg(a, b) {
     var x1 = a.x, y1 = a.y + 9, x2 = b.x, y2 = b.y - 9;
     if (x1 === x2) return 'M' + x1 + ' ' + y1 + ' V' + y2;
-    var ym = y2 - ROW / 2 + 9, r = 10, dir = x2 > x1 ? 1 : -1;
+    var k = TK[b.y] ? Math.max(0, TK[b.y].indexOf(a.x)) : 0, ym = Math.max(y1 + 14, y2 - ROW / 2 + 9 - k * 16), r = 8, dir = x2 > x1 ? 1 : -1;
     return 'M' + x1 + ' ' + y1 + ' V' + (ym - r) + ' Q' + x1 + ' ' + ym + ' ' + (x1 + dir * r) + ' ' + ym + ' H' + (x2 - dir * r) + ' Q' + x2 + ' ' + ym + ' ' + x2 + ' ' + (ym + r) + ' V' + y2;
   }
+  var TK = {}; g.edges.forEach(function (e) { var a = at[e.from], b = at[e.to]; if (!a || !b || a.x === b.x) return; (TK[b.y] = TK[b.y] || []); if (TK[b.y].indexOf(a.x) < 0) TK[b.y].push(a.x); });
+  Object.keys(TK).forEach(function (k) { TK[k].sort(function (p, q) { return q - p; }); });
   var out = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="路線図">';
   g.edges.forEach(function (e) {
     var a = at[e.from], b = at[e.to]; if (!a || !b) return;
@@ -3893,7 +3904,7 @@ decorateGantt12 = function () {
 var unitsHTML18 = unitsHTML;
 unitsHTML = function (t) {
   var h = unitsHTML18(t), k = h.indexOf('</div>') + 6;
-  var fix = function (lab, key, ph) { return '<div class="ur ufix"><span></span><span class="uc num ufl">' + lab + '</span><input class="cell ut" data-bind="' + key + '" value="' + esc(t[key] || '') + '" placeholder="' + ph + '" aria-label="' + lab + '" autocomplete="off"><span></span><span></span><span></span></div>'; };
+  var fix = function (lab, key, ph) { return '<div class="ur ufix"><span></span><span class="uc num ufl">' + lab + '</span><input class="cell ut ufin" data-bind="' + key + '" value="' + esc(t[key] || '') + '" placeholder="' + ph + '" aria-label="' + lab + '" autocomplete="off"><span></span></div>'; };
   h = h.slice(0, k) + fix('START', 'start', '始点（前提となる状態）') + h.slice(k);
   h = h.replace('<div class="ur ghost"><span></span><span></span><input class="cell ut" data-u="new"', '<div class="ur ghost"><span></span><input class="cell uc num" data-u="newcode" placeholder="コード" aria-label="新しい単元のコード" autocomplete="off" spellcheck="false"><input class="cell ut" data-u="new"');
   return h + fix('GOAL', 'goal', '終点（到達する状態）');
