@@ -1247,6 +1247,26 @@ svg.fli{width:15px;height:15px;flex:none;color:#9CA3AF}
 .fpm.editing{outline:0 !important;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12) !important}
 .fpm.empty:not(.editing)::before{content:attr(data-ph);color:var(--dim)}
 .fpm a{color:var(--accent);text-decoration:underline;word-break:break-all}
+.dash .li .t{position:relative}
+.dash .li .t > svg.fi,.dash .li .t > svg.fli{position:absolute;left:-22px;top:2px;width:15px;height:15px}
+.dash .li .t:has(> svg){margin-left:22px}
+.dash .li .t > svg.fi{color:#F59E0B}
+.dash .t.lk{cursor:pointer}
+.dash .t.lk:hover b{text-decoration:underline;text-underline-offset:3px}
+/* ---------- ux16 教材：横並び ---------- */
+.tkboth{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.tkboth > .pane{display:flex;flex-direction:column;min-width:0}
+.tkboth .usheet{flex:1;overflow:auto}
+.tkboth .tkmap .map-wrap{flex:1;height:auto;min-height:420px;max-height:calc(100vh - 300px)}
+@media (min-width:761px){ .tkbar .pseg{display:none} .tkbar{border-top:0;padding-top:0} }
+@media (max-width:760px){
+  .tkboth{grid-template-columns:minmax(0,1fr)}
+  .tkboth[data-tv="map"] .tktab,.tkboth[data-tv="table"] .tkmap{display:none}
+  .tkboth .tkmap .map-wrap{max-height:none}
+}
+.tkboth .uh,.tkboth .ur{grid-template-columns:16px 44px minmax(110px,1fr) 76px minmax(60px,150px) 24px;padding:0 6px}
+@media (max-width:760px){ .sideb{display:none !important} }
+@media (min-width:761px){ .tkbar{display:none} }
 </style>
 </head>
 <body>
@@ -1946,7 +1966,7 @@ function viewDash() {
   left.push('<div class="card o1"><div class="ch">自分の作業</div>' + (mine.length ? mine.map(function (o) {
     var k = o.k, parent = kids(k).length > 0 || !!k.tasks;
     if (!parent && k.done) return '<div class="li" style="color:var(--muted)"><span class="t"><b>' + esc(ttl(k)) + '</b><span>報告済み</span></span><button class="btn sm ghost" data-act="undo" data-id="' + k.id + '">取り消す</button></div>';
-    if (parent) { var g = progress(k); return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(ttl(o.p))) + '・下に ' + (nodesOf(k).length - 1) + ' 件（完了 ' + g.d + '/' + g.n + '）</span></span><span class="r">期限 ' + fmtDate(k.end) + '</span><button class="btn sm" data-act="open" data-id="' + k.id + '">分担する</button></div>'; }
+    if (parent) { var g = progress(k); return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (parentOf(k) ? esc(ttl(parentOf(k))) : '') + '・下に ' + (nodesOf(k).length - 1) + ' 件（完了 ' + g.d + '/' + g.n + '）</span></span><span class="r">期限 ' + fmtDate(k.end) + '</span><button class="btn sm" data-act="open" data-id="' + k.id + '">分担する</button></div>'; }
     return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r' + (late(k) ? ' bad' : '') + '">' + (late(k) ? '期限切れ ' : '期限 ') + fmtDate(k.end) + '</span><button class="btn sm primary" data-act="done" data-id="' + k.id + '">完了</button></div>';
   }).join('') : '<div class="empty sm">担当中の作業はありません</div>') + '</div>');
   var ns = (S.notifs || []).filter(function (n) { return n.to === m.id; }).slice(0, 6);
@@ -2775,13 +2795,13 @@ function viewDash() {
   var alerts = mineOpen.filter(function (o) { return !late(o.k) && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」あと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
   var feed = alerts.concat(ns);
   var myTask = mine.length ? mine.map(function (o) {
-    var k = o.k, parent = kids(k).length > 0 || !!k.tasks;
-    if (!parent && k.done) return '<div class="li dn"><span class="t"><b>' + esc(ttl(k)) + '</b></span><button class="ib" data-act="undo" data-id="' + k.id + '" title="完了を取り消す" aria-label="完了を取り消す"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/></svg></button></div>';
-    if (parent) { var g = progress(k); return '<button class="li" data-act="open" data-id="' + k.id + '"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + (k === o.p ? 'イベント' : esc(ttl(o.p))) + '</span></span><span class="r num">' + g.d + '/' + g.n + '</span><span class="r num">' + fmtDate(k.end) + '</span></button>'; }
-    return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(k) ? ' bad' : '') + '">' + fmtDate(k.end) + '</span><button class="ib ok" data-act="done" data-id="' + k.id + '" title="完了" aria-label="完了"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></button></div>';
+    var k = o.k, parent = isFolder(k);
+    if (!parent && k.done) return '<div class="li dn"><span class="t lk" data-act="open" data-id="' + k.id + '">' + FILE + '<b>' + esc(ttl(k)) + '</b></span><button class="ib" data-act="undo" data-id="' + k.id + '" title="完了を取り消す" aria-label="完了を取り消す"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/></svg></button></div>';
+    if (parent) { var g = progress(k); return '<button class="li" data-act="open" data-id="' + k.id + '"><span class="t">' + FOLD + '<b>' + esc(ttl(k)) + '</b><span>' + (parentOf(k) ? esc(ttl(parentOf(k))) : '') + '</span></span><span class="r num">' + g.d + '/' + g.n + '</span><span class="r num">' + fmtDate(k.end) + '</span></button>'; }
+    return '<div class="li"><span class="t lk" data-act="open" data-id="' + k.id + '">' + FILE + '<b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(k) ? ' bad' : '') + '">' + fmtDate(k.end) + '</span><button class="ib ok" data-act="done" data-id="' + k.id + '" title="完了" aria-label="完了"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></button></div>';
   }).join('') : none;
   var myFeed = feed.length ? feed.map(function (n) { return '<div class="li"><span class="t"><b style="white-space:normal">' + esc(n.text) + '</b><span>' + esc(n.sub || '') + '</span></span>' + (n.at ? '<span class="r num">' + esc(n.at) + '</span>' : '') + '</div>'; }).join('') : none;
-  var self = '<section class="dsec"><h2>' + av(m.id) + esc(m.name) + '</h2><div class="dg2">' + card('自分の作業' + cnt(mineOpen.length) + cnt(mineLate && '期限切れ ' + mineLate, true), myTask) + card('通知' + cnt(feed.length), myFeed) + '</div></section>';
+  var self = '<section class="dsec"><h2>' + av(m.id) + esc(m.name) + '</h2><div class="dg2">' + card('自分の担当' + cnt(mineOpen.length) + cnt(mineLate && '期限切れ ' + mineLate, true), myTask) + card('通知' + cnt(feed.length), myFeed) + '</div></section>';
 
   // 動き（イベント・期限・対応）
   var ks = [], cards = [];
@@ -2792,8 +2812,8 @@ function viewDash() {
     var lv = (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); }));
     ks.push(kpi('進行中のイベント', lv.length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
     var soon = scope.filter(function (o) { return !o.k.done && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
-    cards.push(card('期限が近い作業', soon.length ? soon.map(function (o) {
-      return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(o.k.title) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
+    cards.push(card('期限が近いファイル', soon.length ? soon.map(function (o) {
+      return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(ttl(o.k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
     }).join('') : none, 'projects'));
     var ps = lv.slice().sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
     cards.push(card('イベント', ps.length ? ps.map(function (p) {
@@ -3061,9 +3081,8 @@ function viewTracks() {
       '<span class="dim num tkup" title="最終更新">' + esc(t.updated) + '</span>' +
     '</div>' +
     '<div class="tkbar">' + seg + '<span class="muted num" style="font-size:12px">単元 <span id="unitCount">' + tl(t).length + '</span></span></div>';
-  var main = tv === 'map'
-    ? '<div class="pane tkmap"><div class="map-wrap" id="map"></div><div class="warn" id="warn"></div></div><div id="units" hidden>' + unitsHTML(t) + '</div>'
-    : '<div class="pane"><div class="usheet" id="units">' + unitsHTML(t) + '</div><div class="warn" id="warn"></div></div><div id="map" hidden></div>';
+  var main = '<div class="tkboth" data-tv="' + tv + '"><div class="pane tktab"><div class="ph">単元<span class="muted num" style="font-weight:400">' + tl(t).length + '</span></div><div class="usheet" id="units">' + unitsHTML(t) + '</div></div>' +
+    '<div class="pane tkmap"><div class="ph">路線図</div><div class="map-wrap" id="map"></div><div class="warn" id="warn"></div></div></div>';
   return top('教材') + '<div class="body tk">' + tkList() + '<div class="tkm">' + head + main + '</div></div>' +
     '<aside class="rec udr" id="udr"><div id="detail"></div></aside>';
 }
@@ -3163,11 +3182,11 @@ function addFolder(par, name) {
 }
 function ftree() {
   var cur = S.fcur || '', curN = curFolder(), anc = curN ? ancestors(curN).map(function (a) { return a.id; }).concat([curN.id]) : [];
-  S.fopen = S.fopen || {};
+  UI.fopen = UI.fopen || {};
   var row = function (n, d) {
     if (!visNode(n)) return '';
     var ch = isFolder(n) ? kids(n).filter(visNode) : [];
-    var open = S.fopen[n.id] != null ? S.fopen[n.id] : anc.indexOf(n.id) >= 0;
+    var open = UI.fopen[n.id] != null ? UI.fopen[n.id] : anc.indexOf(n.id) >= 0;
     return '<div class="ft' + (cur === n.id ? ' on' : '') + '" style="--d:' + d + '">' +
       (ch.length ? '<button class="ftc" data-act="ftog" data-id="' + n.id + '" aria-expanded="' + open + '" aria-label="開閉"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (open ? 'M7 10l5 5 5-5' : 'M10 7l5 5-5 5') + '"/></svg></button>' : '<span class="ftc"></span>') +
       '<button class="ftn" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + '>' + (isFolder(n) ? FOLD : FILE) + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
@@ -3261,8 +3280,8 @@ document.addEventListener('click', function (e) {
   if (e.target.closest('[data-act]') !== b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, f = curFolder();
-  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = b.dataset.id; S.fopen = S.fopen || {}; if (S.fcur && S.fcur !== 'mine') S.fopen[S.fcur] = true; UI.rec = null; UI.sp = null; save(); render(); return; }
-  if (a === 'ftog') { S.fopen = S.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); S.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); save(); render(); return; }
+  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = b.dataset.id; UI.rec = null; UI.sp = null; save(); render(); return; }
+  if (a === 'ftog') { UI.fopen = UI.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); UI.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); render(); return; }
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
     var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル');
@@ -3587,7 +3606,7 @@ document.addEventListener('contextmenu', function (e) {
   var id = el.dataset.id || el.dataset.row, n = id && task(id); if (!n) return;
   e.preventDefault(); closePop(); openCM(n, e.clientX, e.clientY);
 });
-function goFolder(id, mode) { if (id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = id; if (mode) S.fmode = mode; S.fopen = S.fopen || {}; S.fopen[id] = true; UI.sp = null; save(); render(); }
+function goFolder(id, mode) { if (id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } S.fcur = id; if (mode) S.fmode = mode; UI.sp = null; save(); render(); }
 document.addEventListener('click', function (e) {
   var c = e.target.closest && e.target.closest('[data-cm]');
   if (c) {
@@ -3745,6 +3764,18 @@ function filePage(n) {
 var viewWork15 = viewWork;
 viewWork = function () { var n = S.fcur && S.fcur !== 'mine' ? task(S.fcur) : null; if (n && !isFolder(n)) { S.wtab = 'list'; return filePage(n); } return viewWork15(); };
 document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-act="toFolder"]'); if (b) UI.fmn = false; }, true);
+
+// ---------- ux16: ツリーの展開はその場だけ・ダッシュボードから業務へ・教材は横並び ----------
+document.addEventListener('click', function (e) {
+  var g = e.target.closest && e.target.closest('[data-act="go"][data-view]');
+  if (g && g.dataset.view !== 'projects') UI.fopen = {};
+  var o = e.target.closest && e.target.closest('[data-act="open"][data-id]');
+  if (o && S.view === 'dash') {
+    e.stopImmediatePropagation(); e.preventDefault();
+    var n = task(o.dataset.id); if (!n) return;
+    UI.fopen = {}; UI.fhist = []; S.view = 'projects'; S.fcur = n.id; S.fmode = 'card'; UI.sp = null; save(); render();
+  }
+}, true);
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
