@@ -4583,6 +4583,49 @@ document.addEventListener('click', function (e) {
   save(); render(); toastUndo('「' + ttl(n) + '」を「' + ttl(g) + '」へ出しました');
 }, true);
 
+
+// ---------- ux34 ドラッグ：どの段の行の間にも置ける（線の位置＝入る段）。フォルダーの真ん中＝中へ ----------
+mvPlan = function (e) {
+  mvClear();
+  var src = mv.n, el = document.elementFromPoint(e.clientX, e.clientY); if (!el) return null;
+  var T = el.closest('.ftn[data-id]') || el.closest('.crumb button[data-act="fgo"][data-id]:not([data-id=""])');
+  var into = function (t, R) {
+    var ok = !!t && isFolder(t) && manages(t) && !within(src, t);
+    R.classList.add('mvinto'); if (!ok) R.classList.add('mvno'); document.body.classList.add('mvin');
+    return { into: t, ok: ok, x: 0, y: 0, r: 0 };
+  };
+  if (T) { var tt = task(T.dataset.id); return tt && tt !== src ? into(tt, T) : null; }
+  var R = el.closest(mv.scope + ' [data-d]'); if (!R || R.classList.contains('gfill')) return null;
+  var rect = function (x) { return x.getBoundingClientRect(); }, rc = rect(R);
+  var cxOf = function (x) { var c = x.querySelector('.lvb') || x.querySelector('.ct') || x.querySelector('.gname'); return c ? rect(c).left - 2 : rc.left + 8; };
+  var rEnd = function (x) { var g = x.querySelector('.gl'); return (g ? rect(g).right : rect(x).right) - 12; };
+  var plan = function (par, ref, before, y, x) {
+    var ok = (par ? manages(par) : isAdmin() && !parentOf(src)) && !(par && within(src, par)) && ref !== src;
+    return { par: par, ref: ref, before: before, ok: ok, x: x, y: y, r: rEnd(R) };
+  };
+  if (!R.dataset.row) { // 「＋ 追加」の行 → その並びの末尾
+    var pi = R.querySelector('[data-parent]'), pp = pi && pi.dataset.parent ? task(pi.dataset.parent) : null; if (!pp) return null;
+    return plan(pp, null, false, rc.top, cxOf(R));
+  }
+  var t = task(R.dataset.row); if (!t) return null;
+  if (t === src || within(src, t)) return null;
+  var f = isFolder(t), y = e.clientY, q = rc.height / 4;
+  if (f && y > rc.top + q && y < rc.bottom - q) return into(t, R);
+  var next = R.nextElementSibling, openKids = f && next && next.dataset && +next.dataset.d > +R.dataset.d;
+  if (y < rc.top + rc.height / 2) return plan(parentOf(t), t, true, rc.top, cxOf(R));
+  if (openKids) return plan(t, kids(t)[0] || null, true, rc.bottom, cxOf(R) + 18); // 開いているフォルダーの下端 → 中の先頭
+  return plan(parentOf(t), t, false, rc.bottom, cxOf(R));
+};
+var _mvEnd34 = mvEnd;
+mvEnd = function (e, cancel) {
+  var m = mv, pl = m && m.plan;
+  if (m && m.on && !cancel && pl && !pl.into) {
+    if (!pl.ok) { _mvEnd34(e, true); UI.mvJust = Date.now(); toast(pl.par ? '「' + ttl(pl.par) + '」のリーダーではないので置けません' : 'ここには置けません'); return; }
+    if (pl.par && !parentOf(m.n)) toNested(m.n);
+  }
+  return _mvEnd34(e, cancel);
+};
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
