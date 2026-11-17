@@ -1484,6 +1484,10 @@ body.mvin .mvline{display:none !important}
 .gr .bar .lb{font-size:12px}
 .gr .bar.sum{top:12px;height:16px;border-radius:4px}
 .gr.g0 .bar.sum{top:13px;height:14px;border-radius:4px}
+
+/* ux36 キーボード・右クリックの総点検 */
+.cm button:focus-visible,.cm button:focus{outline:none;background:var(--hover,#F3F4F6)}
+[data-act][tabindex]:focus-visible,.ied:focus-visible,.pnr:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -4337,18 +4341,18 @@ var PATCH_SEED = [
 function patchesInit() { if (!S.patches) S.patches = PATCH_SEED.map(function (x, i) { return { id: 'pt' + i, date: x[0], title: x[1], note: x[2], state: 'done' }; }); return S.patches; }
 function pRow(x) {
   var ed = isAdmin(), d = x.date ? fmtDate(x.date) : '';
-  return '<div class="pnr' + (ed ? ' ed' : '') + '"' + (ed ? ' data-act="pEdit" data-id="' + x.id + '"' : '') + '><span class="pd num">' + (x.state === 'plan' && !d ? '未定' : d) + '</span><span class="pt"><b>' + esc(x.title) + '</b>' + (x.note ? '<span>' + esc(x.note) + '</span>' : '') + '</span>' +
-    (ed && x.state === 'plan' ? '<button class="ib" data-act="pDone" data-id="' + x.id + '" title="実施済みにする" aria-label="実施済みにする"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></button>' : '<span></span>') + '</div>';
+  return '<div class="pnr' + (ed ? ' ed' : '') + '"' + (ed ? ' data-act="ptEdit" data-id="' + x.id + '"' : '') + '><span class="pd num">' + (x.state === 'plan' && !d ? '未定' : d) + '</span><span class="pt"><b>' + esc(x.title) + '</b>' + (x.note ? '<span>' + esc(x.note) + '</span>' : '') + '</span>' +
+    (ed && x.state === 'plan' ? '<button class="ib" data-act="ptDone" data-id="' + x.id + '" title="実施済みにする" aria-label="実施済みにする"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></button>' : '<span></span>') + '</div>';
 }
 function patchCards() {
   var ps = patchesInit(), by = function (a, b) { return (b.date || '9999').localeCompare(a.date || '9999'); };
   var plan = ps.filter(function (x) { return x.state === 'plan'; }).sort(function (a, b) { return (a.date || '9999').localeCompare(b.date || '9999'); });
   var done = ps.filter(function (x) { return x.state !== 'plan'; }).sort(function (a, b) { return by(a, b) || ps.indexOf(b) - ps.indexOf(a); });
-  var add = function (st) { return isAdmin() ? '<button data-act="pNew" data-s="' + st + '" title="追加" aria-label="追加">' + ic('plus') + '</button>' : ''; };
+  var add = function (st) { return isAdmin() ? '<button data-act="ptNew" data-s="' + st + '" title="追加" aria-label="追加">' + ic('plus') + '</button>' : ''; };
   var none = '<div class="empty sm">なし</div>', lim = UI.pAll ? done.length : 6;
   var c1 = '<div class="card"><div class="ch"><span class="cht">今後の更新<span class="num" style="margin-left:6px;color:var(--muted);font-weight:400">' + plan.length + '</span></span>' + add('plan') + '</div><div class="pnl">' + (plan.length ? plan.map(pRow).join('') : none) + '</div></div>';
   var c2 = '<div class="card"><div class="ch"><span class="cht">パッチノート<span class="num" style="margin-left:6px;color:var(--muted);font-weight:400">' + done.length + '</span></span>' + add('done') + '</div><div class="pnl">' + (done.length ? done.slice(0, lim).map(pRow).join('') : none) + '</div>' +
-    (done.length > 6 ? '<button class="pmore" data-act="pAll">' + (UI.pAll ? '閉じる' : 'すべて表示（' + done.length + '）') + '</button>' : '') + '</div>';
+    (done.length > 6 ? '<button class="pmore" data-act="ptAll">' + (UI.pAll ? '閉じる' : 'すべて表示（' + done.length + '）') + '</button>' : '') + '</div>';
   return '<div class="dg2" style="margin-top:12px">' + c1 + c2 + '</div>';
 }
 var _snap27 = snap; snap = function () { _snap27(); var u = JSON.parse(UI.undo); u.patches = S.patches; UI.undo = JSON.stringify(u); };
@@ -4364,7 +4368,7 @@ function patchDlg() {
     '<div class="two"><div class="fld"><label for="pS">状態</label><select id="pS" class="input"><option value="plan"' + (d.state === 'plan' ? ' selected' : '') + '>今後の更新</option><option value="done"' + (d.state !== 'plan' ? ' selected' : '') + '>実施済み</option></select></div>' +
     '<div class="fld"><label for="pD">日付</label><input id="pD" type="date" class="input" value="' + esc(d.date || '') + '"></div></div>' +
     '<div class="fld"><label for="pN">詳細</label><textarea id="pN" class="input" rows="4" placeholder="変更点・理由など">' + esc(d.note || '') + '</textarea></div>';
-  var foot = (x ? '<button class="btn ghost" data-act="pDel" data-id="' + x.id + '" style="margin-right:auto;color:var(--red,#DC2626)">削除</button>' : '') + '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="pSave">保存</button>';
+  var foot = (x ? '<button class="btn ghost" data-act="ptDel" data-id="' + x.id + '" style="margin-right:auto;color:var(--red,#DC2626)">削除</button>' : '') + '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="ptSave">保存</button>';
   return dlg(x ? '更新を編集' : (d.state === 'plan' ? '今後の更新を追加' : 'パッチを記録'), body, foot, true);
 }
 var _renderModal27 = renderModal;
@@ -4373,15 +4377,15 @@ renderModal = function () {
   return _renderModal27.apply(this, arguments);
 };
 document.addEventListener('click', function (e) {
-  var b = e.target.closest && e.target.closest('[data-act="pNew"],[data-act="pEdit"],[data-act="pSave"],[data-act="pDel"],[data-act="pDone"],[data-act="pAll"]'); if (!b) return;
+  var b = e.target.closest && e.target.closest('[data-act="ptNew"],[data-act="ptEdit"],[data-act="ptSave"],[data-act="ptDel"],[data-act="ptDone"],[data-act="ptAll"]'); if (!b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, ps = patchesInit(), get = function (id) { return ps.filter(function (y) { return y.id === id; })[0]; };
-  if (a === 'pAll') { UI.pAll = !UI.pAll; render(); return; }
+  if (a === 'ptAll') { UI.pAll = !UI.pAll; render(); return; }
   if (!isAdmin()) return;
-  if (a === 'pNew') { M = { m: 'patch', s: b.dataset.s }; renderModal(); return; }
-  if (a === 'pEdit') { M = { m: 'patch', id: b.dataset.id }; renderModal(); return; }
-  if (a === 'pDone') { var x0 = get(b.dataset.id); if (x0) { snap(); x0.state = 'done'; x0.date = isoOf(TODAY); save(); render(); toast('パッチノートに移しました'); } return; }
-  if (a === 'pDel') { var x1 = get(b.dataset.id); if (!x1) return; snap(); S.patches = ps.filter(function (y) { return y !== x1; }); M = null; save(); render(); toastUndo('「' + x1.title + '」を削除しました'); return; }
+  if (a === 'ptNew') { M = { m: 'patch', s: b.dataset.s }; renderModal(); return; }
+  if (a === 'ptEdit') { M = { m: 'patch', id: b.dataset.id }; renderModal(); return; }
+  if (a === 'ptDone') { var x0 = get(b.dataset.id); if (x0) { snap(); x0.state = 'done'; x0.date = isoOf(TODAY); save(); render(); toast('パッチノートに移しました'); } return; }
+  if (a === 'ptDel') { var x1 = get(b.dataset.id); if (!x1) return; snap(); S.patches = ps.filter(function (y) { return y !== x1; }); M = null; save(); render(); toastUndo('「' + x1.title + '」を削除しました'); return; }
   var t = document.getElementById('pT').value.trim(); if (!t) { toast('内容を入れてください'); return; }
   var data = { title: t, state: document.getElementById('pS').value, date: document.getElementById('pD').value, note: document.getElementById('pN').value.trim() };
   if (data.state === 'done' && !data.date) data.date = isoOf(TODAY);
@@ -4631,6 +4635,137 @@ mvEnd = function (e, cancel) {
   return _mvEnd34(e, cancel);
 };
 
+
+// ---------- ux36 どこで何をしても想定どおり：キーボード・右クリックの総点検 ----------
+// 共通の右クリックメニュー（業務以外の画面用）。items: [[label, fn, danger?] | 'sep']
+function openMenu(title, items, x, y) {
+  closeCM();
+  var m = document.createElement('div'); m.id = 'cm'; m.className = 'cm'; m.setAttribute('role', 'menu'); document.body.appendChild(m);
+  UI.cmFns = [];
+  m.innerHTML = (title ? '<div class="cmh"><span>' + esc(title) + '</span></div>' : '') + items.map(function (it) {
+    if (it === 'sep') return '<i class="cmsep"></i>';
+    UI.cmFns.push(it[1]); return '<button role="menuitem" data-gcm="' + (UI.cmFns.length - 1) + '"' + (it[2] ? ' class="cmdel"' : '') + '>' + esc(it[0]) + '</button>';
+  }).join('');
+  var w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(8, Math.min(x, innerWidth - w - 8)) + 'px'; m.style.top = Math.max(8, Math.min(y, innerHeight - h - 8)) + 'px';
+}
+document.addEventListener('click', function (e) {
+  var c = e.target.closest && e.target.closest('[data-gcm]'); if (!c) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var fn = (UI.cmFns || [])[+c.dataset.gcm]; closeCM(); if (fn) fn();
+}, true);
+function clickAct(sel) { var b = document.querySelector(sel); if (b) b.click(); }
+// 右クリック：告知・掲示板・メンバー・教材の余白
+document.addEventListener('contextmenu', function (e) {
+  if (!e.target.closest || e.defaultPrevented) return;
+  if (e.target.closest('input, textarea, select, [contenteditable="true"], a[href], .cm, #modal, .dlg')) return;
+  if (window.getSelection && String(window.getSelection())) return; // 文字を選んでいるときは標準のメニュー（コピー用）
+  var x = e.clientX, y = e.clientY, it = null, title = '';
+  if (S.view === 'notices' && (S.ntab || 'list') === 'list') {
+    var r = e.target.closest('.nr[data-nid]');
+    if (r) { var n = notice(r.dataset.nid); if (!n) return; title = n.title;
+      it = [['編集', function () { M = { m: 'notice', id: n.id }; renderModal(); }],
+            [n.state === 'pub' ? '非公開にする' : '公開する', function () { n.state = n.state === 'pub' ? 'draft' : 'pub'; save(); render(); }],
+            ['複製', function () { snap(); var c = JSON.parse(JSON.stringify(n)); c.id = uid('n'); c.title = n.title + '（コピー）'; c.state = 'draft'; S.notices.splice(S.notices.indexOf(n) + 1, 0, c); save(); render(); toast('下書きで複製しました'); }],
+            'sep', ['削除', function () { snap(); S.notices = S.notices.filter(function (z) { return z !== n; }); save(); render(); toastUndo('「' + n.title + '」を削除しました'); }, true]];
+    } else if (e.target.closest('#view .body') && can('notices')) it = [['新しい告知', function () { M = { m: 'notice' }; renderModal(); }]];
+  } else if (S.view === 'board') {
+    var tr = e.target.closest('#view tbody tr'), bt = tr && tr.querySelector('[data-id]');
+    if (bt) { var pid = bt.dataset.id, post = S.posts.filter(function (z) { return z.id === pid; })[0]; if (!post) return; title = post.text;
+      it = [];
+      if (post.state === 'ok') { if (post.reports > 0) it.push(['問題なし（通報を消す）', function () { clickAct('[data-act="pOk"][data-id="' + pid + '"]'); }]); it.push(['非表示にする', function () { clickAct('[data-act="pHide"][data-id="' + pid + '"]'); }]); it.push('sep'); it.push(['削除', function () { clickAct('[data-act="pDelNow"][data-id="' + pid + '"]'); }, true]); }
+      else it.push(['表示に戻す', function () { clickAct('[data-act="pShow"][data-id="' + pid + '"]'); }]);
+    }
+  } else if (S.view === 'perms') {
+    var mr = e.target.closest('#view tbody tr'), mb = mr && mr.querySelector('.mname[data-id]');
+    if (mb) { var mm = member(mb.dataset.id); title = mm ? mm.name : '';
+      it = [['詳細を開く', function () { mb.click(); }], ['役職を変える', function () { var sel = mr.querySelector('select.mpost'); if (sel && !sel.disabled) { sel.focus(); if (sel.showPicker) try { sel.showPicker(); } catch (er) {} } else toast('自分の役職は変更できません'); }]];
+    }
+  } else if (S.view === 'tracks' && can('tracks')) {
+    if (!e.target.closest('.tki[data-id], #units .ur[data-code], #map [data-code]') && e.target.closest('#view')) {
+      var t = typeof track === 'function' ? track() : null;
+      it = [['新しいトラック', function () { clickAct('[data-act="newTrack"]'); }]];
+      if (t) { it.push(['単元を追加', function () { var g = document.querySelector('#units .cell[data-u="newcode"], #units .cell[data-u="new"]'); if (!g) { UI.tv = 'table'; render(); g = document.querySelector('#units .cell[data-u="newcode"], #units .cell[data-u="new"]'); } if (g) g.focus(); }]);
+        it.push('sep'); it.push(['このトラックを削除', function () { delTrack(t.id); }, true]); }
+      title = t ? t.name : '教材';
+    }
+  }
+  if (!it || !it.length) return;
+  e.preventDefault(); if (typeof closePop === 'function') closePop(); openMenu(title, it, x, y);
+});
+function confirmOnce(k) { var now = Date.now(); if (UI.cfm && UI.cfm.k === k && now - UI.cfm.t < 4000) { UI.cfm = null; return true; } UI.cfm = { k: k, t: now }; return false; }
+
+// 右クリックメニューのキーボード操作：開いたら先頭にフォーカス、↑↓で移動、Esc で閉じて元へ戻る
+var _cmFocusBack = null;
+new MutationObserver(function () {
+  var m = document.getElementById('cm');
+  if (m && !m.dataset.kb) { m.dataset.kb = '1'; if (!_cmFocusBack) _cmFocusBack = document.activeElement; var f = m.querySelector('button'); if (f && UI.kbMenu) f.focus(); UI.kbMenu = false; }
+  if (!m && _cmFocusBack) { var b = _cmFocusBack; _cmFocusBack = null; if (b && document.contains(b) && UI.kbBack) b.focus(); UI.kbBack = false; }
+}).observe(document.body, { childList: true });
+document.addEventListener('keydown', function (e) {
+  var m = document.getElementById('cm'); if (!m) return;
+  var bs = Array.prototype.slice.call(m.querySelectorAll('button')), i = bs.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); var j = i < 0 ? (e.key === 'ArrowDown' ? 0 : bs.length - 1) : (i + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length; bs[j].focus(); }
+  else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); bs[e.key === 'Home' ? 0 : bs.length - 1].focus(); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); UI.kbBack = true; closeCM(); }
+  else if (e.key === 'Tab') { e.preventDefault(); UI.kbBack = true; closeCM(); }
+}, true);
+// Shift+F10 / メニューキー：フォーカス中のものに右クリックメニューを出す
+document.addEventListener('keydown', function (e) {
+  if (!((e.shiftKey && e.key === 'F10') || e.key === 'ContextMenu')) return;
+  var el = document.activeElement; if (!el || el === document.body || el.closest('input, textarea, select')) return;
+  var r = el.getBoundingClientRect(); e.preventDefault(); UI.kbMenu = true;
+  el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.left + Math.min(24, r.width / 2), clientY: r.bottom - 4, button: 2 }));
+});
+// メニュー・ポップアップは、スクロール・画面サイズ変更・別ウィンドウへ移ったら閉じる
+['resize', 'blur'].forEach(function (ev) { window.addEventListener(ev, function () { closeCM(); }); });
+document.addEventListener('wheel', function (e) { if (!(e.target.closest && e.target.closest('.cm'))) closeCM(); }, { passive: true });
+// Esc で開いているものを全部閉じる（期間ポップアップなど）
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var pp = document.getElementById('perpop'); if (pp) { pp.remove(); e.preventDefault(); }
+});
+
+// ダイアログ：開いたら最初の入力欄へ、Tab はダイアログの中だけで回る、閉じたら開く前の場所へ戻る
+var _dlgBack = null;
+function dlgRoot() { var d = document.querySelector('#modal .dlg, #cpov .dlg, .ov .dlg'); return d && d.getClientRects().length ? d : null; }
+new MutationObserver(function () {
+  var d = dlgRoot();
+  if (d && !d.dataset.kb) {
+    d.dataset.kb = '1'; if (!_dlgBack) _dlgBack = document.activeElement;
+    if (!d.contains(document.activeElement)) { var f = d.querySelector('.c input:not([type=hidden]):not([disabled]), .c textarea, .c select, .c button, .f .btn.primary'); if (f) f.focus(); }
+  }
+  if (!d && _dlgBack) { var b = _dlgBack, key = _dlgKey; _dlgBack = null; _dlgKey = null;
+    if (!(b && document.contains(b)) && key) b = document.querySelector(key);
+    if (b && document.contains(b) && b !== document.body) try { b.focus({ preventScroll: true }); } catch (er) {} }
+}).observe(document.body, { childList: true, subtree: true });
+var _dlgKey = null;
+document.addEventListener('focusin', function (e) { var t = e.target; if (dlgRoot() || !t.dataset) return; _dlgKey = t.dataset.act ? '[data-act="' + t.dataset.act + '"]' + (t.dataset.id ? '[data-id="' + t.dataset.id + '"]' : '') : (t.id ? '#' + t.id : null); });
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Tab') return; var d = dlgRoot(); if (!d) return;
+  var fs = Array.prototype.slice.call(d.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter(function (x) { return !x.disabled && x.getClientRects().length && getComputedStyle(x).visibility !== 'hidden'; });
+  if (!fs.length) return;
+  var i = fs.indexOf(document.activeElement);
+  if (i < 0) { e.preventDefault(); fs[0].focus(); return; }
+  if (!e.shiftKey && i === fs.length - 1) { e.preventDefault(); fs[0].focus(); }
+  else if (e.shiftKey && i === 0) { e.preventDefault(); fs[fs.length - 1].focus(); }
+}, true);
+
+// クリックできるのにキーボードで届かないもの（パッチノートの行・その場で編集する文字）を Tab で選べるように
+function kbDecorate() {
+  document.querySelectorAll('.pnr[data-act], .ied, [data-act]:not(button):not(a):not(input):not(select):not(textarea):not([tabindex])').forEach(function (el) {
+    if (el.closest('.cm') || el.tagName === 'OPTION' || el.tagName === 'SVG' || el.tagName === 'svg') return;
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role') && !el.classList.contains('ied')) el.setAttribute('role', 'button');
+  });
+}
+var _render36 = render; render = function () { _render36.apply(this, arguments); kbDecorate(); };
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  var el = e.target; if (!el || !el.matches || el.isContentEditable) return;
+  if (el.matches('[data-act][tabindex]:not(button):not(a):not(input):not(select):not(textarea), .ied[tabindex]')) { e.preventDefault(); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); }
+});
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
@@ -4744,7 +4879,7 @@ document.addEventListener('click', function (e) {
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') { if (M) { M = null; renderModal(); } if (UI.acct) { UI.acct = false; render(); } return; }
   var n = e.target.closest && e.target.closest('.node, .gl[role=button]');
-  if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); n.click(); }
+  if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); n.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); }
   if (e.key === 'Enter' && M && e.target.tagName === 'INPUT') { var pb = document.querySelector('.dlg .btn.primary'); if (pb) pb.click(); }
 });
 document.addEventListener('input', function (e) {
