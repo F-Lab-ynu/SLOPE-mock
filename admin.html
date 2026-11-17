@@ -1412,6 +1412,7 @@ svg.crown{fill:#F59E0B}
 .fld .hint{font-size:11px;color:var(--muted)}
 @media (max-width:1100px){ .nh,.nr{grid-template-columns:minmax(0,1.6fr) 120px minmax(0,.9fr) 100px minmax(0,1fr) 56px 64px} }
 @media (max-width:760px){ .nr{grid-template-columns:96px minmax(0,1fr) 44px 60px} .nacts{grid-area:x} }
+@media (max-width:760px){ .efabw{bottom:calc(84px + env(safe-area-inset-bottom)) !important} }
 </style>
 </head>
 <body>
@@ -4240,6 +4241,16 @@ document.addEventListener('click', function (e) {
 }, true);
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M && M.m === 'notice') { M = null; renderModal(); } });
 
+
+// ux25 スマホ：＋ボタンを下のタブバーの上に置く
+var _placeFab25 = placeFab;
+placeFab = function () {
+  _placeFab25.apply(this, arguments);
+  var f = document.querySelector('.efabw'), nav = document.querySelector('.nav');
+  if (!f || !nav || innerWidth > 760) return;
+  var r = nav.getBoundingClientRect(); if (r.height) f.style.setProperty('bottom', (innerHeight - r.top + 16) + 'px', 'important');
+};
+addEventListener('resize', function () { placeFab(); });
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
