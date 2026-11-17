@@ -295,11 +295,11 @@ body:not(.wide) #progList,body:not(.wide) #progOut{padding-bottom:calc(96px + en
 </span>
 </button>
 
-<button onClick="{{ goPractice }}" class="card" style="width: 100%; min-height: 148px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; text-align: left; color: #F3F1EC">
-<span style="display: flex; justify-content: space-between; align-items: center; width: 100%"><span style="font-size: 13px; font-weight: 700; color: #A3A19B">未提出の課題</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M7 17 17 7"></path><path d="M9 7h8v8"></path></svg></span>
+<button onClick="{{ goJoin }}" class="card" style="width: 100%; min-height: 148px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; text-align: left; color: #F3F1EC">
+<span style="display: flex; justify-content: space-between; align-items: center; width: 100%"><span style="font-size: 13px; font-weight: 700; color: #A3A19B">参加予定</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M7 17 17 7"></path><path d="M9 7h8v8"></path></svg></span>
 <span style="display: flex; flex-direction: column; gap: 6px">
 <span style="display: flex; align-items: baseline; gap: 4px"><span class="big" style="font-size: 46px; font-weight: 700; line-height: 0.9; color: #F2A93B">2</span><span style="font-size: 14px; color: #A3A19B">件</span></span>
-<span style="font-size: 13px; color: #BDBAB3">次の締切 11.20</span>
+<span style="font-size: 13px; color: #BDBAB3">次 11.18 演習会：戦略理論</span>
 </span>
 </button>
 
@@ -2069,7 +2069,7 @@ class Component extends DCLogic {
       ti: { home: s.tab === 'home' ? RT : 'transparent', learn: s.tab === 'learn' ? RT : 'transparent', board: s.tab === 'board' ? RT : 'transparent', cal: s.tab === 'cal' ? RT : 'transparent', news: s.tab === 'news' ? RT : 'transparent' },
       tc: { home: s.tab === 'home' ? A : M, learn: s.tab === 'learn' ? A : M, board: s.tab === 'board' ? A : M, cal: s.tab === 'cal' ? A : M, news: s.tab === 'news' ? A : M },
       seg: { oBg: s.seg === 'other' ? '#F3F1EC' : 'transparent', oFg: s.seg === 'other' ? INK : '#BDBAB3', rBg: s.seg === 'recruit' ? '#F3F1EC' : 'transparent', rFg: s.seg === 'recruit' ? INK : '#BDBAB3', pBg: s.seg === 'pain' ? '#F3F1EC' : 'transparent', pFg: s.seg === 'pain' ? INK : '#BDBAB3', eBg: s.seg === 'event' ? '#F3F1EC' : 'transparent', eFg: s.seg === 'event' ? INK : '#BDBAB3' },
-      goHome: go('home'), goLearn: go('learn'), goBoard: () => this.setState({ tab: 'board', sub: null, seg: 'recruit' }), goCal: go('cal'), goMe: go('me'), goNews: go('news'), goPractice: () => this.setState({ tab: 'learn', sub: null, lseg: 'practice' }),
+      goHome: go('home'), goLearn: go('learn'), goBoard: () => this.setState({ tab: 'board', sub: null, seg: 'recruit' }), goCal: go('cal'), goJoin: go('cal'), goMe: go('me'), goNews: go('news'), goPractice: () => this.setState({ tab: 'learn', sub: null, lseg: 'practice' }),
       goBoardPain: () => this.setState({ tab: 'board', sub: null, seg: 'pain' }),
       back: () => this.setState({ sub: s.sub === 'unit' && s.ufrom === 'course' ? 'course' : null, ufrom: null }),
       openUnit: () => this.setState({ sub: 'unit' }),
