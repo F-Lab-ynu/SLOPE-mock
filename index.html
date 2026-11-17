@@ -150,6 +150,19 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgkn{position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#F2A93B;box-shadow:0 0 0 3px #070707,0 0 12px rgba(242,169,59,.6);z-index:1}
 .pgout{display:flex;flex-direction:column;border-top:1px solid #1C1C1B;border-bottom:1px solid #1C1C1B;margin-bottom:8px}
 .pgout .pgu{min-height:50px}
+
+/* 見やすく：線をなくし、見出し＞小見出し＞単元の差をはっきり */
+.pgbh{padding:16px 0 8px !important;min-height:0}
+.pgbn{font-size:19px !important;font-weight:700}
+.pgb>.pgbody>.pgbh:first-child{padding-top:4px !important}
+.pgsh{min-height:48px;padding:6px 0 !important;color:#F3F1EC !important}
+.pgsn{font-size:16px !important;font-weight:700 !important}
+.pgin{border-left:0 !important;margin-left:0 !important;padding-left:14px !important}
+.pgn{font-size:15px;font-weight:500}
+.pgu.ev .pgn{font-size:19px;font-weight:700}
+.pgu.ev{min-height:60px}
+.pgsc{font-size:12px;color:#7D7B76}
+.pgb+.pgb .pgbody{border-top:0}
 </style>
 </head>
 <body>
@@ -1911,7 +1924,7 @@ class Component extends DCLogic {
       const prog = [{ k: 't', id: 'B' }, { k: 'e', id: 'luna', name: 'LUNA', from: '2026-10-24', to: '2026-10-24', todo: '' },
         { k: 'g', id: 'roles', name: 'ロールトラック', order: 'one', items: ['S', 'N', 'A', 'E'].map((x) => ({ k: 't', id: x })) },
         { k: 'e', id: 'mira', name: 'MIRA', from: '2026-12-05', to: '2026-12-06', todo: 'チームを組んで事業案を1つ出す' }, { k: 'e', id: 'nova', name: 'NOVA', from: '2027-02-20', to: '', todo: '' }];
-      window.__PROG = { tracks: PT, program: prog, today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
+      window.__PROG = { tracks: PT, program: prog, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
       const ct = PT.find((t) => t.id === cur), KN = { all: '全員', choose: '選択', opt: '任意' };
       var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
     }
@@ -2143,6 +2156,7 @@ document.addEventListener('click',function(e){
     var prev = true, d = 0, all = 0;
     items.forEach(function (n) {
       n._lk = locked || (!!n.lock && !prev);
+      if (n.k === 'f' && !P._noRole && P.roles && P.roles.length && ROLES.indexOf(n.name) >= 0 && P.roles.indexOf(n.name) < 0) { n._n = 0; n._d = 0; n._done = true; return; }
       if (n.k === 'f') { var r = mark(P, n.items || [], n._lk); n._d = r.d; n._n = r.n; n._done = r.n > 0 && r.d === r.n; }
       else if (leafOK(P, n)) { n._n = 1; n._done = n.k === 'u' ? tById(P, n.t).units[n.c].st === 'done' : !!(n.to || n.from) && (n.to || n.from) < P.today; n._d = n._done ? 1 : 0; }
       else { n._n = 0; n._d = 0; n._done = true; }
@@ -2150,6 +2164,7 @@ document.addEventListener('click',function(e){
     });
     return { d: d, n: all };
   }
+  var ROLES = ['Strategist', 'Negotiator', 'Advertiser', 'Engineer', 'Innovator'];
   function firstCur(items) { for (var i = 0; i < items.length; i++) { var n = items[i]; if (!n._n) continue; if (n.k === 'f') { var c = firstCur(n.items || []); if (c) return c; } else if (!n._done && !n._lk) return n; } return null; }
   function has(n, c) { if (n === c) return true; return !!(n.items && n.items.some(function (x) { return has(x, c); })); }
   var LOCK = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
@@ -2164,7 +2179,7 @@ document.addEventListener('click',function(e){
   function nodeHTML(P, n, cur, top) {
     if (!n._n) return '';
     if (n.k !== 'f') return leafRow(P, n, cur);
-    var k = 'f:' + n.id, open = fold[k] === undefined ? (cur === null ? false : !(n._done && !top)) : !fold[k];
+    var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
     var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '">' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + body : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
@@ -2178,7 +2193,7 @@ document.addEventListener('click',function(e){
     }).join('') + '</div>';
   }
   function outHTML(P) {
-    var o = v2Of(P).filter(function (n) { return n.out; })[0]; if (!o) return ''; mark(P, o.items, false);
+    var o = v2Of(P).filter(function (n) { return n.out; })[0]; if (!o) return ''; P._noRole = true; mark(P, o.items, false); P._noRole = false;
     var h = o.items.map(function (n) { return nodeHTML(P, n, null, false); }).join(''); return h ? '<div class="pgout">' + h + '</div>' : '';
   }
   function paint() {
