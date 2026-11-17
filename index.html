@@ -1382,7 +1382,7 @@ body:not(.wide) #progList,body:not(.wide) #progOut{padding-bottom:calc(96px + en
     refs.forEach(function(r){ try{ r[0](r[1]); }catch(e){} });
   }
   function fit(){
-    var W=window.innerWidth, H=window.innerHeight, phone=W<600, s, h;
+    var vv=window.visualViewport, W=window.innerWidth, H=Math.min(window.innerHeight, document.documentElement.clientHeight || 1e9, vv ? vv.height + (vv.offsetTop || 0) : 1e9), phone=W<600, s, h;
     if(W>=900){ document.body.classList.add('wide'); document.body.classList.remove('desk'); stage.style.transform='none'; stage.style.top=''; stage.style.transformOrigin=''; document.documentElement.style.setProperty('--h',H+'px'); return; }
     document.body.classList.remove('wide');
     var pr=document.getElementById('sai'), cs=pr?getComputedStyle(pr):null, it=cs?(parseFloat(cs.paddingTop)||0):0, ib=cs?(parseFloat(cs.paddingBottom)||0):0;
@@ -1404,6 +1404,12 @@ body:not(.wide) #progList,body:not(.wide) #progOut{padding-bottom:calc(96px + en
     stage=document.getElementById('stage'); tpl=document.getElementById('tpl');
     comp=new Component({}); fit(); render();
     window.addEventListener('resize',fit);
+    // iPhone：起動直後・通話中・画面の回転などで高さがあとから変わるので測り直す
+    if(window.visualViewport) window.visualViewport.addEventListener('resize',fit);
+    window.addEventListener('orientationchange',function(){ setTimeout(fit,300); });
+    window.addEventListener('pageshow',fit);
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(fit,100); });
+    [100,400,1200].forEach(function(t){ setTimeout(fit,t); });
   };
 })();
 </script>
