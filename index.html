@@ -175,6 +175,15 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgdt.done{background:#F3F1EC}
 .pgdt.open{background:#070707;border:2px solid #BDBAB3}
 .pgdt.locked{width:6px;height:6px;margin:-3px 0 0 -3px;background:#474744}
+
+/* 行の下に線、済みは✓付きの丸、やることはリンクっぽく（＞はフォルダだけ） */
+.pgbh,.pgsh,.pgu,.pgu.ev{border-bottom:1px solid #1E1E1D !important}
+.pgu .pgr{display:none}
+.pgu .pgn{text-decoration:underline;text-decoration-color:#474744;text-underline-offset:4px;text-decoration-thickness:1px}
+.pgu[data-st="locked"] .pgn,div.pgu.ev .pgn{text-decoration:none}
+.pgu:hover .pgn{text-decoration-color:#BDBAB3}
+.pgdt.done{width:14px;height:14px;margin:-7px 0 0 -7px;background:#F3F1EC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23070707' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/9px no-repeat}
+.pgdt.open{width:12px;height:12px;margin:-6px 0 0 -6px}
 </style>
 </head>
 <body>
@@ -2194,7 +2203,7 @@ document.addEventListener('click',function(e){
     var vis = (n.items || []).filter(function (x) { return x._n; });
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '"' + (open ? '' : ' data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"') + '>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '">' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + body : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
