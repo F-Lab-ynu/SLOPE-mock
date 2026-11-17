@@ -1439,6 +1439,23 @@ html,body{touch-action:manipulation}
 .menu .msm:empty{display:none !important}
 /* ux29 スマホ：部員画面と同じく右上（アカウントの左）に運営スイッチ */
 @media (max-width:760px){ .acct .mode{display:flex !important;padding:0 2px 0 0 !important;gap:8px;font-size:12px} .acct .mode span{display:inline !important} }
+
+/* ux30 アクセス統計 */
+.acc{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;margin-top:12px}
+.acc .card{min-width:0}
+.akp{display:flex;gap:22px;padding:12px 14px 4px}
+.akp div{display:flex;flex-direction:column}
+.akp b{font-size:22px;font-weight:600;line-height:1.2}
+.akp span{font-size:11px;color:var(--muted)}
+.abars{display:flex;align-items:flex-end;gap:4px;height:120px;padding:10px 14px 0}
+.abar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+.abar i{display:block;width:100%;max-width:22px;background:var(--text);border-radius:3px 3px 0 0;min-height:2px}
+.abar.today i{background:var(--accent,#EA580C)}
+.abar em{font-style:normal;font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
+.abar u{text-decoration:none;font-size:10px;color:var(--sub,#4B5563);margin-bottom:2px}
+.anote{font-size:11px;color:var(--muted);padding:6px 14px 12px}
+.atab .hb .l{width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:760px){ .acc{grid-template-columns:1fr} .abar em{font-size:9px} }
 </style>
 </head>
 <body>
@@ -4354,6 +4371,36 @@ document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M 
   document.addEventListener('gesturestart', function (e) { if (!inG(e.target)) e.preventDefault(); }, { passive: false });
   document.addEventListener('gesturechange', function (e) { if (!inG(e.target)) e.preventDefault(); }, { passive: false });
 })();
+
+// ---------- ux30 アクセス統計（代表だけ） ----------
+var TABN = { member: { home: 'ホーム', learn: '学ぶ', news: 'ニュース', board: '掲示板', cal: '予定', me: 'マイページ', open: '起動' }, admin: { dash: 'ダッシュボード', projects: '業務', tracks: '教材', notices: '外部告知', board: '掲示板', perms: 'メンバー', open: '起動' } };
+function sampleAccess() {
+  var days = [], seed = 7;
+  for (var i = 13; i >= 0; i--) { seed = (seed * 37 + 11) % 97; var u = 18 + seed % 40 + (i < 3 ? 15 : 0); days.push({ day: isoOf(TODAY - i * DAY), users: u, views: u * 4 + seed % 20 }); }
+  return { days: days, dau: days[13].users, wau: 96, mau: 131, total: 150,
+    tabs: [{ app: 'member', tab: 'home', views: 820, users: 128 }, { app: 'member', tab: 'learn', views: 410, users: 88 }, { app: 'member', tab: 'board', views: 260, users: 61 }, { app: 'member', tab: 'news', views: 190, users: 54 }, { app: 'member', tab: 'cal', views: 140, users: 47 }, { app: 'admin', tab: 'projects', views: 95, users: 9 }, { app: 'admin', tab: 'dash', views: 70, users: 10 }] };
+}
+function accessCard() {
+  var a = S.access || (typeof sb === 'undefined' ? (S.access = sampleAccess()) : null);
+  if (!a) return '<div class="acc"><div class="card"><div class="ch"><span class="cht">アクセス</span></div><div class="empty sm">読み込み中…</div></div></div>';
+  var days = a.days || [], mx = Math.max.apply(null, days.map(function (d) { return d.users; }).concat([1]));
+  var total = a.total || S.members.length || 1;
+  var bars = days.map(function (d, i) {
+    var dt = new Date(d.day + 'T00:00:00Z'), lab = (dt.getUTCMonth() + 1) + '/' + dt.getUTCDate();
+    return '<div class="abar' + (i === days.length - 1 ? ' today' : '') + '" title="' + lab + '：' + d.users + '人・' + d.views + '回"><u>' + (d.users || '') + '</u><i style="height:' + Math.round(d.users / mx * 82) + '%"></i><em>' + (i % 2 === days.length % 2 ? '' : lab) + '</em></div>';
+  }).join('');
+  var c1 = '<div class="card"><div class="ch"><span class="cht">アクセス</span></div><div class="akp">' +
+    '<div><b class="num">' + a.dau + '</b><span>今日</span></div><div><b class="num">' + a.wau + '</b><span>7日間</span></div><div><b class="num">' + a.mau + '</b><span>30日間</span></div>' +
+    '<div><b class="num">' + Math.round(a.wau / total * 100) + '%</b><span>週に1回以上（全' + total + '人中）</span></div></div>' +
+    '<div class="abars">' + bars + '</div><div class="anote">棒は1日に開いた人数（14日間）</div></div>';
+  var tb = (a.tabs || []).slice().sort(function (x, y) { return y.views - x.views; }).slice(0, 8), tmx = Math.max.apply(null, tb.map(function (t) { return t.views; }).concat([1]));
+  var c2 = '<div class="card atab"><div class="ch"><span class="cht">よく見られている画面<span style="margin-left:6px;color:var(--muted);font-weight:400;font-size:11px">30日間</span></span></div><div class="cb"><div class="hbs">' +
+    (tb.length ? tb.map(function (t) { var n = (TABN[t.app] || {})[t.tab] || t.tab; return '<div class="hb"><span class="l">' + esc(n) + (t.app === 'admin' ? '<span style="color:var(--muted);font-size:11px">（運営）</span>' : '') + '</span><span class="b"><i style="width:' + Math.round(t.views / tmx * 100) + '%"></i></span><span class="v">' + t.views + '</span></div>'; }).join('') : '<div class="empty sm">まだデータがありません</div>') + '</div></div></div>';
+  return '<div class="acc">' + c1 + c2 + '</div>';
+}
+var _patchCards30 = patchCards;
+patchCards = function () { return (isAdmin() ? accessCard() : '') + _patchCards30(); };
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
