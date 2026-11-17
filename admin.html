@@ -1770,9 +1770,6 @@ body.mvin .mvline{display:none !important}
 .p2pvopen span{writing-mode:vertical-rl;line-height:1}
 .p2reg{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted)}.p2reg b{font-size:22px;color:var(--text);font-weight:700}
 
-.evsec{display:flex;align-items:baseline;gap:10px;font-size:13px;font-weight:700;color:var(--text);margin:20px 0 8px}
-.evsec:first-child{margin-top:0}
-.evsec small{font-weight:400;color:var(--muted);font-size:12px}
 .p2pub{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:#F2F4F7;color:var(--muted);align-self:center}
 .p2pub.on{background:#ECFDF3;color:#067647}
 .p2golink{margin-left:auto;align-self:center;border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:2px 4px}
@@ -5491,12 +5488,12 @@ viewNotices = function () {
   if (tab === 'ev') body = '<div class="body">' + viewEvents() + '</div>';
   else if (tab === 'cal') body = '<div class="body">' + viewCal() + '</div>';
   else { var h = _viewNotices42(); var k = h.indexOf('<div class="body">'); body = k >= 0 ? h.slice(k) : h; }
-  var evn = (typeof p2Events === 'function' && S.program && S.program.v2 ? p2Events() : []).filter(function (n) { return !(n.to || n.from) || (n.to || n.from) >= isoOf(TODAY); }).length;
+  var evn = (S.program && S.program.v2 ? p2Events() : []).filter(function (n) { return !(n.to || n.from) || (n.to || n.from) >= isoOf(TODAY); }).length + (S.cals || []).filter(function (c) { return c.date >= isoOf(TODAY); }).length;
   return top('告知') + utabs('ntab', [['ev', 'イベント', evn], ['cal', 'カレンダー', null], ['list', '外部', S.notices.length], ['offer', '部員からの情報', wait]]) + body;
 };
 var _fabHTML42 = fabHTML;
 fabHTML = function () {
-  if (S.view === 'notices' && S.ntab === 'cal' && can('notices')) return '<div class="efabw"><button class="efab" data-act="calNew" title="予定を追加" aria-label="予定を追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
+  if (S.view === 'notices' && (S.ntab === 'cal' || S.ntab === 'ev') && can('notices')) return '<div class="efabw"><button class="efab" data-act="calNew" title="予定を追加" aria-label="予定を追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
   if (S.view === 'notices' && S.ntab !== 'list') return '';
   return _fabHTML42();
 };
@@ -6158,32 +6155,37 @@ document.addEventListener('click', function (e) { var b = e.target.closest && e.
 var P2RT = null, _save50 = save;
 save = function () { var r = _save50.apply(this, arguments); if (S.view === 'tracks' && P2F && P2F.style.display !== 'none') { clearTimeout(P2RT); P2RT = setTimeout(p2FrameReload, window.sb ? 2500 : 600); } return r; };
 
-// ---------- ux51 学ぶのイベントも告知タブで公開する（公開したら部員に参加登録ボタン） ----------
-function p2Events() { var out = []; if (!S.program || !S.program.v2) return out; p2Walk(S.program.v2, function (n, a, par) { if (n.k === 'e') out.push(n); }); return out.filter(function (n) { var f = p2Get(n.id); var p = f && f.parent; while (p) { if (p.out) return false; var pp = p2Get(p.id); p = pp && pp.parent; } return true; }); }
+// ---------- ux51 告知のイベント＝学ぶのイベント＋部内の予定。公開したものだけ部員に出て参加登録できる ----------
+function p2Events() { var out = []; if (!S.program || !S.program.v2) return out; p2Walk(S.program.v2, function (n) { if (n.k === 'e') out.push(n); }); return out.filter(function (n) { var f = p2Get(n.id); var p = f && f.parent; while (p) { if (p.out) return false; var pp = p2Get(p.id); p = pp && pp.parent; } return true; }); }
 function pmd(x) { return x ? x.slice(5).replace('-', '.') : ''; }
-var _viewEvents51 = viewEvents;
 viewEvents = function () {
-  var h = _viewEvents51(), es = (S.program && S.program.v2) ? p2Events() : [];
-  if (!es.length) return '<div class="empty big">イベントはまだありません。教材のプログラムで「イベント」を作ると、ここで公開できます</div>';
-  var ok = can('tracks') && can('notices');
+  var es = (S.program && S.program.v2) ? p2Events() : [], cs = (S.cals || []).slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  if (!es.length && !cs.length) return '<div class="empty big">イベントはまだありません。右下の＋で追加するか、教材のプログラムで「イベント」を作ると、ここで公開できます</div>';
+  var ok = can('tracks') && can('notices'), okc = can('notices'), today = isoOf(TODAY);
   var rows = es.map(function (n) {
-    var past = !!(n.to || n.from) && (n.to || n.from) < isoOf(TODAY), when = n.from ? pmd(n.from) + (n.to && n.to !== n.from ? ' – ' + pmd(n.to) : '') : '<span class="dim">未定</span>';
-    return '<div class="evr" data-pevid="' + n.id + '"><span class="evn"><b>' + esc(n.name || 'イベント') + '</b><span>' + esc(n.todo || '学ぶ（プログラム）') + '</span></span>' +
+    var past = !!(n.to || n.from) && (n.to || n.from) < today, when = n.from ? pmd(n.from) + (n.to && n.to !== n.from ? ' – ' + pmd(n.to) : '') : '<span class="dim">未定</span>';
+    return '<div class="evr" data-pevid="' + n.id + '"><span class="evn"><b>' + esc(n.name || 'イベント') + '</b>' + (n.todo ? '<span>' + esc(n.todo) + '</span>' : '') + '</span>' +
       '<span class="evq num">' + when + '</span><span class="evp">学ぶ</span>' +
       '<span class="evg num">' + (n.pub ? ((S.joins || {})['pe:' + n.id] || 0) + ' 人' : '<span class="dim">—</span>') + '</span>' +
       (past ? '<span class="muted nsw" style="font-size:12px">終了</span>' : '<button class="sw nsw" role="switch" data-act="pevPub" data-id="' + n.id + '" aria-checked="' + !!n.pub + '" aria-label="部員に公開"' + (ok ? '' : ' disabled title="教材と告知の権限が必要です"') + '><i></i></button>') +
       '<button class="ib" data-act="pevEdit" data-id="' + n.id + '" aria-label="教材で編集" title="教材で編集">' + PEN + '</button></div>';
+  }).join('') + cs.map(function (c) {
+    var past = c.date < today, pub = c.state === 'pub';
+    return '<div class="evr" data-calid="' + c.id + '"><span class="evn"><b>' + esc(c.title || '予定') + '</b>' + (c.memo ? '<span>' + esc(memoText(c.memo).slice(0, 60)) + '</span>' : '') + '</span>' +
+      '<span class="evq num">' + pmd(c.date) + (c.time ? ' ' + esc(c.time) : '') + '</span><span class="evp">' + esc(c.place || '—') + '</span>' +
+      '<span class="evg num">' + (pub ? ((S.joins || {})[c.id] || 0) + ' 人' : '<span class="dim">—</span>') + '</span>' +
+      (past ? '<span class="muted nsw" style="font-size:12px">終了</span>' : '<button class="sw nsw" role="switch" data-act="calPub" data-id="' + c.id + '" aria-checked="' + pub + '" aria-label="部員に公開"' + (okc ? '' : ' disabled') + '><i></i></button>') +
+      '<button class="ib" data-act="calItem" data-k="cal" data-id="' + c.id + '" aria-label="編集" title="編集">' + PEN + '</button></div>';
   }).join('');
-  var sec = '<div class="evsec">学ぶのイベント</div><div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>';
-  return rows ? '<div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>' : '';
+  return '<div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>';
 };
 document.addEventListener('click', function (e) {
-  var b = e.target.closest && e.target.closest('[data-act="pevPub"],[data-act="pevEdit"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  var b = e.target.closest && e.target.closest('[data-act="pevPub"],[data-act="pevEdit"],[data-act="calPub"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  if (b.dataset.act === 'calPub') { if (b.disabled) return; var c = (S.cals || []).filter(function (x) { return x.id === b.dataset.id; })[0]; if (!c) return; snap(); c.state = c.state === 'pub' ? 'draft' : 'pub'; save(); render(); toast(c.state === 'pub' ? '「' + c.title + '」を公開しました' : '「' + c.title + '」を非公開にしました'); return; }
   var f = p2Get(b.dataset.id); if (!f) return;
   if (b.dataset.act === 'pevEdit') { S.view = 'tracks'; UI.psel = f.n.id; UI.pren = null; save(); render(); return; }
-  if (b.disabled) return; snap(); f.n.pub = !f.n.pub; S.program.updated = Date.now(); save(); render(); toast(f.n.pub ? '「' + f.n.name + '」を公開しました。部員の学ぶタブに参加登録ボタンが出ます' : '「' + f.n.name + '」を非公開にしました');
+  if (b.disabled) return; snap(); f.n.pub = !f.n.pub; S.program.updated = Date.now(); save(); render(); toast(f.n.pub ? '「' + f.n.name + '」を公開しました' : '「' + f.n.name + '」を非公開にしました');
 }, true);
-
 document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-p2tonotice]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation(); S.view = 'notices'; S.ntab = 'ev'; save(); render(); }, true);
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
