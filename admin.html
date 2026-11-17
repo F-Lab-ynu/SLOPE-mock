@@ -1768,6 +1768,7 @@ body.mvin .mvline{display:none !important}
 .p2pvopen:hover{width:42px;color:#F3F1EC !important}
 .p2pvopen svg{width:16px !important;height:16px !important;flex:none}
 .p2pvopen span{writing-mode:vertical-rl;line-height:1}
+.p2reg{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted)}.p2reg b{font-size:22px;color:var(--text);font-weight:700}
 </style>
 </head>
 <body>
@@ -5876,7 +5877,7 @@ function p2Rows(a, d) {
   return a.map(function (n) {
     var on = UI.psel === n.id, open = n.k === 'f' && n.open !== false, nm = p2Name(n);
     var name = UI.pren === n.id ? '<input class="p2ren" data-p2ren="' + n.id + '" value="' + esc(nm) + '" aria-label="名前" autocomplete="off">' : '<span class="p2n">' + (esc(nm) || '<i class="dim">名前なし</i>') + '</span>';
-    var meta = n.k === 'u' ? '<span class="p2m num">' + esc(n.c) + '</span>' : (n.k === 'e' && n.from ? '<span class="p2m num">' + esc(n.from.slice(5).replace('-', '.')) + '</span>' : (n.k === 'f' ? '<span class="p2m num">' + p2Leaves(n) + '</span>' : ''));
+    var meta = n.k === 'u' ? '<span class="p2m num">' + esc(n.c) + '</span>' : (n.k === 'e' ? '<span class="p2m num">' + (n.from ? esc(n.from.slice(5).replace('-', '.')) : '') + ((S.joins || {})['pe:' + n.id] ? ' · ' + S.joins['pe:' + n.id] + '人' : '') + '</span>' : (n.k === 'f' ? '<span class="p2m num">' + p2Leaves(n) + '</span>' : ''));
     return '<div class="p2r' + (on ? ' on' : '') + (n.out ? ' out' : '') + '" data-p2="' + n.id + '" style="--d:' + d + '" draggable="' + (!n.out) + '" tabindex="' + (on || (!UI.psel && d === 0 && a.indexOf(n) === 0) ? 0 : -1) + '" role="treeitem" aria-selected="' + on + '"' + (n.k === 'f' ? ' aria-expanded="' + open + '"' : '') + '>' +
       (n.k === 'f' ? '<button class="p2c" data-p2a="tog" tabindex="-1" aria-label="' + (open ? '畳む' : '開く') + '" style="transform:rotate(' + (open ? 90 : 0) + 'deg)">' + PI2.chev + '</button>' : '<span class="p2c"></span>') +
       PI2[n.k] + name + meta +
@@ -5899,7 +5900,8 @@ function p2Editor() {
   if (n.k === 'e') return head + '<input class="p2title" data-p2f="name" value="' + esc(n.name) + '" placeholder="イベント名" aria-label="イベント名" autocomplete="off">' + lock +
     '<div class="p2grid"><label>開始<input type="date" class="input" data-p2f="from" value="' + esc(n.from || '') + '"></label><label>終了<input type="date" class="input" data-p2f="to" value="' + esc(n.to || '') + '"></label></div>' +
     '<label class="p2fld">部員がやること<textarea class="input" data-p2f="todo" rows="4" placeholder="例：事業案を1つ持ってくる">' + esc(n.todo || '') + '</textarea></label>' +
-    '<label class="p2fld">リンク<input class="input" data-p2f="link" value="' + esc(n.link || '') + '" placeholder="https://" autocomplete="off"></label>';
+    '<label class="p2fld">リンク<input class="input" data-p2f="link" value="' + esc(n.link || '') + '" placeholder="https://" autocomplete="off"></label>' +
+    '<div class="p2reg"><span>参加登録</span><b class="num">' + ((S.joins || {})['pe:' + n.id] || 0) + '</b><span>人</span></div>';
   var t = p2Track(n.t), u = p2Unit(n); if (!t || !u) return '';
   var d = unitData(t, u.code);
   var mats = (d.materials || []).map(function (m, i) { return '<div class="p2mat"><span class="tag">' + esc(m.type || '記事') + '</span><input class="cell" data-p2m="' + i + '" value="' + esc(m.memo || '') + '" placeholder="' + esc(m.url) + '" aria-label="タイトル" autocomplete="off"><a href="' + esc(m.url) + '" target="_blank" rel="noopener">' + esc(host(m.url)) + '</a><button class="ib" data-p2a="mdel" data-i="' + i + '" aria-label="削除">' + ic('x') + '</button></div>'; }).join('');
