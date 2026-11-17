@@ -224,6 +224,11 @@ a.pgn{color:inherit}
 .pgjoin{height:28px !important;padding:0 10px !important;border:1px solid #474744 !important;background:transparent !important;color:#D2CFC8 !important;font-family:inherit !important;font-size:12px !important;font-weight:700 !important;border-radius:6px}
 .pgjoin.on{border-color:transparent !important;color:#7D7B76 !important;padding:0 2px !important}
 .pgn.lat{font-size:15px !important}
+
+/* 点はタイトルの行の高さにそろえる */
+.pgu .pgn{position:relative}
+.pgbody>.pgu .pgn>.nd{left:-20px}
+.pgin>.pgu .pgn>.nd{left:-14px}
 </style>
 </head>
 <body>
@@ -2248,12 +2253,12 @@ document.addEventListener('click',function(e){
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
     if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '', jid = 'pe:' + n.id, on = P.joined ? P.joined(jid) : false;
-      return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
-        (n.link ? '<a class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + esc(n.name) + '</a>' : '<span class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name) + '</span>') +
+      return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
+        (n.link ? '<a class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</a>' : '<span class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</span>') +
         (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' +
         (!n._done && n.from && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '✓ 登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
     var u = tById(P, n.t).units[n.c];
-    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
+    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
   function nodeHTML(P, n, cur, top) {
     if (!n._n) return '';
