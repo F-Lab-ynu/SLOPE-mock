@@ -151,20 +151,30 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgout{display:flex;flex-direction:column;border-top:1px solid #1C1C1B;border-bottom:1px solid #1C1C1B;margin-bottom:8px}
 .pgout .pgu{min-height:50px}
 
-/* 見やすく：丸があるのがやること（単元・イベント）、丸がないのが見出し（フォルダ） */
-.pgbh{padding:14px 0 6px !important;min-height:0}
+/* 見やすく：見出し 18 ＞ 小見出し 15 ＞ やること 14。やることの状態はバーの上の点で */
+.pgbh{padding:14px 0 4px !important;min-height:0}
 .pgb>.pgbody>.pgbh:first-child{padding-top:2px !important}
-.pgbn{font-size:18px !important;font-weight:700;color:#F3F1EC}
-.pgsh{min-height:36px;padding:12px 0 4px !important;color:#A3A19B !important;border-top:0 !important}
-.pgsn{font-size:13px !important;font-weight:700 !important;letter-spacing:.04em;color:#A3A19B}
+.pgbn{font-size:18px !important;font-weight:700;color:#F3F1EC;flex:1}
+.pgsh{min-height:40px;padding:10px 0 2px !important;border-top:0 !important}
+.pgsn{font-size:15px !important;font-weight:700 !important;color:#D2CFC8 !important;flex:1;min-width:0}
 .pgsub{border-top:0 !important}
-.pgin{border-left:0 !important;margin-left:0 !important;padding-left:0 !important}
-.pgu,.pgu.ev{min-height:52px !important}
-.pgn,.pgu.ev .pgn,.pgu.tr .pgn{font-size:15px !important;font-weight:500 !important}
-.pgc{font-size:11px;color:#7D7B76}
-.pgsc{font-size:12px;color:#7D7B76}
-.pgu+.pgu{border-top:1px solid #1C1C1B}
-.pgsub+.pgu,.pgu+.pgsub{border-top:0}
+.pgsub.lk>.pgsh .pgsn{color:#7D7B76 !important}
+.pgin{border-left:0 !important;margin-left:0 !important;padding-left:14px !important}
+.pglk{display:inline-flex;align-items:center;flex:none;margin:0 2px}
+.pgu,.pgu.ev{min-height:46px !important;padding:6px 0 !important;gap:10px}
+.pgu .pgd{display:none !important}
+.pgn,.pgu.ev .pgn,.pgu.tr .pgn{font-size:14px !important;font-weight:500 !important;color:#E9E6DF}
+.pgu[data-st="done"] .pgn{color:#A3A19B}
+.pgu[data-st="locked"] .pgn{color:#5F5E5A}
+.pgu.cur .pgn{color:#F3F1EC;font-weight:700 !important}
+.pgc{font-size:11px;color:#7D7B76;line-height:1.3}
+.pgm{font-size:12px}
+.pgsc{font-size:12px;color:#7D7B76;flex:none}
+.pgu+.pgu,.pgsub+.pgu,.pgu+.pgsub{border-top:0 !important}
+.pgdt{position:absolute;left:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;box-sizing:border-box;z-index:1;box-shadow:0 0 0 2px #070707}
+.pgdt.done{background:#F3F1EC}
+.pgdt.open{background:#070707;border:2px solid #BDBAB3}
+.pgdt.locked{width:6px;height:6px;margin:-3px 0 0 -3px;background:#474744}
 </style>
 </head>
 <body>
@@ -2123,7 +2133,7 @@ document.addEventListener('click',function(e){
   function curCode(t, tree) { var cs = codes(tree); for (var i = 0; i < cs.length; i++) if (t.units[cs[i]].st === 'open') return cs[i]; return null; }
   function unitRow(t, c, cur, d) {
     var u = t.units[c], isCur = c === cur;
-    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(c) + '" style="padding-left:' + (d * 16) + 'px">' + (isCur ? '<i class="pgk" aria-hidden="true"></i>' : '') +
+    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(c) + '" style="padding-left:' + (d * 16) + 'px">' + (isCur ? '<i class="pgk" aria-hidden="true"></i>' : '') +
       '<span class="pgd ' + u.st + '">' + (DOT[u.st] || '') + '</span><span class="pgt"><span class="pgc en">' + esc(c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
   function itemsHTML(t, items, cur, d, key) {
@@ -2174,7 +2184,7 @@ document.addEventListener('click',function(e){
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
     if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
-      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '">' + k + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
+      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '">' + k + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + k + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
@@ -2184,7 +2194,7 @@ document.addEventListener('click',function(e){
     var vis = (n.items || []).filter(function (x) { return x._n; });
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '">' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '"' + (open ? '' : ' data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"') + '>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + body : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
@@ -2207,11 +2217,14 @@ document.addEventListener('click',function(e){
     put('progOut', JSON.stringify([P.key, fold]), function () { return outHTML(P); });
     var t = tById(P, P.cur) || P.tracks[0]; if (t) put('progTree', JSON.stringify([P.key, P.cur, fold]), function () { return trackHTML(t); });
   }
-  function knob() { Array.prototype.forEach.call(document.querySelectorAll('.pgb.here'), function (b) { var k = b.querySelector('.pgkn'), c = b.querySelector('.pgu.cur'), r = b.querySelector('.pgrail'); if (!k || !r) return; if (!c) { k.style.display = 'none'; return; } k.style.display = ''; k.style.top = (c.getBoundingClientRect().top - r.getBoundingClientRect().top + c.offsetHeight / 2 - 7) + 'px'; }); }
+  function dots() { Array.prototype.forEach.call(document.querySelectorAll('.pgtree .pgb'), function (b) { var r = b.querySelector('.pgrail'); if (!r) return; var top = r.getBoundingClientRect().top;
+      Array.prototype.forEach.call(r.querySelectorAll('.pgdt'), function (x) { x.remove(); });
+      Array.prototype.forEach.call(b.querySelectorAll('.pgu[data-st], .pgbh[data-st], .pgsh[data-st]'), function (u) { if (u.classList.contains('cur')) return; var d = document.createElement('i'); d.className = 'pgdt ' + u.dataset.st; d.style.top = (u.getBoundingClientRect().top - top + u.offsetHeight / 2) + 'px'; r.appendChild(d); }); }); }
+  function knob() { dots(); Array.prototype.forEach.call(document.querySelectorAll('.pgb.here'), function (b) { var k = b.querySelector('.pgkn'), c = b.querySelector('.pgu.cur'), r = b.querySelector('.pgrail'); if (!k || !r) return; if (!c) { k.style.display = 'none'; return; } k.style.display = ''; k.style.top = (c.getBoundingClientRect().top - r.getBoundingClientRect().top + c.offsetHeight / 2 - 7) + 'px'; }); }
   var _paint = paint; paint = function () { _paint(); knob(); };
   window.addEventListener('resize', knob);
   window.__progPaint = paint;
-  new MutationObserver(function () { paint(); }).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver(function (ms) { var own = ms.every(function (m) { return m.target.classList && m.target.classList.contains('pgrail'); }); if (!own) paint(); }).observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener('click', function (e) {
     var f = e.target.closest && e.target.closest('[data-pgf]'), u = e.target.closest && e.target.closest('[data-pgu]'), c = e.target.closest && e.target.closest('[data-pgt]'), P = window.__PROG; if (!P) return;
     if (f) { e.preventDefault(); fold[f.dataset.pgf] = f.dataset.open ? f.dataset.open === 'true' : !fold[f.dataset.pgf]; paint(); return; }
