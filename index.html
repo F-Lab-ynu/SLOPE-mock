@@ -215,6 +215,10 @@ body.wide .pgpb{display:block;flex:none;width:160px;height:4px;border-radius:2px
 body.wide .pgpb i{display:block;height:100%;background:#F3F1EC;border-radius:2px}
 body.wide .pgsc{width:36px;text-align:right}
 body:not(.wide) #progList,body:not(.wide) #progOut{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+
+.pgjoin{flex:none;height:32px;padding:0 12px;border-radius:6px;border:1px solid #F3F1EC;background:#F3F1EC;color:#070707;font:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer}
+.pgjoin.on{background:transparent;color:#F3F1EC}
+a.pgn{color:inherit}
 </style>
 </head>
 <body>
@@ -1982,7 +1986,7 @@ class Component extends DCLogic {
       const prog = [{ k: 't', id: 'B' }, { k: 'e', id: 'luna', name: 'LUNA', from: '2026-10-24', to: '2026-10-24', todo: '' },
         { k: 'g', id: 'roles', name: 'ロールトラック', order: 'one', items: ['S', 'N', 'A', 'E'].map((x) => ({ k: 't', id: x })) },
         { k: 'e', id: 'mira', name: 'MIRA', from: '2026-12-05', to: '2026-12-06', todo: 'チームを組んで事業案を1つ出す' }, { k: 'e', id: 'nova', name: 'NOVA', from: '2027-02-20', to: '', todo: '' }];
-      window.__PROG = { tracks: PT, program: prog, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
+      window.__PROG = { joined: (id) => !!this.state.joined[id], join: (id) => { const j = Object.assign({}, this.state.joined); j[id] = !j[id]; this.setState({ joined: j }); }, jkey: JSON.stringify(s.joined), tracks: PT, program: prog, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
       const ct = PT.find((t) => t.id === cur), KN = { all: '全員', choose: '選択', opt: '任意' };
       var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
     }
@@ -2229,8 +2233,11 @@ document.addEventListener('click',function(e){
   function leafRow(P, n, cur) {
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
-    if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
-      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
+    if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '', jid = 'pe:' + n.id, on = P.joined ? P.joined(jid) : false;
+      return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
+        (n.link ? '<a class="pgn en' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + esc(n.name) + '</a>' : '<span class="pgn en' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name) + '</span>') +
+        (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' +
+        (!n._done && n.from && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
@@ -2259,7 +2266,7 @@ document.addEventListener('click',function(e){
   function paint() {
     var P = window.__PROG; if (!P) return;
     var put = function (id, k, html) { var el = document.getElementById(id); if (el && el.dataset.k !== k) { el.dataset.k = k; el.innerHTML = html(); } };
-    P._v2 = null; put('progList', JSON.stringify([P.key, fold]), function () { return progHTML(P); });
+    P._v2 = null; put('progList', JSON.stringify([P.key, fold, P.jkey || '']), function () { return progHTML(P); });
     put('progOut', JSON.stringify([P.key, fold]), function () { return outHTML(P); });
     var t = tById(P, P.cur) || P.tracks[0]; if (t) put('progTree', JSON.stringify([P.key, P.cur, fold]), function () { return trackHTML(t); });
   }
@@ -2273,6 +2280,7 @@ document.addEventListener('click',function(e){
   new MutationObserver(function (ms) { var own = ms.every(function (m) { return m.target.classList && m.target.classList.contains('pgrail'); }); if (!own) paint(); }).observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener('click', function (e) {
     var f = e.target.closest && e.target.closest('[data-pgf]'), u = e.target.closest && e.target.closest('[data-pgu]'), c = e.target.closest && e.target.closest('[data-pgt]'), P = window.__PROG; if (!P) return;
+    var j = e.target.closest && e.target.closest('[data-pgj]'); if (j && P.join) { e.preventDefault(); P.join(j.dataset.pgj); return; }
     if (f) { e.preventDefault(); fold[f.dataset.pgf] = f.dataset.open ? f.dataset.open === 'true' : !fold[f.dataset.pgf]; paint(); return; }
     if (u) { e.preventDefault(); P.openUnit(u.dataset.pgut || P.cur, u.dataset.pgu); return; }
     if (c) { e.preventDefault(); P.openTrack(c.dataset.pgt); window.scrollTo(0, 0); }
