@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
 <title>SLOPE mock 運営画面</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1435,6 +1435,7 @@ svg.crown{fill:#F59E0B}
 .pnr .ib{margin-top:-4px}
 .ch .cha{display:flex;gap:2px;align-items:center}
 .pmore{padding:8px 14px;border-top:1px solid #F0F1F3;font-size:12px;color:var(--muted);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer}
+html,body{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -4342,6 +4343,14 @@ document.addEventListener('click', function (e) {
 }, true);
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M && M.m === 'patch') { M = null; renderModal(); } });
 
+
+// ---------- ux28 スマホ：ピンチやダブルタップで画面全体が拡大・縮小しないようにする（ガントチャートのピンチは残す） ----------
+(function () {
+  var inG = function (t) { return typeof inGantt === 'function' && inGantt(t); };
+  document.addEventListener('touchmove', function (e) { if (e.touches.length > 1 && !inG(e.target)) e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturestart', function (e) { if (!inG(e.target)) e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturechange', function (e) { if (!inG(e.target)) e.preventDefault(); }, { passive: false });
+})();
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
