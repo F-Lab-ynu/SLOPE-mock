@@ -197,6 +197,14 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .nd.locked{width:7px;height:7px;background:#474744}
 .nd.done{width:14px;height:14px;background:#F3F1EC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23070707' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/9px no-repeat}
 .nd.cur{width:14px;height:14px;background:#F2A93B;border:0;box-shadow:0 0 0 3px #070707,0 0 10px rgba(242,169,59,.6)}
+
+/* 同じ段は同じ大きさ：フォルダは太字、やることは普通の字。大きさは全部15px */
+.pgbn,.pgsn{font-size:15px !important;font-weight:700 !important;color:#F3F1EC !important;letter-spacing:0 !important}
+.pgsub.lk>.pgsh .pgsn{color:#7D7B76 !important}
+.pgn,.pgu.ev .pgn,.pgu.tr .pgn{font-size:15px !important}
+.pgbh{min-height:48px;padding:8px 0 !important}
+.pgsh{min-height:48px;padding:8px 0 !important}
+.pgb>.pgbody>.pgbh:first-child{padding-top:8px !important}
 </style>
 </head>
 <body>
