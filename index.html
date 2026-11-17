@@ -115,13 +115,13 @@ body.wide .app > main > .crspg{max-width:1160px}
 body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 .pgcard{display:flex;align-items:stretch;gap:14px;width:100%;padding:16px 16px 16px 14px;background:#131313;border:1px solid #252524;border-radius:10px;color:#F3F1EC;text-align:left;font:inherit}
 .pgcard.mine{border-color:#5F5E5A}
-.pgcr{display:flex;flex-direction:column;gap:3px;width:6px;flex:none;min-height:64px}
+.pgcr{display:flex;flex-direction:column;gap:3px;width:6px;flex:none;min-height:40px}
 .pgcr i{display:block;border-radius:3px;min-height:6px}
 .pgct{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .pgck{font-size:12px;color:#A3A19B;letter-spacing:.04em}.pgck b{color:#F2A93B;font-weight:700}
 .pgcn{font-size:19px;font-weight:700;line-height:1.2}
 .pgcj{font-size:13px;color:#BDBAB3;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pgcm{font-size:13px;color:#A3A19B;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pgcm b{color:#F2A93B;font-weight:600;margin-right:2px}.pgcm:empty{display:none}.pgcm{font-size:13px;color:#A3A19B;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pgcp{font-size:22px;font-weight:700;align-self:center;flex:none}.pgcp small{font-size:12px;color:#A3A19B;margin-left:1px}
 #progTree{max-width:720px}
 .pgsum{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px;color:#A3A19B;margin-bottom:14px}
@@ -156,7 +156,7 @@ body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 .pgin .pgu{padding-left:0}
 .pgsub{border-top:1px solid #1C1C1B}
 .pgsh{display:flex;align-items:center;gap:8px;width:100%;padding:10px 0 6px;background:transparent;border:0;color:#D2CFC8;text-align:left;font:inherit}
-.pgsn{font-size:13px;font-weight:700;flex:1;min-width:0}
+.pgsn{font-size:13px;font-weight:700;flex:1;min-width:0}.pgsh:has(.pgsn:empty){display:none}
 .pgin{border-left:1px solid #2C2C2A;margin-left:9px;padding-left:12px}
 .pgin.any{border-left-style:dashed}
 .pgfold{width:100%;text-align:left;padding:10px 0;background:transparent;border:0;color:#7D7B76;font:inherit;font-size:13px}.pgfold b{color:#F2A93B}
@@ -367,67 +367,7 @@ body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 </div>
 </sc-if>
 
-<sc-if value="{{ show.study }}" hint-placeholder-val="{{ true }}">
-<h2 class="h2" style="margin-top: 12px">演習</h2>
-<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
-<sc-for list="{{ pStats }}" as="k" hint-placeholder-count="3">
-<div class="card" style="padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px">
-<span class="en" style="font-size: 24px; font-weight: 700; line-height: 1.1; color: {{ k.color }}">{{ k.n }}</span>
-<span style="font-size: 13px; color: #BDBAB3">{{ k.label }}</span>
-</div>
-</sc-for>
-</div>
 
-<div style="display: flex; flex-direction: column; gap: 10px">
-<h2 class="h2">締切が近い</h2>
-<sc-for list="{{ pDue }}" as="t" hint-placeholder-count="2">
-<div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 10px">
-<div style="display: flex; justify-content: space-between; align-items: center">
-<span class="chip" style="border-color: {{ t.kindColor }}; color: {{ t.kindColor }}">{{ t.kind }}</span>
-<span class="en" style="font-size: 13px; font-weight: 700; color: {{ t.dueColor }}">{{ t.due }}</span>
-</div>
-<div style="font-weight: 700; font-size: 17px; line-height: 1.4; word-break: auto-phrase">{{ t.title }}</div>
-<div style="font-size: 13px; color: #BDBAB3">{{ t.link }}</div>
-<button onClick="{{ t.go }}" style="height: 46px; border: 0; border-radius: 8px; background: #F3F1EC; color: #070707; font-weight: 700; font-size: 15px">{{ t.cta }}</button>
-</div>
-</sc-for>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 10px">
-<div style="display: flex; justify-content: space-between; align-items: baseline">
-<h2 class="h2">匿名レビュー</h2>
-
-</div>
-<div class="card" style="border-radius: 10px; overflow: hidden">
-<sc-for list="{{ pReviews }}" as="r" hint-placeholder-count="3">
-<div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: {{ r.sep }}">
-<span class="en" style="width: 40px; height: 40px; flex: none; border-radius: 8px; background: #1C1C1B; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #BDBAB3">{{ r.code }}</span>
-<span style="flex: 1; display: flex; flex-direction: column; min-width: 0">
-<span style="font-weight: 500; font-size: 15px">{{ r.title }}</span>
-<span style="font-size: 13px; color: #A3A19B">{{ r.meta }}</span>
-</span>
-<button onClick="{{ r.toggle }}" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid {{ r.bd }}; background: {{ r.bg }}; color: {{ r.fg }}; font-weight: 700; font-size: 13px; flex: none">{{ r.label }}</button>
-</div>
-</sc-for>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 10px">
-<h2 class="h2">提出済み</h2>
-<sc-for list="{{ pDone }}" as="d" hint-placeholder-count="2">
-<div class="card" style="padding: 14px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px">
-<span style="width: 28px; height: 28px; flex: none; border-radius: 50%; background: #F3F1EC; color: #070707; display: flex; align-items: center; justify-content: center">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>
-</span>
-<span style="flex: 1; display: flex; flex-direction: column; min-width: 0">
-<span style="font-weight: 500; font-size: 15px">{{ d.title }}</span>
-<span style="font-size: 13px; color: #A3A19B">{{ d.meta }}</span>
-</span>
-<span style="font-size: 13px; color: #F3F1EC; flex: none">FB {{ d.fb }}</span>
-</div>
-</sc-for>
-</div>
-</sc-if>
 </div>
 </sc-if>
 
@@ -497,17 +437,7 @@ body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 </sc-for>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 10px">
-<div style="display: flex; align-items: center; gap: 8px"><span class="en" style="font-size: 13px; font-weight: 700; color: #F2A93B; background: transparent; border: 1px solid #F2A93B; padding: 1px 7px; border-radius: 6px">OUTPUT</span><span style="font-size: 14px; color: #BDBAB3">実習</span></div>
-<div class="card" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
-<div style="font-weight: 700; font-size: 17px; line-height: 1.4; word-break: auto-phrase">LUNAの事業でポジショニングを描く</div>
-<div style="font-size: 14px; color: #D2CFC8; line-height: 1.7">LUNAで扱った事業の競合を洗い出し、ポジショニングマップと競争優位の仮説を1枚にまとめる。演習会でグループ講評したうえで提出し、匿名で他の受講者のレビューに回る。</div>
-<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #BDBAB3">
-<span>締切 11.20 FRI 23:59</span><span>提出 9 / 14</span>
-</div>
-<button style="height: 48px; border: 0; border-radius: 8px; background: #F3F1EC; color: #070707; font-weight: 700; font-size: 16px">提出する</button>
-</div>
-</div>
+<button style="height: 48px; border: 1px solid #F3F1EC; border-radius: 8px; background: transparent; color: #F3F1EC; font-weight: 700; font-size: 16px">修了にする</button>
 
 <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg>
@@ -525,11 +455,6 @@ body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 <div style="display: flex; flex-direction: column; gap: 8px">
 <span class="lbl">{{ crs.kind }}</span>
 <h1 class="en" style="margin: 0; font-size: 30px; font-weight: 700; line-height: 1.1">{{ crs.name }}</h1>
-<div style="font-size: 14px; color: #D2CFC8">{{ crs.jp }}</div>
-<div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px">
-<span class="chip">{{ crs.count }}</span>
-<span class="chip" style="border-color: {{ crs.lockColor }}; color: {{ crs.lockColor }}">{{ crs.lock }}</span>
-</div>
 </div>
 
 <div id="progTree"></div>
@@ -2001,7 +1926,7 @@ class Component extends DCLogic {
       pracRaw.forEach((g, i) => PT.push({ id: 'P' + i, name: g.name, jp: '', kind: 'opt', mine: false, tree: [{ g: 'p' + i, name: '', order: 'any', items: g.items.map((x) => ({ u: x[0] })) }], units: Object.fromEntries(g.items.map((x) => [x[0], { title: x[1], meta: '', st: 'open' }])) }));
       const cur = PT.find((t) => t.id === s.course) ? s.course : 'S';
       window.__PROG = { tracks: PT, cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit', ufrom: 'course' }) };
-      const ct = PT.find((t) => t.id === cur), KN = { all: '全員が受ける', choose: 'ロールトラック', opt: '必要になったら' };
+      const ct = PT.find((t) => t.id === cur), KN = { all: '全員', choose: '選択', opt: '任意' };
       var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
     }
     // ---- Markets (sample figures) ----
@@ -2199,14 +2124,14 @@ document.addEventListener('click',function(e){
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(c) + '" style="padding-left:' + (d * 16) + 'px">' +
       (isCur ? '<i class="pgk" aria-hidden="true"></i>' : '') +
       '<span class="pgd ' + st + '">' + (DOT[st] || '') + '</span>' +
-      '<span class="pgt"><span class="pgc en">' + esc(c) + (isCur ? ' · <b>次はここ</b>' : (st === 'done' ? ' · 修了' : (st === 'locked' ? ' · 未解放' : ' · 受講可'))) + '</span><span class="pgn">' + esc(u.title) + '</span>' + (u.meta ? '<span class="pgm">' + esc(u.meta) + '</span>' : '') + '</span>' +
+      '<span class="pgt"><span class="pgc en">' + esc(c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' +
       '<svg class="pgr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
   }
   function itemsHTML(t, items, cur, d, key) {
     return items.map(function (n, i) {
       if (n.u) return unitRow(t, n.u, cur, d);
       var k = key + '/' + (n.g || i), st = stats(t, n.items), open = !fold[k], any = n.order === 'any';
-      return '<div class="pgsub"><button class="pgsh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '" style="padding-left:' + (d * 16) + 'px"><span class="pgo ' + (any ? 'any' : 'seq') + '">' + (any ? '順不同' : '順番') + '</span><span class="pgsn">' + esc(n.name || (any ? 'どれからでも' : '上から順に')) + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      return '<div class="pgsub"><button class="pgsh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '" style="padding-left:' + (d * 16) + 'px"><span class="pgsn">' + esc(n.name || '') + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>' +
         (open ? '<div class="pgin' + (any ? ' any' : '') + '">' + itemsHTML(t, n.items, cur, d + 1, k) + '</div>' : '') + '</div>';
     }).join('');
   }
@@ -2215,21 +2140,20 @@ document.addEventListener('click',function(e){
     var tree = treeOf(t), cur = curCode(t, tree), all = stats(t, tree);
     var blocks = tree.map(function (n, i) {
       var items = n.u ? [n] : n.items, st = stats(t, items), any = !n.u && n.order === 'any', k = t.id + '/' + (n.g || i), open = n.u || !fold[k], has = codes(items).indexOf(cur) >= 0;
-      var head = n.u ? '' : '<button class="pgbh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '"><span class="pgbn">' + esc(n.name || (any ? 'どれからでも' : 'ステップ')) + '</span><span class="pgo ' + (any ? 'any' : 'seq') + '">' + (any ? '順不同' : '順番') + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
-      var body = open ? itemsHTML(t, items, cur, 0, k) : '<button class="pgfold" data-pgf="' + esc(k) + '">' + st.n + ' 単元を表示' + (has ? ' · <b>次はこの中</b>' : '') + '</button>';
+      var head = n.u ? '' : '<button class="pgbh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '"><span class="pgbn">' + esc(n.name || '') + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+      var body = open ? itemsHTML(t, items, cur, 0, k) : '';
       return '<div class="pgb' + (st.d === st.n ? ' fin' : '') + (has ? ' has' : '') + '"><button class="pgrail" ' + (n.u ? 'tabindex="-1" disabled' : 'data-pgf="' + esc(k) + '"') + ' aria-label="' + (open ? '畳む' : '開く') + '" style="background:' + railBg(st, any) + '"></button><div class="pgbody">' + head + body + '</div></div>';
     }).join('');
-    return '<div class="pgsum"><span class="pgleg"><i class="s"></i>順番<i class="a"></i>順不同<i class="k"></i>次はここ</span></div><div class="pgtree">' + blocks + '</div>';
+    return '<div class="pgtree">' + blocks + '</div>';
   }
   // 一覧：種類ごと。カードの左にも同じバー（最上位のかたまりごとの区間）
   function listHTML(P) {
     return ['all', 'choose', 'opt'].map(function (kd) {
       var ts = P.tracks.filter(function (t) { return t.kind === kd; }); if (!ts.length) return '';
-      return '<section class="pgsec"><h2 class="h2">' + (kd === 'all' ? '全員が受ける' : kd === 'choose' ? 'ロールを選んで受ける' : '必要になったら') + '</h2><div class="pgcards">' + ts.map(function (t) {
+      return '<section class="pgsec"><h2 class="h2">' + KIND[kd] + '</h2><div class="pgcards">' + ts.map(function (t) {
         var tree = treeOf(t), all = stats(t, tree), pc = all.n ? Math.round(all.d / all.n * 100) : 0, cur = curCode(t, tree);
         var segs = tree.map(function (n) { var st = stats(t, n.u ? [n] : n.items); return '<i style="flex:' + st.n + ';background:' + railBg(st, !n.u && n.order === 'any') + '"></i>'; }).join('');
-        return '<button class="pgcard' + (t.mine ? ' mine' : '') + '" data-pgt="' + esc(t.id) + '"><span class="pgcr">' + segs + '</span><span class="pgct"><span class="pgck">' + (t.mine ? '<b>受講中</b> · ' : '') + KIND[t.kind] + '</span><span class="pgcn en">' + esc(t.name) + '</span>' + (t.jp ? '<span class="pgcj">' + esc(t.jp) + '</span>' : '') +
-          '<span class="pgcm">' + (all.n ? all.d + ' / ' + all.n + ' 修了' + (cur ? ' · 次は ' + esc(cur) + ' ' + esc(t.units[cur].title) : (all.d === all.n ? ' · 完了' : '')) : 'まだ単元がありません') + '</span></span><span class="pgcp en">' + pc + '<small>%</small></span></button>';
+        return '<button class="pgcard' + (t.mine ? ' mine' : '') + '" data-pgt="' + esc(t.id) + '"><span class="pgcr">' + segs + '</span><span class="pgct"><span class="pgcn en">' + esc(t.name) + '</span><span class="pgcm">' + (cur ? '<b class="en">' + esc(cur) + '</b> ' + esc(t.units[cur].title) : (all.n && all.d === all.n ? '完了' : '')) + '</span></span><span class="pgcp en">' + pc + '<small>%</small></span></button>';
       }).join('') + '</div></section>';
     }).join('');
   }

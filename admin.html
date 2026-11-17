@@ -1601,8 +1601,15 @@ body.mvin .mvline{display:none !important}
 .utree .uadd button:hover{border-color:var(--accent);color:var(--accent)}
 .utree .ur.ghost.ing{background:transparent}
 #detail .udeps [data-act="uDepX"],#detail select[data-udep]{display:none !important}
-#detail .udeps::after{content:"並び方から自動で決まります";display:block;font-size:11px;color:var(--muted);margin-top:4px}
 .tkf.kind select{min-width:92px}
+
+/* ux44 路線図をなくし、単元の入れ子だけに */
+.tkboth{grid-template-columns:minmax(0,1fr) !important;max-width:880px}
+.tkboth .tkmap,.pseg:has([data-act="tv"]){display:none !important}
+.tkboth[data-tv] .tktab{display:flex !important}
+.utree .ufix{display:none !important}
+.tkboth .usheet{flex:none !important;overflow:visible !important;max-height:none !important}
+.tkboth .tktab{max-height:none !important}
 </style>
 </head>
 <body>
@@ -3514,7 +3521,7 @@ function renderDetail(g) {
     '<div class="rb">' +
       '<section><h3>目標</h3><textarea class="input" rows="2" data-ubind="goal" placeholder="この単元で何ができるようになるか">' + esc(d.goal || '') + '</textarea></section>' +
       '<section><h3>教材</h3><div data-list="mats">' + mats + '</div><div class="matnew"><input id="mUrl" class="input" placeholder="URLを貼り付けて Enter" aria-label="教材のURL" autocomplete="off"></div></section>' +
-      '<section><h3>演習</h3><textarea id="uPractice" class="input" rows="3" data-ubind="practice">' + esc(d.practice || '') + '</textarea></section>' +
+      
       '<section><h3>マイルストーン</h3><input id="uMile" class="input" data-ubind="milestone" value="' + esc(d.milestone || '') + '"></section>' +
       '<section><h3>前提</h3><div class="udeps">' + (deps || '<span class="dim">なし</span>') +
         (others.length ? '<select class="input sm" data-udep="' + esc(u.code) + '" aria-label="前提を追加"><option value="">＋</option>' + others.map(function (x) { return '<option value="' + esc(x.code) + '">' + esc(x.code + ' ' + x.title) + '</option>'; }).join('') + '</select>' : '') + '</div></section>' +
@@ -5432,7 +5439,7 @@ function treeRowsHTML(t, items, d, errs, doneOf) {
     var cs = treeCodes(n.items), open = n.open !== false;
     h += '<div class="ur ugrp" data-gid="' + n.g + '">' + ind +
       '<span class="ugn"><button class="ugc" data-act="tgOpen" data-gid="' + n.g + '" aria-label="' + (open ? '畳む' : '開く') + '">' + CHEV(open) + '</button>' +
-      '<input class="cell" data-tg="name" data-gid="' + n.g + '" value="' + esc(n.name || '') + '" placeholder="グループ名（なくても可）" aria-label="グループ名" autocomplete="off"></span>' +
+      '<input class="cell" data-tg="name" data-gid="' + n.g + '" value="' + esc(n.name || '') + '" placeholder="グループ名" aria-label="グループ名" autocomplete="off"></span>' +
       '<span style="display:flex;align-items:center;gap:8px"><span class="ugo" role="group" aria-label="並び方"><button data-act="tgOrder" data-gid="' + n.g + '" data-v="seq" aria-pressed="' + (n.order !== 'any') + '">順番</button><button data-act="tgOrder" data-gid="' + n.g + '" data-v="any" aria-pressed="' + (n.order === 'any') + '">順不同</button></span><span class="ugcnt num">' + cs.length + '</span></span>' +
       '<button class="ib udel" data-act="tgUngroup" data-gid="' + n.g + '" aria-label="グループを解除" title="グループを解除（中の単元は残る）"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
     if (open) h += treeRowsHTML(t, n.items, d + 1, errs, doneOf) + '<div class="ur ghost ing" data-gin="' + n.g + '">' + '<span class="uind">' + new Array(d + 2).join('<i></i>') + '</span><input class="cell uc num" data-u="newcode" data-gin="' + n.g + '" placeholder="コード" autocomplete="off"><input class="cell ut" data-u="new" data-gin="' + n.g + '" placeholder="＋ ' + esc(n.name || 'このグループ') + 'に単元を追加" autocomplete="off"></div>';
