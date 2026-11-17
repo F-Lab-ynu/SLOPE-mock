@@ -1436,6 +1436,9 @@ svg.crown{fill:#F59E0B}
 .ch .cha{display:flex;gap:2px;align-items:center}
 .pmore{padding:8px 14px;border-top:1px solid #F0F1F3;font-size:12px;color:var(--muted);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer}
 html,body{touch-action:manipulation}
+.menu .msm:empty{display:none !important}
+/* ux29 スマホ：部員画面と同じく右上（アカウントの左）に運営スイッチ */
+@media (max-width:760px){ .acct .mode{display:flex !important;padding:0 2px 0 0 !important;gap:8px;font-size:12px} .acct .mode span{display:inline !important} }
 </style>
 </head>
 <body>
@@ -2068,7 +2071,7 @@ function renderChrome() {
     return '<button data-act="go" data-view="' + v.id + '"' + (S.view === v.id ? ' aria-current="page"' : '') + '>' + ic(v.id) + '<span class="full">' + v.name + '</span><span class="short">' + (SH[v.id] || v.name) + '</span>' + (c[v.id] ? '<span class="n" title="' + (BADGE[v.id] || '') + ' ' + c[v.id] + '件">' + c[v.id] + '</span>' : '') + '</button>';
   }).join('');
   document.getElementById('acct').innerHTML = '<div class="mode"><span>運営</span><button class="msw on" data-to="./" role="switch" aria-checked="true" aria-label="部員画面に切り替える"><i></i></button></div>' + '<button data-act="acct" aria-haspopup="true" aria-expanded="' + UI.acct + '">' + av(m.id, 'lg') + '<span class="who"><b>' + esc(m.name) + '</b><span>' + esc(m.unit === '—' ? '部員' : m.unit) + '</span></span>' + ic('chev') + '</button>' +
-    (UI.acct ? '<div class="menu" role="menu"><div class="msm">' + (isAdmin() ? '<button role="menuitem" data-act="go" data-view="perms">' + ic('perms') + '<span>メンバー</span></button>' : '') + '<button role="menuitem" data-act="toMember">' + ic('back') + '<span>部員画面に切り替える</span></button></div><div class="mh">アカウントを切り替え（モック）</div>' + S.members.map(function (x) {
+    (UI.acct ? '<div class="menu" role="menu"><div class="msm">' + (isAdmin() ? '<button role="menuitem" data-act="go" data-view="perms">' + ic('perms') + '<span>メンバー</span></button>' : '') + '</div><div class="mh">アカウントを切り替え（モック）</div>' + S.members.map(function (x) {
       return '<button role="menuitem" data-act="switch" data-id="' + x.id + '">' + av(x.id) + '<span>' + esc(x.name) + '</span><span class="r">' + permLabel(x) + '</span></button>'; }).join('') + '<div class="msep"></div><button role="menuitem" class="mdanger" data-act="resetAsk"><span>サンプルデータに戻す…</span></button></div>' : '');
 }
 
