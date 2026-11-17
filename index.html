@@ -198,11 +198,14 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .nd.done{width:14px;height:14px;background:#F3F1EC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23070707' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/9px no-repeat}
 .nd.cur{width:14px;height:14px;background:#F2A93B;border:0;box-shadow:0 0 0 3px #070707,0 0 10px rgba(242,169,59,.6)}
 
-/* 同じ段は同じ大きさ：フォルダは太字、やることは普通の字。大きさは全部15px */
-.pgbn,.pgsn{font-size:15px !important;font-weight:700 !important;color:#F3F1EC !important;letter-spacing:0 !important}
+/* 一番外側のフォルダだけ大見出し(18px)。英字だけの名前は和文と同じ大きさに見えるよう少し大きく */
+.pgbn{font-size:18px !important;font-weight:700 !important;color:#F3F1EC !important}
+.pgsn{font-size:15px !important;font-weight:700 !important;color:#F3F1EC !important;letter-spacing:0 !important}
 .pgsub.lk>.pgsh .pgsn{color:#7D7B76 !important}
 .pgn,.pgu.ev .pgn,.pgu.tr .pgn{font-size:15px !important}
-.pgbh{min-height:48px;padding:8px 0 !important}
+.pgbn.lat{font-size:20px !important}
+.pgsn.lat,.pgn.lat{font-size:16.5px !important}
+.pgbh{min-height:52px;padding:8px 0 !important}
 .pgsh{min-height:48px;padding:8px 0 !important}
 .pgb>.pgbody>.pgbh:first-child{padding-top:8px !important}
 </style>
@@ -2214,7 +2217,7 @@ document.addEventListener('click',function(e){
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
     if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
-      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
+      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
@@ -2224,7 +2227,7 @@ document.addEventListener('click',function(e){
     var vis = (n.items || []).filter(function (x) { return x._n; });
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + (body ? '<div class="pgin">' + body + '</div>' : '') : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
