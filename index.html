@@ -184,6 +184,19 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgu:hover .pgn{text-decoration-color:#BDBAB3}
 .pgdt.done{width:14px;height:14px;margin:-7px 0 0 -7px;background:#F3F1EC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23070707' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/9px no-repeat}
 .pgdt.open{width:12px;height:12px;margin:-6px 0 0 -6px}
+
+/* 字下げした位置に点。外側のバーと内側の段は細い線でつなぐ */
+.pgrail .rd{width:2px !important}
+.pgbh,.pgsh{position:relative}
+.pgin{position:relative;padding-left:26px !important}
+.pgin::before{content:"";position:absolute;left:11px;top:0;bottom:22px;width:2px;background:#2C2C2A}
+.nd{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;box-sizing:border-box;transform:translate(-50%,-50%);z-index:1;box-shadow:0 0 0 3px #070707}
+.pgbody>.pgbh>.nd,.pgbody>.pgu>.nd{left:-20px}
+.pgin>.pgu>.nd,.pgin>.pgsub>.pgsh>.nd{left:-14px}
+.nd.open{background:#070707;border:2px solid #BDBAB3}
+.nd.locked{width:7px;height:7px;background:#474744}
+.nd.done{width:14px;height:14px;background:#F3F1EC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23070707' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/9px no-repeat}
+.nd.cur{width:14px;height:14px;background:#F2A93B;border:0;box-shadow:0 0 0 3px #070707,0 0 10px rgba(242,169,59,.6)}
 </style>
 </head>
 <body>
@@ -2134,8 +2147,8 @@ document.addEventListener('click',function(e){
   }
   // バー：かたまりごとの区間がつながった1本。済んだぶんは太い白、残りは細い灰（順不同は点線）。今いるかたまりは残りも太くする
   function rail(p, any, here, btn) {
-    var w = here ? 6 : 2, rest = any ? 'repeating-linear-gradient(#4A4A46 0 3px,transparent 3px 6px)' : (here ? '#3A3A37' : '#2C2C2A');
-    return '<' + (btn ? 'button' : 'span') + ' class="pgrail"' + (btn ? ' data-pgf="' + esc(btn) + '" aria-label="開閉"' : ' aria-hidden="true"') + '><i class="rr" style="width:' + w + 'px;background:' + rest + '"></i><i class="rd" style="height:' + Math.round(p * 100) + '%"></i>' + (here ? '<i class="pgkn" aria-hidden="true"></i>' : '') + '</' + (btn ? 'button' : 'span') + '>';
+    var w = 2, rest = any ? 'repeating-linear-gradient(#4A4A46 0 3px,transparent 3px 6px)' : (here ? '#3A3A37' : '#2C2C2A');
+    return '<' + (btn ? 'button' : 'span') + ' class="pgrail"' + (btn ? ' data-pgf="' + esc(btn) + '" aria-label="開閉"' : ' aria-hidden="true"') + '><i class="rr" style="width:' + w + 'px;background:' + rest + '"></i><i class="rd" style="height:' + Math.round(p * 100) + '%"></i>' + '' + '</' + (btn ? 'button' : 'span') + '>';
   }
   // ---------- トラックの中身 ----------
   function stats(t, items) { var cs = codes(items), d = cs.filter(function (c) { return t.units[c].st === 'done'; }).length; return { n: cs.length, d: d }; }
@@ -2193,9 +2206,9 @@ document.addEventListener('click',function(e){
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
     if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
-      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '">' + k + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
+      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
     var u = tById(P, n.t).units[n.c];
-    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + k + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
+    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '"><i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
   function nodeHTML(P, n, cur, top) {
     if (!n._n) return '';
@@ -2203,9 +2216,9 @@ document.addEventListener('click',function(e){
     var vis = (n.items || []).filter(function (x) { return x._n; });
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '">' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
-    return top ? head + body : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
+    return top ? head + (body ? '<div class="pgin">' + body + '</div>' : '') : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
   function v2Of(P) { if (!P._v2) P._v2 = JSON.parse(JSON.stringify(P.v2 || fromOld(P))); return P._v2; }
   function progHTML(P) {
@@ -2229,7 +2242,7 @@ document.addEventListener('click',function(e){
   function dots() { Array.prototype.forEach.call(document.querySelectorAll('.pgtree .pgb'), function (b) { var r = b.querySelector('.pgrail'); if (!r) return; var top = r.getBoundingClientRect().top;
       Array.prototype.forEach.call(r.querySelectorAll('.pgdt'), function (x) { x.remove(); });
       Array.prototype.forEach.call(b.querySelectorAll('.pgu[data-st], .pgbh[data-st], .pgsh[data-st]'), function (u) { if (u.classList.contains('cur')) return; var d = document.createElement('i'); d.className = 'pgdt ' + u.dataset.st; d.style.top = (u.getBoundingClientRect().top - top + u.offsetHeight / 2) + 'px'; r.appendChild(d); }); }); }
-  function knob() { dots(); Array.prototype.forEach.call(document.querySelectorAll('.pgb.here'), function (b) { var k = b.querySelector('.pgkn'), c = b.querySelector('.pgu.cur'), r = b.querySelector('.pgrail'); if (!k || !r) return; if (!c) { k.style.display = 'none'; return; } k.style.display = ''; k.style.top = (c.getBoundingClientRect().top - r.getBoundingClientRect().top + c.offsetHeight / 2 - 7) + 'px'; }); }
+  function knob() { return; Array.prototype.forEach.call(document.querySelectorAll('.pgb.here'), function (b) { var k = b.querySelector('.pgkn'), c = b.querySelector('.pgu.cur'), r = b.querySelector('.pgrail'); if (!k || !r) return; if (!c) { k.style.display = 'none'; return; } k.style.display = ''; k.style.top = (c.getBoundingClientRect().top - r.getBoundingClientRect().top + c.offsetHeight / 2 - 7) + 'px'; }); }
   var _paint = paint; paint = function () { _paint(); knob(); };
   window.addEventListener('resize', knob);
   window.__progPaint = paint;
