@@ -1538,6 +1538,8 @@ body.mvin .mvline{display:none !important}
 .fcm.nodt{color:var(--dim)}
 /* ux40 フォルダーのバーもファイルと同じ太さ（色で見分ける） */
 .gr .bar.sum,.gr.g0 .bar.sum{top:7px;height:26px;border-radius:5px}
+.ftn.mine span{font-weight:600}
+.ftn.mine::after{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px}
 </style>
 </head>
 <body>
@@ -3525,7 +3527,13 @@ function addFolder(par, name) {
   kids(par).push(n); expandTo(par.id); return n;
 }
 function ftree() {
-  var cur = S.fcur || '', curN = curFolder(), anc = curN ? ancestors(curN).map(function (a) { return a.id; }).concat([curN.id]) : [];
+  var cur = S.fcur || '', curN = curFolder(), anc = curN ? ancestors(curN).map(function (a) { return a.id; }).concat([curN.id]) : [], mine = {};
+  if (cur === 'mine') { // 自分の担当：担当しているファイル・リーダーのフォルダーまでの道を開いて、印を付ける
+    allNodes().forEach(function (n) {
+      if (!(isFolder(n) ? isLead(n, S.me) : n.who === S.me && !n.done)) return;
+      mine[n.id] = 1; ancestors(n).forEach(function (a) { if (anc.indexOf(a.id) < 0) anc.push(a.id); });
+    });
+  }
   UI.fopen = UI.fopen || {};
   var row = function (n, d) {
     if (!visNode(n)) return '';
@@ -3533,7 +3541,7 @@ function ftree() {
     var open = UI.fopen[n.id] != null ? UI.fopen[n.id] : anc.indexOf(n.id) >= 0;
     return '<div class="ft' + (cur === n.id ? ' on' : '') + '" style="--d:' + d + '">' +
       (ch.length ? '<button class="ftc" data-act="ftog" data-id="' + n.id + '" aria-expanded="' + open + '" aria-label="開閉"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (open ? 'M7 10l5 5 5-5' : 'M10 7l5 5-5 5') + '"/></svg></button>' : '<span class="ftc"></span>') +
-      '<button class="ftn" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + '>' + (isFolder(n) ? FOLD : FILE) + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
+      '<button class="ftn' + (mine[n.id] ? ' mine' : '') + '" data-act="fgo" data-id="' + n.id + '"' + (cur === n.id ? ' aria-current="true"' : '') + (mine[n.id] ? ' title="自分の担当"' : '') + '>' + (isFolder(n) ? FOLD : FILE) + '<span>' + esc(ttl(n)) + '</span>' + (isEvent(n) ? '<i class="evd" title="イベント"></i>' : '') + '</button></div>' +
       (open ? ch.map(function (c) { return row(c, d + 1); }).join('') : '');
   };
   return '<button class="ftop' + (cur === 'mine' ? ' on' : '') + '" data-act="fgo" data-id="mine">' + ic('users') + '<span>自分の担当</span></button>' +
