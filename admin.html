@@ -1544,6 +1544,43 @@ body.mvin .mvline{display:none !important}
 .gg .gr.mvsrc{opacity:1}
 .gg .gr.mvsrc > .gl > *:not(.lwh),.gg .gr.mvsrc > .gt > *{opacity:.35}
 .gg .gr.mvsrc > .gl{background:#F9FAFB !important}
+
+/* ux42 告知：イベント・カレンダー・外部 */
+.evl{border:1px solid var(--line);border-radius:8px;background:#fff}
+.evr{display:grid;grid-template-columns:minmax(0,1.6fr) 150px minmax(0,1fr) 90px 56px 40px;align-items:center;gap:8px;min-height:48px;padding:6px 12px;border-bottom:1px solid #F0F1F3}
+.evr:last-child{border-bottom:0}
+.evr.evh{min-height:36px;font-size:12px;color:var(--muted)}
+.evr .evn{display:flex;flex-direction:column;min-width:0}
+.evr .evn b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evr .evn span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evr .evp{font-size:12px;color:var(--sub,#4B5563);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evr .evq{font-size:12px;white-space:nowrap}
+.evr .evg{font-size:12px}
+.calh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.calh b{font-size:16px;font-weight:700;min-width:120px;text-align:center}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.calg .cw{padding:6px 8px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line);background:#FAFAFA}
+.calg .cd{min-height:104px;padding:4px;border-right:1px solid #F0F1F3;border-bottom:1px solid #F0F1F3;display:flex;flex-direction:column;gap:2px;cursor:pointer;min-width:0}
+.calg .cd:nth-child(7n){border-right:0}
+.calg .cd:hover{background:#FAFBFF}
+.calg .cd.out{background:#FAFAFA;color:var(--dim)}
+.calg .cd .dn{font-size:12px;padding:2px 4px;align-self:flex-start;border-radius:10px}
+.calg .cd.today .dn{background:var(--accent);color:#fff}
+.calg .cd.sun .dn{color:#DC2626}.calg .cd.sat .dn{color:#2563EB}
+.cchip{display:block;font-size:11px;line-height:1.3;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;text-align:left;font-family:inherit;cursor:pointer;max-width:100%}
+.cchip.cal{background:#EEF2FF;color:#3730A3}
+.cchip.cal.draft{background:#fff;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line2)}
+.cchip.ev{background:#FFF7ED;color:#9A3412}
+.cchip.ev.draft{background:#fff;color:#C2410C;box-shadow:inset 0 0 0 1px #FED7AA}
+.cchip.ext{background:#F3F4F6;color:var(--sub,#4B5563);cursor:default}
+.cmore{font-size:11px;color:var(--muted);padding:0 6px}
+.calleg{display:flex;gap:14px;margin-top:8px;font-size:12px;color:var(--muted)}
+.calleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+@media (max-width:760px){
+  .evr{grid-template-columns:minmax(0,1fr) 56px 36px;grid-template-areas:"n s e" "d d d" "p p p"}
+  .evr.evh{display:none}.evr .evn{grid-area:n}.evr .evq{grid-area:d;font-size:12px;color:var(--muted)}.evr .evp{grid-area:p}.evr .evg{display:none}.evr .nsw{grid-area:s}.evr .ib{grid-area:e}
+  .calg .cd{min-height:64px}.cchip{font-size:10px;padding:1px 4px}
+}
 </style>
 </head>
 <body>
@@ -1569,7 +1606,7 @@ var uid = function (p) { return p + Date.now().toString(36) + Math.floor(Math.ra
 var TABS = [
   { id: 'projects', name: '業務' },
   { id: 'tracks', name: '教材' },
-  { id: 'notices', name: '外部告知' },
+  { id: 'notices', name: '告知' },
   { id: 'board', name: '掲示板' }
 ];
 
@@ -5197,6 +5234,130 @@ document.addEventListener('focusout', function (e) { if (e.target.id === 'fdoc' 
 // ガントをスクロール・拡大縮小したら、選んだバーの日付入力欄もついていく
 document.addEventListener('scroll', function (e) { if (UI.gsel && e.target && e.target.id === 'gs') bpopShow(); }, true);
 window.addEventListener('resize', function () { if (UI.gsel) bpopShow(); });
+
+
+// ---------- ux42 告知タブ：部内イベントの告知・カレンダー（部内の予定）・外部告知 ----------
+function calsInit() {
+  if (!S.cals) {
+    var d = function (n) { return isoOf(TODAY + n * DAY); };
+    S.cals = typeof sb === 'undefined' ? [
+      { id: 'c1', title: '定例会', date: d(2), time: '18:30', place: '経営学部 2-101', memo: '', state: 'pub' },
+      { id: 'c2', title: '演習会：ピッチ練習', date: d(6), time: '17:00', place: 'オンライン', memo: '資料は前日までに共有', state: 'pub' },
+      { id: 'c3', title: '定例会', date: d(9), time: '18:30', place: '経営学部 2-101', memo: '', state: 'draft' }
+    ] : [];
+  }
+  return S.cals;
+}
+function evNodes() { return allNodes().filter(function (n) { return isFolder(n) && isEvent(n); }).sort(function (a, b) { return dayOf(a.start) - dayOf(b.start); }); }
+function canEv(n) { return editSelf(n) || isLead(n, S.me); }
+function evPeriod(n) { return n.start === n.end ? fmtDate(n.start) : shortDate(n.start) + ' – ' + shortDate(n.end); }
+function viewEvents() {
+  var es = evNodes().filter(function (n) { return dayOf(n.end) >= TODAY - 30 * DAY; });
+  if (!es.length) return '<div class="empty big">イベントはまだありません。業務でフォルダーを右クリック →「イベントとして記録」で追加できます</div>';
+  return '<div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + es.map(function (n) {
+    var ok = canEv(n), pub = n.announce === 'done', past = dayOf(n.end) < TODAY;
+    return '<div class="evr" data-evid="' + n.id + '"><span class="evn"><b>' + esc(ttl(n)) + '</b><span>' + esc(n.purpose ? memoText(n.purpose).slice(0, 60) : (parentOf(n) ? ttl(parentOf(n)) : '')) + '</span></span>' +
+      '<span class="evq num">' + evPeriod(n) + '</span><span class="evp">' + esc(n.place || '—') + '</span>' +
+      '<span class="evg num">' + (pub ? (n.reg || 0) + ' 人' : '<span class="dim">—</span>') + '</span>' +
+      (past ? '<span class="muted nsw" style="font-size:12px">終了</span>' : '<button class="sw nsw" role="switch" data-act="evPub" data-id="' + n.id + '" aria-checked="' + pub + '" aria-label="部員に公開"' + (ok ? '' : ' disabled title="このイベントのリーダーだけが公開できます"') + '><i></i></button>') +
+      '<button class="ib" data-act="evEdit" data-id="' + n.id + '" aria-label="告知を編集" title="' + (ok ? '告知を編集' : '内容を見る') + '">' + PEN + '</button></div>';
+  }).join('') + '</div>';
+}
+function calItems(y, m) {
+  var out = {}, add = function (iso, o) { (out[iso] = out[iso] || []).push(o); };
+  calsInit().forEach(function (c) { add(c.date, { k: 'cal', id: c.id, t: (c.time ? c.time + ' ' : '') + c.title, draft: c.state !== 'pub' }); });
+  evNodes().forEach(function (n) { add(n.end, { k: 'ev', id: n.id, t: ttl(n), draft: n.announce !== 'done' }); }); // 部員のカレンダーと同じく、当日（終了日）に出す
+  S.notices.forEach(function (n) { if (n.state === 'pub' && /^\d{4}-\d{2}-\d{2}$/.test(n.due || '')) add(n.due, { k: 'ext', id: n.id, t: '締切 ' + n.title }); });
+  return out;
+}
+function viewCal() {
+  var base = new Date(TODAY), y = UI.calY != null ? UI.calY : base.getUTCFullYear(), m = UI.calM != null ? UI.calM : base.getUTCMonth();
+  var first = Date.UTC(y, m, 1), start = first - new Date(first).getUTCDay() * DAY, items = calItems(), cells = '';
+  for (var i = 0; i < 42; i++) {
+    var t = start + i * DAY, d = new Date(t), iso = isoOf(t), its = items[iso] || [], wd = d.getUTCDay();
+    if (i >= 35 && d.getUTCMonth() !== m) break;
+    cells += '<div class="cd' + (d.getUTCMonth() !== m ? ' out' : '') + (t === TODAY ? ' today' : '') + (wd === 0 ? ' sun' : wd === 6 ? ' sat' : '') + '" data-act="calDay" data-d="' + iso + '" role="button" tabindex="0" aria-label="' + (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日に予定を追加"><span class="dn num">' + d.getUTCDate() + '</span>' +
+      its.slice(0, 3).map(function (o) { return '<button class="cchip ' + o.k + (o.draft ? ' draft' : '') + '" data-act="calItem" data-k="' + o.k + '" data-id="' + o.id + '" title="' + esc(o.t) + (o.draft ? '（非公開）' : '') + '">' + esc(o.t) + '</button>'; }).join('') +
+      (its.length > 3 ? '<span class="cmore">ほか ' + (its.length - 3) + ' 件</span>' : '') + '</div>';
+  }
+  return '<div class="calh"><button class="ib" data-act="calMv" data-v="-1" aria-label="前の月">' + '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><b class="num">' + y + '年' + (m + 1) + '月</b><button class="ib" data-act="calMv" data-v="1" aria-label="次の月"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button class="btn sm" data-act="calMv" data-v="0">今日</button></div>' +
+    '<div class="calg">' + ['日', '月', '火', '水', '木', '金', '土'].map(function (w) { return '<div class="cw">' + w + '</div>'; }).join('') + cells + '</div>' +
+    '<div class="calleg"><span><i style="background:#EEF2FF"></i>部内の予定</span><span><i style="background:#FFF7ED"></i>イベント（業務）</span><span><i style="background:#F3F4F6"></i>外部の締切</span><span><i style="background:#fff;box-shadow:inset 0 0 0 1px var(--line2)"></i>枠だけ＝まだ部員に非公開</span></div>';
+}
+var _viewNotices42 = viewNotices;
+viewNotices = function () {
+  if (['ev', 'cal', 'list', 'offer'].indexOf(S.ntab) < 0) S.ntab = 'ev';
+  var tab = S.ntab, wait = S.offers.filter(function (o) { return o.state === 'wait'; }).length;
+  var body;
+  if (tab === 'ev') body = '<div class="body">' + viewEvents() + '</div>';
+  else if (tab === 'cal') body = '<div class="body">' + viewCal() + '</div>';
+  else { var h = _viewNotices42(); var k = h.indexOf('<div class="body">'); body = k >= 0 ? h.slice(k) : h; }
+  var evn = evNodes().filter(function (n) { return dayOf(n.end) >= TODAY; }).length;
+  return top('告知') + utabs('ntab', [['ev', 'イベント', evn], ['cal', 'カレンダー', null], ['list', '外部', S.notices.length], ['offer', '部員からの情報', wait]]) + body;
+};
+var _fabHTML42 = fabHTML;
+fabHTML = function () {
+  if (S.view === 'notices' && S.ntab === 'cal' && can('notices')) return '<div class="efabw"><button class="efab" data-act="calNew" title="予定を追加" aria-label="予定を追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>';
+  if (S.view === 'notices' && S.ntab !== 'list') return '';
+  return _fabHTML42();
+};
+function calDlg() {
+  var c = M.id ? calsInit().filter(function (x) { return x.id === M.id; })[0] : null, d = c || { title: '', date: M.d || isoOf(TODAY), time: '', place: '', memo: '', state: 'pub' };
+  var ro = !can('notices');
+  var body = '<div class="fld"><label for="cT">予定</label><input id="cT" class="input" value="' + esc(d.title) + '" placeholder="定例会" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div class="two"><div class="fld"><label for="cD">日付</label><input id="cD" type="date" class="input" value="' + esc(d.date) + '"' + (ro ? ' disabled' : '') + '></div><div class="fld"><label for="cH">時間</label><input id="cH" type="time" class="input" value="' + esc(d.time || '') + '"' + (ro ? ' disabled' : '') + '></div></div>' +
+    '<div class="fld"><label for="cP">場所</label><input id="cP" class="input" value="' + esc(d.place || '') + '" placeholder="経営学部 2-101 / オンライン" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div class="fld"><label for="cM">メモ</label><textarea id="cM" class="input" rows="3" placeholder="持ち物・準備など"' + (ro ? ' disabled' : '') + '>' + esc(d.memo || '') + '</textarea></div>' +
+    '<label style="display:flex;align-items:center;gap:8px"><input id="cS" type="checkbox" class="check"' + (d.state === 'pub' ? ' checked' : '') + (ro ? ' disabled' : '') + '>部員のカレンダーに出す</label>';
+  var foot = ro ? '<button class="btn" data-act="close">閉じる</button>' : (c ? '<button class="btn ghost" data-act="calDel" data-id="' + c.id + '" style="margin-right:auto;color:var(--red,#DC2626)">削除</button>' : '') + '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="calSave">保存</button>';
+  return dlg(c ? '予定を編集' : '予定を追加', body, foot, true);
+}
+function evDlg() {
+  var n = task(M.id); if (!n) return '';
+  var ok = canEv(n), dis = ok ? '' : ' disabled';
+  var body = '<div class="muted" style="font-size:12px">' + esc(ancestors(n).map(ttl).join(' › ')) + '</div>' +
+    '<div class="fld"><label>イベント</label><div style="font-weight:600;font-size:15px">' + esc(ttl(n)) + '</div></div>' +
+    '<div class="two"><div class="fld"><label for="eS">開始</label><input id="eS" type="date" class="input" value="' + esc(n.start) + '"' + dis + '></div><div class="fld"><label for="eE">終了</label><input id="eE" type="date" class="input" value="' + esc(n.end) + '"' + dis + '></div></div>' +
+    '<div class="fld"><label for="eP">場所</label><input id="eP" class="input" value="' + esc(n.place || '') + '" placeholder="経営学部 講義棟" autocomplete="off"' + dis + '></div>' +
+    '<div class="fld"><label for="eD">告知文</label><textarea id="eD" class="input" rows="5" placeholder="内容・対象・持ち物・申し込み方法など"' + dis + '>' + esc(memoText(n.purpose || '')) + '</textarea></div>' +
+    '<label style="display:flex;align-items:center;gap:8px"><input id="eA" type="checkbox" class="check"' + (n.announce === 'done' ? ' checked' : '') + dis + '>部員に公開する（ホーム・カレンダーに出て、参加登録できる）</label>' +
+    (ok ? '' : '<div class="muted" style="font-size:12px">編集できるのは、このイベントのリーダーか、ひとつ上のフォルダーのリーダーです</div>');
+  var foot = ok ? '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="evSave">保存</button>' : '<button class="btn" data-act="close">閉じる</button>';
+  return dlg('イベントの告知', body, foot, true);
+}
+var _renderModal42 = renderModal;
+renderModal = function () {
+  if (M && (M.m === 'cal' || M.m === 'ev')) { document.getElementById('modal').innerHTML = M.m === 'cal' ? calDlg() : evDlg(); var f = document.getElementById(M.m === 'cal' ? 'cT' : 'eP'); if (f && !f.disabled && !M.id) f.focus(); return; }
+  return _renderModal42.apply(this, arguments);
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="evPub"],[data-act="evEdit"],[data-act="calMv"],[data-act="calNew"],[data-act="calDay"],[data-act="calItem"],[data-act="calSave"],[data-act="calDel"],[data-act="evSave"]'); if (!b) return;
+  if (b.dataset.act === 'calDay' && e.target.closest('.cchip') && e.target.closest('.cchip') !== b) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  var a = b.dataset.act, v = function (id) { var x = document.getElementById(id); return x ? x.value.trim() : ''; };
+  if (a === 'evPub') { var n = task(b.dataset.id); if (!n || !canEv(n)) return; snap(); n.announce = n.announce === 'done' ? 'before' : 'done'; save(); render(); toast(n.announce === 'done' ? '部員に公開しました' : '非公開にしました'); return; }
+  if (a === 'evEdit') { M = { m: 'ev', id: b.dataset.id }; renderModal(); return; }
+  if (a === 'calMv') { var dv = +b.dataset.v, base = new Date(TODAY); if (!dv) { UI.calY = null; UI.calM = null; } else { var y = UI.calY != null ? UI.calY : base.getUTCFullYear(), m = (UI.calM != null ? UI.calM : base.getUTCMonth()) + dv; UI.calY = y + Math.floor(m / 12); UI.calM = (m % 12 + 12) % 12; } render(); return; }
+  if (a === 'calNew') { if (!can('notices')) return; M = { m: 'cal' }; renderModal(); return; }
+  if (a === 'calDay') { if (!can('notices')) return; M = { m: 'cal', d: b.dataset.d }; renderModal(); return; }
+  if (a === 'calItem') { var k = b.dataset.k; if (k === 'cal') M = { m: 'cal', id: b.dataset.id }; else if (k === 'ev') M = { m: 'ev', id: b.dataset.id }; else { S.ntab = 'list'; render(); return; } renderModal(); return; }
+  if (a === 'calDel') { var c0 = calsInit().filter(function (x) { return x.id === b.dataset.id; })[0]; if (!c0) return; snap(); S.cals = S.cals.filter(function (x) { return x !== c0; }); M = null; save(); render(); toastUndo('「' + c0.title + '」を削除しました'); return; }
+  if (a === 'calSave') {
+    if (!v('cT')) { toast('予定の名前を入れてください'); document.getElementById('cT').focus(); return; }
+    if (!v('cD')) { toast('日付を入れてください'); return; }
+    var data = { title: v('cT'), date: v('cD'), time: v('cH'), place: v('cP'), memo: v('cM'), state: document.getElementById('cS').checked ? 'pub' : 'draft' };
+    snap(); if (M.id) Object.assign(calsInit().filter(function (x) { return x.id === M.id; })[0], data); else calsInit().push(Object.assign({ id: uid('c') }, data));
+    M = null; save(); render(); toast('保存しました'); return;
+  }
+  if (a === 'evSave') {
+    var n2 = task(M.id); if (!n2 || !canEv(n2)) return;
+    var s0 = v('eS'), e0 = v('eE'); if (s0 && e0 && dayOf(e0) < dayOf(s0)) { toast('終了が開始より前になっています'); return; }
+    snap(); if (s0) n2.start = s0; if (e0) n2.end = e0; n2.place = v('eP'); n2.purpose = document.getElementById('eD').value.trim(); n2.announce = document.getElementById('eA').checked ? 'done' : 'before';
+    M = null; save(); render(); toast('保存しました'); return;
+  }
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M && (M.m === 'cal' || M.m === 'ev')) { M = null; renderModal(); } });
+var _snap42 = snap; snap = function () { _snap42(); var u = JSON.parse(UI.undo); u.cals = S.cals; UI.undo = JSON.stringify(u); };
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
