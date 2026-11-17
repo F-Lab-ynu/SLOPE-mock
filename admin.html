@@ -1488,6 +1488,8 @@ body.mvin .mvline{display:none !important}
 /* ux36 キーボード・右クリックの総点検 */
 .cm button:focus-visible,.cm button:focus{outline:none;background:var(--hover,#F3F4F6)}
 [data-act][tabindex]:focus-visible,.ied:focus-visible,.pnr:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.cm button.cmoff{color:var(--dim);cursor:default}
+.cm button.cmoff:hover{background:transparent}
 </style>
 </head>
 <body>
@@ -4644,6 +4646,7 @@ function openMenu(title, items, x, y) {
   UI.cmFns = [];
   m.innerHTML = (title ? '<div class="cmh"><span>' + esc(title) + '</span></div>' : '') + items.map(function (it) {
     if (it === 'sep') return '<i class="cmsep"></i>';
+    if (it[3]) return '<button role="menuitem" disabled aria-disabled="true" class="cmoff" title="' + esc(it[3]) + '">' + esc(it[0]) + '<span class="cmk">' + esc(it[3]) + '</span></button>';
     UI.cmFns.push(it[1]); return '<button role="menuitem" data-gcm="' + (UI.cmFns.length - 1) + '"' + (it[2] ? ' class="cmdel"' : '') + '>' + esc(it[0]) + '</button>';
   }).join('');
   var w = m.offsetWidth, h = m.offsetHeight;
@@ -4704,7 +4707,7 @@ new MutationObserver(function () {
 }).observe(document.body, { childList: true });
 document.addEventListener('keydown', function (e) {
   var m = document.getElementById('cm'); if (!m) return;
-  var bs = Array.prototype.slice.call(m.querySelectorAll('button')), i = bs.indexOf(document.activeElement);
+  var bs = Array.prototype.slice.call(m.querySelectorAll('button:not([disabled])')), i = bs.indexOf(document.activeElement); if (!bs.length) return;
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); var j = i < 0 ? (e.key === 'ArrowDown' ? 0 : bs.length - 1) : (i + (e.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length; bs[j].focus(); }
   else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); bs[e.key === 'Home' ? 0 : bs.length - 1].focus(); }
   else if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); UI.kbBack = true; closeCM(); }
@@ -4765,6 +4768,24 @@ document.addEventListener('keydown', function (e) {
   var el = e.target; if (!el || !el.matches || el.isContentEditable) return;
   if (el.matches('[data-act][tabindex]:not(button):not(a):not(input):not(select):not(textarea), .ied[tabindex]')) { e.preventDefault(); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); }
 });
+
+
+// ---------- ux37 フォルダーツリーの余白で右クリック：フォルダー追加など（ツリー専用のメニュー） ----------
+document.addEventListener('contextmenu', function (e) {
+  if (S.view !== 'projects' || !e.target.closest) return;
+  var tr = e.target.closest('.ftree'); if (!tr || e.target.closest('.ftn[data-id], input, textarea, .cm')) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  var f = curFolder(), it = [];
+  var mk = function (par) { snap(); var k = addFolder(par, '新しいフォルダー'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } };
+  it.push(['新しいフォルダー（一番上）', function () { mk(null); }, false, isAdmin() ? '' : '代表のみ']);
+  if (f) it.push(['「' + ttl(f).slice(0, 12) + '」に新しいフォルダー', function () { mk(f); }, false, manages(f) ? '' : 'リーダーのみ']);
+  if (f && canPasteInto(f)) it.push(['「' + ttl(clipNode()).slice(0, 12) + '」を貼り付け', function () { pasteInto(f); }]);
+  it.push('sep');
+  it.push(['開いている場所以外を閉じる', function () { UI.fopen = {}; render(); }]);
+  it.push(['ツリーを隠す', function () { S.ftreeC = true; save(); render(); }]);
+  if (typeof closePop === 'function') closePop();
+  openMenu('フォルダー', it, e.clientX, e.clientY);
+}, true);
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
