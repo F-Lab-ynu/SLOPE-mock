@@ -1525,7 +1525,7 @@ body.mvin .mvline{display:none !important}
 .gr .bar.nod .lb{color:var(--muted);font-weight:500}
 .gr:hover .bar.nod{border-color:var(--accent);color:var(--accent)}
 .gr:hover .bar.nod .lb{color:var(--accent)}
-.bar.bsel{outline:2px solid var(--accent);outline-offset:2px;z-index:3}
+.bar.bsel{outline:2px solid var(--accent);outline-offset:1px;z-index:1}
 .bar .hdl{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize}
 .bar.bsel .hd,.bar.bsel .hdl{background:rgba(255,255,255,.35)}
 .bar.bsel .hd::after,.bar.bsel .hdl::after{content:"";position:absolute;top:50%;left:50%;width:2px;height:12px;margin:-6px 0 0 -1px;background:#fff;border-radius:1px}
@@ -5085,8 +5085,12 @@ function bpopShow() {
   var p = document.getElementById('bpop'); if (!p) { p = document.createElement('div'); p.id = 'bpop'; document.body.appendChild(p); }
   p.innerHTML = '<input type="date" id="bpS" value="' + (n.nodate ? '' : esc(n.start)) + '" aria-label="開始"><span class="sep">–</span><input type="date" id="bpE" value="' + (n.nodate ? '' : esc(n.end)) + '" aria-label="期限">' +
     (n.nodate ? '' : '<button data-bp="none" title="期間未定に戻す（Delete）">未定にする</button>') + '<button class="bpx" data-bp="x" aria-label="閉じる" title="閉じる（Esc）">✕</button>';
-  var r = b.getBoundingClientRect(), w = p.offsetWidth;
-  p.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px'; p.style.top = (r.bottom + 8 + p.offsetHeight > innerHeight ? r.top - p.offsetHeight - 8 : r.bottom + 8) + 'px';
+  var r = b.getBoundingClientRect(), w = p.offsetWidth, gs = document.getElementById('gs'), gl = document.querySelector('.gg .ghead .gl');
+  // 見えている時間軸の範囲に合わせて置く（バーが左右にはみ出していても、見えている部分の下に出す）
+  var vl = (gl ? gl.getBoundingClientRect().right : 0) + 8, vr = gs ? gs.getBoundingClientRect().right - 8 : innerWidth - 8, vt = gs ? gs.getBoundingClientRect().top : 0, vb = gs ? gs.getBoundingClientRect().bottom : innerHeight;
+  if (r.right < vl || r.left > vr || r.bottom < vt || r.top > vb) { p.style.display = 'none'; return; } p.style.display = '';
+  var x0 = Math.max(r.left, vl);
+  p.style.left = Math.max(vl, Math.min(x0, vr - w)) + 'px'; p.style.top = (r.bottom + 8 + p.offsetHeight > innerHeight ? r.top - p.offsetHeight - 8 : r.bottom + 8) + 'px';
 }
 function setPeriod(n, s, e) { if (!n) return; if (dayOf(e) < dayOf(s)) { var t = s; s = e; e = t; } snap(); n.start = s; n.end = e; delete n.nodate; save(); render(); }
 document.addEventListener('change', function (e) {
@@ -5174,6 +5178,11 @@ document.addEventListener('click', function (e) {
 var _render39b = render;
 render = function () { var d = docEl(); if (d && document.activeElement === d) { UI.pendRender = true; return; } return _render39b.apply(this, arguments); };
 document.addEventListener('focusout', function (e) { if (e.target.id === 'fdoc' && UI.pendRender) { UI.pendRender = false; setTimeout(render, 0); } });
+
+
+// ガントをスクロール・拡大縮小したら、選んだバーの日付入力欄もついていく
+document.addEventListener('scroll', function (e) { if (UI.gsel && e.target && e.target.id === 'gs') bpopShow(); }, true);
+window.addEventListener('resize', function () { if (UI.gsel) bpopShow(); });
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
