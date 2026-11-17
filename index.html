@@ -102,7 +102,9 @@ body.wide #wchrome{display:block}
 html,body{touch-action:manipulation}
 .crsw{display:flex;flex-direction:column;gap:20px}
 .crsl{display:flex;flex-direction:column;gap:20px;min-width:0}
-body.wide .crsw{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+body.wide .crsw{display:flex;flex-direction:row;gap:24px;align-items:flex-start}
+body.wide .crsl{flex:0 1 auto}
+body.wide .crsr{flex:0 0 340px}
 body.wide .crsr{position:sticky;top:16px}
 body.wide .app > main > .crspg{max-width:1160px}
 </style>
