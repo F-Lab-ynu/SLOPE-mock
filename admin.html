@@ -1714,6 +1714,31 @@ body.mvin .mvline{display:none !important}
   .p2back svg.i{width:16px;height:16px}
   .p2r{height:40px}.p2n{line-height:40px}.p2l{opacity:1}
 }
+
+/* ux49 部員の画面のプレビュー */
+.p2cols{display:grid;grid-template-columns:minmax(0,720px) 360px;gap:40px;align-items:start}
+.p2pv{position:sticky;top:0;background:#070707;color:#F3F1EC;border-radius:16px;overflow:hidden;max-height:calc(100vh - 120px);display:flex;flex-direction:column;box-shadow:0 0 0 1px #E4E7EC}
+.pvbar{display:flex;justify-content:space-between;align-items:center;height:40px;padding:0 16px;font-size:11px;color:#7D7B76;border-bottom:1px solid #1C1C1B;flex:none}
+.pvbar span{color:#BDBAB3;font-weight:600}
+.pvbody{overflow:auto;padding:8px 16px 24px 30px}
+.p2pv button{padding:0;display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;position:relative;border-bottom:1px solid #1C1C1B;border-radius:0}
+.p2pv button:hover{background:#121211}
+.p2pv button.on{background:#262218}
+.p2pv .pvh{padding:0;min-height:40px;font-size:13px;font-weight:700}
+.pvh.top{min-height:44px;font-size:15px}
+.pvh span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvh em{font-style:normal;font-size:11px;color:#7D7B76;font-weight:400}
+.pvu{min-height:44px;padding:4px 0}
+.pvt{flex:1;min-width:0;display:flex;flex-direction:column}
+.pvt small{font-size:10px;color:#7D7B76;line-height:1.3}
+.pvt b{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvd{position:absolute;left:-14px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;border:1.5px solid #BDBAB3;background:#070707;box-sizing:border-box}
+.pvin{position:relative;padding-left:18px}
+.pvin::before{content:"";position:absolute;left:-11px;top:0;bottom:14px;width:1px;background:#2C2C2A}
+.pvbody>.pvf>.pvin::before,.pvbody::before{display:none}
+.pvl svg{width:11px;height:11px;fill:none;stroke:#7D7B76;stroke-width:2;display:block}
+.pvj{flex:none;font-size:10px;font-weight:700;color:#D2CFC8;border:1px solid #474744;border-radius:4px;padding:2px 6px}
+@media (max-width:1380px){.p2cols{grid-template-columns:minmax(0,1fr)}.p2pv{display:none}}
 </style>
 </head>
 <body>
@@ -6034,6 +6059,22 @@ document.addEventListener('contextmenu', function (e) {
   if (!it.length) return;
   e.preventDefault(); openMenu(c ? lab(c) : '', it, e.clientX, e.clientY);
 });
+
+// ---------- ux49 教材の右：部員の「プログラム」での見え方（選んでいる項目を強調、クリックで選ぶ） ----------
+function p2Prev(a, d, sel) {
+  return a.filter(function (n) { return !n.out; }).map(function (n) {
+    var on = n.id === sel, lk = n.lock ? '<span class="pvl">' + PI2.lock + '</span>' : '';
+    if (n.k === 'f') { var kids = p2Prev(n.items || [], d + 1, sel); return '<div class="pvf"><button class="pvh' + (d ? '' : ' top') + (on ? ' on' : '') + '" data-p2go="' + n.id + '"><i class="pvd"></i><span>' + esc(n.name || '') + '</span>' + lk + '<em>' + p2Leaves(n) + '</em></button>' + (kids ? '<div class="pvin">' + kids + '</div>' : '') + '</div>'; }
+    var u = n.k === 'u' ? p2Unit(n) : null, when = n.k === 'e' && n.from ? n.from.slice(5).replace('-', '.') + (n.to && n.to !== n.from ? '–' + n.to.slice(5).replace('-', '.') : '') : '';
+    return '<button class="pvu' + (on ? ' on' : '') + '" data-p2go="' + n.id + '"><i class="pvd"></i><span class="pvt"><small>' + esc(n.k === 'u' ? n.c : when) + '</small><b>' + esc(u ? u.title : n.name || '') + '</b></span>' + lk + (n.k === 'e' ? '<span class="pvj">参加登録</span>' : '') + '</button>';
+  }).join('');
+}
+var _viewTracks49 = viewTracks;
+viewTracks = function () {
+  var h = _viewTracks49();
+  var pv = '<aside class="p2pv" aria-label="部員の画面"><div class="pvbar">部員の画面<span>プログラム</span></div><div class="pvbody">' + p2Prev(p2(), 0, UI.psel) + '</div></aside>';
+  return h.replace('<div class="p2ed">', '<div class="p2cols"><div class="p2ed">').replace(/<\/main><\/div>$/, pv + '</div></main></div>');
+};
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
