@@ -1474,7 +1474,7 @@ var MK_PRESETS = [
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { tab: 'home', sub: null, seg: 'recruit', post: 'r1', emp: {}, joined: { e4: true }, day: 21, lens: 'すべて', course: 'S', cnode: null, lseg: 'study', libf: 'all', reviewed: {}, bfilter: 'all', accBase: false, exf: 'all', enType: 'ビジコン', accRole: true, np: 'idea', npFrame: '実プロジェクト枠', npRoles: { Engineer: true }, npEnd: 0, src: '聞き取り', sev: 2, anon: true, nf: 'すべて', news: 'n1', fo: null, ps: '共感順', accPrac: true, likes: {} };
+    this.state = { tab: /[?&]tab=learn/.test(location.search) || /^#learn/.test(location.hash) ? 'learn' : 'home', sub: null, seg: 'recruit', post: 'r1', emp: {}, joined: { e4: true }, day: 21, lens: 'すべて', course: 'S', cnode: null, lseg: 'study', libf: 'all', reviewed: {}, bfilter: 'all', accBase: false, exf: 'all', enType: 'ビジコン', accRole: true, np: 'idea', npFrame: '実プロジェクト枠', npRoles: { Engineer: true }, npEnd: 0, src: '聞き取り', sev: 2, anon: true, nf: 'すべて', news: 'n1', fo: null, ps: '共感順', accPrac: true, likes: {} };
     try { const sv = JSON.parse(localStorage.getItem('slope-mk-v1')); if (Array.isArray(sv)) { const ok = sv.filter((x) => x && x.s !== 'TVC:US10Y'); if (ok.length) this.state.mkSyms = ok; } } catch (e) {}
     if (!this.state.mkSyms) this.state.mkSyms = MK_DEFAULT.slice();
     try {

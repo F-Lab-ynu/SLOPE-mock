@@ -1741,6 +1741,27 @@ body.mvin .mvline{display:none !important}
 @media (max-width:1380px){.p2cols{grid-template-columns:minmax(0,1fr)}.p2pv{display:none}}
 .pvbody::-webkit-scrollbar{width:8px}.pvbody::-webkit-scrollbar-thumb{background:#3A3A37;border-radius:4px}.pvbody::-webkit-scrollbar-track{background:transparent}
 @media (max-width:900px){.p2wk>.p2tree,.p2wk>.p2main{flex:1 1 0 !important;min-height:0 !important}.p2wk>.p2main{overflow:auto !important;-webkit-overflow-scrolling:touch}.p2list{overscroll-behavior:contain}}
+
+/* ux50 本物の部員画面・畳む */
+.p2cols.nopv{grid-template-columns:minmax(0,720px) 0}
+.p2pv.slot{height:calc(100vh - 140px);min-height:480px;box-shadow:none;background:transparent}
+#p2pvf{position:fixed;z-index:30;display:flex;flex-direction:column;background:#070707;border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px #E4E7EC,0 12px 32px rgba(16,24,40,.12)}
+#p2pvf .pvbar b{color:#BDBAB3;margin-left:8px}
+#p2pvf .pvbtns{display:flex;gap:2px}
+#p2pvf .pvbtns button{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#7D7B76;cursor:pointer;padding:0}
+#p2pvf .pvbtns button:hover{background:#1C1C1B;color:#F3F1EC}
+#p2pvf .pvbtns svg,.p2fold svg,.p2treeopen svg,.p2pvopen svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#p2pvf iframe{flex:1;width:100%;border:0;background:#070707}
+.p2wk.notree{grid-template-columns:minmax(0,1fr)}
+.p2wk.notree .p2tree{display:none}
+.p2treeopen{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px 0 6px;margin:0 0 12px -6px;border:1px solid var(--line2);border-radius:6px;background:#fff;font:inherit;font-size:12px;color:var(--muted);cursor:pointer}
+.p2treeopen:hover{color:var(--text)}
+.p2pvopen{position:sticky;top:0;justify-self:end;display:flex;flex-direction:column;align-items:center;gap:8px;width:32px;padding:12px 0;border:1px solid var(--line2);border-radius:8px;background:#fff;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;writing-mode:vertical-rl}
+.p2pvopen svg{writing-mode:horizontal-tb}
+.p2pvopen:hover{color:var(--text)}
+.p2cols.nopv .p2pvopen{position:fixed;right:16px;top:120px}
+.p2cols.nopv{grid-template-columns:minmax(0,720px) 32px}
+@media (max-width:900px){.p2fold,.p2treeopen{display:none !important}}
 </style>
 </head>
 <body>
@@ -5786,7 +5807,7 @@ var PI2 = {
 };
 function p2() {
   if (!S.program) S.program = {};
-  if (!S.program.v2) { var mv = p2Migrate(); S.program.v2 = mv; }
+  if (!S.program.v2) { var mv = p2Migrate(); S.program.v2 = mv; setTimeout(save, 0); }
   var T = S.program.v2, out = T.filter(function (n) { return n.out; })[0];
   if (!out) { out = { id: 'out', k: 'f', name: 'プログラム外', out: true, items: [] }; T.push(out); }
   if (T[T.length - 1] !== out) { T.splice(T.indexOf(out), 1); T.push(out); }
@@ -6080,6 +6101,46 @@ viewTracks = function () {
   var pv = '<aside class="p2pv" aria-label="部員の画面"><div class="pvbar">部員の画面<span>プログラム</span></div><div class="pvbody">' + p2Prev(p2(), 0, UI.psel) + '</div></aside>';
   return h.replace('<div class="p2ed">', '<div class="p2cols"><div class="p2ed">').replace(/<\/main><\/div>$/, pv + '</div></main></div>');
 };
+
+// ---------- ux50 右の部員画面＝本物の部員アプリ（学ぶタブ）を読み込む。ツリーと部員画面は畳める ----------
+var P2UI = (function () { try { return JSON.parse(localStorage.getItem('slope-p2ui') || '{}'); } catch (e) { return {}; } })();
+function p2UiSave() { try { localStorage.setItem('slope-p2ui', JSON.stringify(P2UI)); } catch (e) {} }
+var CLL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>', CLR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+viewTracks = function () {
+  var h = _viewTracks49();
+  // 右：本物の部員画面を置く場所（iframe は描画のたびに作り直さず、上に重ねる）
+  var slot = P2UI.noPv ? '<button class="p2pvopen" data-p2ui="pv" title="部員の画面を開く">' + CLL + '<span>部員の画面</span></button>'
+    : '<aside class="p2pv slot" id="p2pvslot" aria-label="部員の画面"></aside>';
+  h = h.replace('<div class="p2ed">', '<div class="p2cols' + (P2UI.noPv ? ' nopv' : '') + '"><div class="p2ed">').replace(/<\/main><\/div>$/, slot + '</div></main></div>');
+  h = h.replace('<div class="wk p2wk', '<div class="wk p2wk' + (P2UI.noTree ? ' notree' : ''));
+  h = h.replace('<div class="p2bar"><span>プログラム</span><span class="p2tb">', '<div class="p2bar"><span>プログラム</span><span class="p2tb"><button class="ib p2fold" data-p2ui="tree" title="ツリーを畳む" aria-label="ツリーを畳む">' + CLL + '</button>');
+  h = h.replace('<main class="p2main">', '<main class="p2main">' + (P2UI.noTree ? '<button class="p2treeopen" data-p2ui="tree">' + CLR + 'プログラム</button>' : ''));
+  return h;
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-p2ui]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  if (b.dataset.p2ui === 'tree') P2UI.noTree = !P2UI.noTree; else P2UI.noPv = !P2UI.noPv; p2UiSave(); render(); p2Frame();
+}, true);
+var P2F = null;
+function p2Frame() {
+  var slot = S.view === 'tracks' && document.getElementById('p2pvslot'), vis = slot && slot.getClientRects().length && slot.offsetWidth > 0;
+  if (!P2F) {
+    if (!vis) return;
+    P2F = document.createElement('div'); P2F.id = 'p2pvf'; P2F.className = 'p2pv';
+    P2F.innerHTML = '<div class="pvbar"><span>部員の画面<b>学ぶ</b></span><span class="pvbtns"><button data-p2pv="reload" title="読み込み直す" aria-label="読み込み直す"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg></button><button data-p2ui="pv" title="畳む" aria-label="部員の画面を畳む">' + CLR + '</button></span></div><iframe title="部員の画面（学ぶ）" src="index.html?embed=1&tab=learn"></iframe>';
+    document.body.appendChild(P2F);
+  }
+  if (!vis) { P2F.style.display = 'none'; return; }
+  var r = slot.getBoundingClientRect(); P2F.style.display = ''; P2F.style.left = r.left + 'px'; P2F.style.top = r.top + 'px'; P2F.style.width = r.width + 'px'; P2F.style.height = r.height + 'px';
+}
+function p2FrameReload() { var f = P2F && P2F.querySelector('iframe'); if (f) { try { f.contentWindow.location.reload(); } catch (x) { f.src = f.src; } } }
+var _render50 = render; render = function () { var r = _render50.apply(this, arguments); p2Frame(); return r; };
+window.addEventListener('resize', p2Frame);
+document.addEventListener('scroll', function () { if (P2F && P2F.style.display !== 'none') p2Frame(); }, true);
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-p2pv]'); if (!b) return; e.preventDefault(); p2FrameReload(); }, true);
+// 教材を変えたら、少し待って部員の画面を読み込み直す（本番はデータベースへの保存を待つ）
+var P2RT = null, _save50 = save;
+save = function () { var r = _save50.apply(this, arguments); if (S.view === 'tracks' && P2F && P2F.style.display !== 'none') { clearTimeout(P2RT); P2RT = setTimeout(p2FrameReload, window.sb ? 2500 : 600); } return r; };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
