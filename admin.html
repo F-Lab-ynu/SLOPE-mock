@@ -1490,6 +1490,51 @@ body.mvin .mvline{display:none !important}
 [data-act][tabindex]:focus-visible,.ied:focus-visible,.pnr:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .cm button.cmoff{color:var(--dim);cursor:default}
 .cm button.cmoff:hover{background:transparent}
+
+/* ux38 ファイルのメモ＝簡単なドキュメント */
+.fpage2{max-width:880px;margin:0 auto;padding:0 8px 120px}
+.dtb{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:2px;padding:6px 0;margin-bottom:8px;background:var(--bg,#fff);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.dtb::-webkit-scrollbar{display:none}
+.dtb button{flex:none;height:30px;min-width:30px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:var(--sub,#4B5563);font:inherit;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.dtb button:hover{background:var(--hover,#F3F4F6);color:var(--text)}
+.dtb button.on{background:#EEF2FF;color:var(--accent)}
+.dtb button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dtb i{width:1px;height:18px;background:var(--line);margin:0 6px;flex:none}
+.dtb .dts{margin-left:auto;font-size:11px;color:var(--dim);white-space:nowrap;padding-left:8px}
+.fdoc{min-height:55vh;font-size:15px;line-height:1.85;color:var(--text);outline:none;word-break:break-word;padding:4px 2px}
+.fdoc:empty::before{content:attr(data-ph);color:var(--dim);pointer-events:none}
+.fdoc h2{font-size:21px;font-weight:700;line-height:1.4;margin:22px 0 6px}
+.fdoc h3{font-size:17px;font-weight:700;line-height:1.5;margin:18px 0 4px}
+.fdoc h2:first-child,.fdoc h3:first-child{margin-top:4px}
+.fdoc p,.fdoc div{margin:0}
+.fdoc ul,.fdoc ol{margin:4px 0;padding-left:24px}
+.fdoc ul.todo{list-style:none;padding-left:4px}
+.fdoc ul.todo li{position:relative;padding-left:28px}
+.fdoc ul.todo li::before{content:"";position:absolute;left:2px;top:.45em;width:16px;height:16px;border:1.5px solid var(--line2);border-radius:4px;background:#fff;cursor:pointer;box-sizing:border-box}
+.fdoc ul.todo li[data-done]{color:var(--dim);text-decoration:line-through}
+.fdoc ul.todo li[data-done]::before{background:#10B981 no-repeat center/12px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");border-color:#10B981}
+.fdoc blockquote{margin:6px 0;padding:2px 12px;border-left:3px solid var(--line2);color:var(--sub,#4B5563)}
+.fdoc hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.fdoc a{color:var(--accent);text-decoration:underline;word-break:break-all}
+.fdoc[contenteditable="true"] a{cursor:text}
+@media (max-width:760px){ .fpage2{padding:0 2px 120px} .fdoc{font-size:16px} }
+
+/* ux39 ガントのバー：選んで編集・期間未定 */
+.gr .bar.nod{background:transparent !important;box-shadow:none !important;border:1.5px dashed var(--line2);color:var(--muted);cursor:crosshair}
+.gr .bar.nod .lb{color:var(--muted);font-weight:500}
+.gr:hover .bar.nod{border-color:var(--accent);color:var(--accent)}
+.gr:hover .bar.nod .lb{color:var(--accent)}
+.bar.bsel{outline:2px solid var(--accent);outline-offset:2px;z-index:3}
+.bar .hdl{position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize}
+.bar.bsel .hd,.bar.bsel .hdl{background:rgba(255,255,255,.35)}
+.bar.bsel .hd::after,.bar.bsel .hdl::after{content:"";position:absolute;top:50%;left:50%;width:2px;height:12px;margin:-6px 0 0 -1px;background:#fff;border-radius:1px}
+#bpop{position:fixed;z-index:90;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(17,24,39,.16);padding:10px;display:flex;align-items:center;gap:8px;font-size:12px}
+#bpop input[type=date]{height:30px;border:1px solid var(--line2);border-radius:6px;padding:0 6px;font:inherit;font-size:12px}
+#bpop .sep{color:var(--muted)}
+#bpop button{height:30px;padding:0 10px;border:1px solid var(--line2);border-radius:6px;background:#fff;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+#bpop button:hover{background:var(--hover,#F3F4F6)}
+#bpop .bpx{border:0;width:30px;padding:0}
+.fcm.nodt{color:var(--dim)}
 </style>
 </head>
 <body>
@@ -1874,7 +1919,7 @@ function fmtDate(iso) { var p = String(iso || '').split('-'); return p.length ==
 var TODAY = (function () { var d = new Date(); return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()); })();
 function dayOf(iso) { var p = String(iso).split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
 function isoOf(t) { var d = new Date(t); return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0'); }
-function late(k) { return !k.tasks && !(k.kids && k.kids.length) && !k.done && dayOf(k.end) < TODAY; }
+function late(k) { return !k.tasks && !(k.kids && k.kids.length) && !k.done && !k.nodate && dayOf(k.end) < TODAY; }
 // ---------------- 業務ツリー ----------------
 function kids(n) { return n.tasks || n.kids || []; }
 function ttl(n) { return n.name || n.title; }
@@ -2014,7 +2059,7 @@ function ganttOf(rows) {
     var n = r.n, parent = isFolder(n), w = member(n.who), dn = isDone(n);
     var cls = parent ? ' sum' + (r.d === 0 ? ' root' : '') + (dn ? ' done' : '') : (n.done ? ' done' : (!n.who ? ' none' : ''));
     var bar = '<div class="bar' + cls + (late(n) ? ' late' : '') + (editSelf(n) ? '' : ' lock') + '" data-bar="' + n.id + '" style="left:' + x(n.start) + 'px;width:' + Math.max(PX, x(n.end) - x(n.start) + PX) + 'px" title="' + esc(ttl(n) + '  ' + fmtDate(n.start) + '–' + fmtDate(n.end) + (w ? '  ' + w.name : '')) + '">' +
-      (parent ? '' : '<span class="lb">' + esc(n.done ? '完了' : w ? w.name : '未定') + '</span>') + (editSelf(n) ? '<span class="hd" data-hd="1"></span>' : '') + '</div>';
+      (parent ? '' : '<span class="lb">' + esc(n.done ? '完了' : w ? w.name : '') + '</span>') + (editSelf(n) ? '<span class="hd" data-hd="1"></span>' : '') + '</div>';
     var ed = editSelf(n) ? '' : ' disabled';
     body += '<div data-d="' + r.d + '" class="gr lv' + lv(r.d) + (r.d === 0 && isFolder(n) ? ' g0' : '') + (r.d === 0 && GZ > 1 ? ' gtop' : '') + (GZ % 2 === 0 ? ' gz' : '') + (r.ctx ? ' gctx' : '') + (dn && !parent ? ' gdone' : '') + '" data-row="' + n.id + '" style="' + cols + ';--lc:' + LVC[lv(r.d)] + '"><div class="gl" style="padding-left:' + (narrow ? 2 + r.d * 8 : 8 + r.d * 14) + 'px">' + (canMove(n) ? '<span class="dh" data-drag="' + n.id + '" title="ドラッグで移動（Alt+↑↓でも可）" aria-label="移動"><svg viewBox="0 0 10 16" aria-hidden="true"><circle cx="3" cy="3" r="1.3"/><circle cx="7" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="7" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="7" cy="13" r="1.3"/></svg></span>' : '<span class="dh ph"></span>') + caret(r) +
         (r.d === 0 && isFolder(n) ? '' : !parent ? '<input type="checkbox" class="check wck" data-c="done" data-id="' + n.id + '"' + (n.done ? ' checked' : '') + (editSelf(n) || n.who === S.me ? '' : ' disabled') + ' aria-label="完了">' : '<span class="wck ckph"></span>') +
@@ -2266,7 +2311,7 @@ function viewDash() {
     return '<div class="li"><span class="t"><b>' + esc(ttl(k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r' + (late(k) ? ' bad' : '') + '">' + (late(k) ? '期限切れ ' : '期限 ') + fmtDate(k.end) + '</span><button class="btn sm primary" data-act="done" data-id="' + k.id + '">完了</button></div>';
   }).join('') : '<div class="empty sm">担当中の作業はありません</div>') + '</div>');
   var ns = (S.notifs || []).filter(function (n) { return n.to === m.id; }).slice(0, 6);
-  var alerts = mineOpen.filter(function (o) { return !late(o.k) && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」の期限まであと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
+  var alerts = mineOpen.filter(function (o) { return !late(o.k) && !o.k.nodate && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」の期限まであと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
   var feed = alerts.concat(ns);
   right.push('<div class="card o2"><div class="ch">通知</div>' + (feed.length ? feed.map(function (n) {
     return '<div class="li"><span class="t"><b style="white-space:normal">' + esc(n.text) + '</b><span>' + esc(n.sub || '') + '</span></span>' + (n.at ? '<span class="r">' + esc(n.at) + '</span>' : '') + '</div>'; }).join('') : '<div class="empty">通知はありません</div>') + '</div>');
@@ -3088,7 +3133,7 @@ function viewDash() {
 
   // 自分
   var ns = (S.notifs || []).filter(function (n) { return n.to === m.id; }).slice(0, 6);
-  var alerts = mineOpen.filter(function (o) { return !late(o.k) && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」あと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
+  var alerts = mineOpen.filter(function (o) { return !late(o.k) && !o.k.nodate && dayOf(o.k.end) - TODAY <= 3 * DAY; }).map(function (o) { return { text: '「' + ttl(o.k) + '」あと' + Math.round((dayOf(o.k.end) - TODAY) / DAY) + '日', sub: o.p.name, at: '' }; });
   var feed = alerts.concat(ns);
   var myTask = mine.length ? mine.map(function (o) {
     var k = o.k, parent = isFolder(k);
@@ -3107,7 +3152,7 @@ function viewDash() {
     var lateN = scope.filter(function (o) { return late(o.k); }).length;
     var lv = (isAdmin() ? live : live.filter(function (p) { return involved(p, m.id); }));
     ks.push(kpi('進行中のイベント', lv.length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
-    var soon = scope.filter(function (o) { return !o.k.done && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
+    var soon = scope.filter(function (o) { return !o.k.done && !o.k.nodate && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
     cards.push(card('期限が近いファイル', soon.length ? soon.map(function (o) {
       return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(ttl(o.k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
     }).join('') : none, 'projects'));
@@ -4088,9 +4133,9 @@ HLS = [
 ];
 EXPS = [['depth', '深さで開く', '今いるフォルダーから何段下まで開くか'], ['active', '進行中の所だけ', '今日が期間内のフォルダーだけ開く'], ['mine', '自分の担当まで', '自分が関わるフォルダー・ファイルまで開く'], ['flag', '強調した所まで', '強調に当てはまるものまで開く']];
 function vs() { if (!S.view2) S.view2 = { exp: 'depth', hl: { late: true, soon: true, over: true }, days: 7, done: 'show', dimDone: false, focus: false, foldersOnly: false }; if (!S.view2.done) S.view2.done = S.view2.dimDone ? 'dim' : 'show'; return S.view2; }
-function overOf(n) { return isFolder(n) && nodesOf(n).slice(1).some(function (x) { return dayOf(x.end) > dayOf(n.end); }); }
+function overOf(n) { return isFolder(n) && nodesOf(n).slice(1).some(function (x) { return !x.nodate && dayOf(x.end) > dayOf(n.end); }); }
 function hlFlags(n) {
-  var v = vs(), f = [], dn = isDone(n), leaf = !isFolder(n);
+  var v = vs(), f = [], dn = isDone(n) || (n.nodate && !isFolder(n)), leaf = !isFolder(n);
   if (v.hl.late && !dn && dayOf(n.end) < TODAY && (leaf || kids(n).some(function (k) { return !isDone(k); }))) f.push('late');
   else if (v.hl.soon && !dn && dayOf(n.end) >= TODAY && dayOf(n.end) <= TODAY + v.days * DAY) f.push('soon');
   if (v.hl.over && !dn && overOf(n)) f.push('over');
@@ -4786,6 +4831,348 @@ document.addEventListener('contextmenu', function (e) {
   if (typeof closePop === 'function') closePop();
   openMenu('フォルダー', it, e.clientX, e.clientY);
 }, true);
+
+
+// ---------- ux38 ファイルのメモを、枠なしの簡単なドキュメントに ----------
+var DOC_TAGS = { P: 1, DIV: 1, BR: 1, H2: 1, H3: 1, B: 1, STRONG: 1, I: 1, EM: 1, U: 1, S: 1, STRIKE: 1, UL: 1, OL: 1, LI: 1, A: 1, HR: 1, BLOCKQUOTE: 1 };
+function isDocHtml(m) { return /<\/?(p|div|h2|h3|ul|ol|li|b|strong|i|em|u|s|a|br|hr|blockquote)\b/i.test(m || ''); }
+function docSanitize(html) {
+  var t = document.createElement('template'); t.innerHTML = html || '';
+  (function walk(node) {
+    Array.prototype.slice.call(node.childNodes).forEach(function (c) {
+      if (c.nodeType === 3) return;
+      if (c.nodeType !== 1) { c.remove(); return; }
+      var tag = c.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IFRAME' || tag === 'OBJECT') { c.remove(); return; }
+      if (tag === 'H1') { var h = document.createElement('h2'); while (c.firstChild) h.appendChild(c.firstChild); c.replaceWith(h); c = h; tag = 'H2'; }
+      if (/^H[4-6]$/.test(tag)) { var h3 = document.createElement('h3'); while (c.firstChild) h3.appendChild(c.firstChild); c.replaceWith(h3); c = h3; tag = 'H3'; }
+      walk(c);
+      if (!DOC_TAGS[tag]) { var frag = document.createDocumentFragment(); while (c.firstChild) frag.appendChild(c.firstChild); c.replaceWith(frag); return; }
+      var keep = {};
+      if (tag === 'A') { var href = c.getAttribute('href') || ''; if (/^(https?:|mailto:)/i.test(href)) keep.href = href; }
+      if (tag === 'UL' && c.classList.contains('todo')) keep['class'] = 'todo';
+      if (tag === 'LI' && c.hasAttribute('data-done')) keep['data-done'] = '';
+      Array.prototype.slice.call(c.attributes).forEach(function (a) { c.removeAttribute(a.name); });
+      Object.keys(keep).forEach(function (k) { c.setAttribute(k, keep[k]); });
+      if (tag === 'A') { c.setAttribute('target', '_blank'); c.setAttribute('rel', 'noopener'); }
+    });
+  })(t.content);
+  // 文中のURLはリンクに
+  var tw = document.createTreeWalker(t.content, NodeFilter.SHOW_TEXT), ts = [], x;
+  while ((x = tw.nextNode())) if (/https?:\/\//.test(x.textContent) && !(x.parentNode.closest && x.parentNode.closest('a'))) ts.push(x);
+  ts.forEach(function (tn) {
+    var frag = document.createDocumentFragment(), parts = tn.textContent.split(/(https?:\/\/[^\s<>"]+)/);
+    parts.forEach(function (pt, i) { if (i % 2) { var a = document.createElement('a'); a.href = pt; a.textContent = pt; a.target = '_blank'; a.rel = 'noopener'; frag.appendChild(a); } else if (pt) frag.appendChild(document.createTextNode(pt)); });
+    tn.replaceWith(frag);
+  });
+  return t.innerHTML;
+}
+function docHTML(m) { if (!m) return ''; return isDocHtml(m) ? docSanitize(m) : linkify(m).replace(/\n/g, '<br>'); }
+function memoText(m) {
+  if (!m || !isDocHtml(m)) return m || '';
+  var d = document.createElement('div'); d.innerHTML = docSanitize(m.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|h2|h3|li|blockquote)>/gi, '$&\n'));
+  return d.textContent.replace(/\n{3,}/g, '\n\n').trim();
+}
+var DOCI = {
+  h2: '<b style="font-size:13px">見出し</b>', h3: '<b style="font-size:12px">小見出し</b>', p: '本文',
+  b: '<b>B</b>', i: '<i style="font-family:serif">I</i>', s: '<s>S</s>',
+  ul: '<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>',
+  ol: '<svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5l1.5-1V9M3.5 15.5c0-1 2.5-1.2 2.5 0 0 .9-2.5 1.6-2.5 3h2.6"/></svg>',
+  chk: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="1.5"/><path d="M4.5 7.5l1.5 1.5 2.5-3M14 7.5h7M3 15h7v6H3zM14 18h7"/></svg>',
+  q: '<svg viewBox="0 0 24 24"><path d="M4 6v12M9 8h11M9 12h11M9 16h7"/></svg>',
+  hr: '<svg viewBox="0 0 24 24"><path d="M3 12h18"/></svg>',
+  a: '<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>'
+};
+function docBar() {
+  var b = function (k, t, key) { return '<button type="button" data-doc="' + k + '" title="' + t + (key ? '（' + key + '）' : '') + '" aria-label="' + t + '">' + DOCI[k] + '</button>'; };
+  return '<div class="dtb" role="toolbar" aria-label="書式">' + b('h2', '見出し', '# + スペース') + b('h3', '小見出し', '## + スペース') + b('p', '本文') + '<i></i>' +
+    b('b', '太字', 'Ctrl+B') + b('i', '斜体', 'Ctrl+I') + b('s', '取り消し線') + '<i></i>' +
+    b('ul', '箇条書き', '- + スペース') + b('ol', '番号付き', '1. + スペース') + b('chk', 'チェックリスト', '[] + スペース') + b('q', '引用', '> + スペース') + b('hr', '区切り線', '---') + b('a', 'リンク', 'Ctrl+K') +
+    '<span class="dts" id="dts"></span></div>';
+}
+var _filePage38 = filePage;
+filePage = function (n) {
+  var h = _filePage38(n), canM = editSelf(n) || n.who === S.me;
+  var k = h.indexOf('<div class="body"><div class="fpage">'); if (k < 0) return h;
+  var end = h.lastIndexOf('</div></div>'); // wk / wkm の閉じ
+  var doc = '<div class="body"><div class="fpage2">' + (canM ? docBar() : '') +
+    '<div class="fdoc" id="fdoc" data-id="' + n.id + '"' + (canM ? ' contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="メモ" data-ph="メモを書く（どこで・どうやって・結果・連絡先・資料URLなど）。# で見出し、- で箇条書き、[] でチェックリスト"' : ' data-ph="メモはありません"') + '>' + docHTML(n.memo) + '</div></div></div>';
+  return h.slice(0, k) + doc + h.slice(end);
+};
+var _docT = null;
+function docEl() { return document.getElementById('fdoc'); }
+function docSave(now) {
+  clearTimeout(_docT);
+  var go = function () {
+    var d = docEl(); if (!d || d.getAttribute('contenteditable') !== 'true') return;
+    var n = task(d.dataset.id); if (!n) return;
+    var html = d.textContent.trim() || d.querySelector('hr, li') ? docSanitize(d.innerHTML) : '';
+    if (html === (n.memo || '')) return;
+    n.memo = html; save();
+    var st = document.getElementById('dts'); if (st) { var t = new Date(); st.textContent = '保存しました ' + t.getHours() + ':' + String(t.getMinutes()).padStart(2, '0'); }
+  };
+  if (now) go(); else { var st = document.getElementById('dts'); if (st) st.textContent = '編集中…'; _docT = setTimeout(go, 700); }
+}
+// 空のときやブロックの外に文字があるときは、段落（div）に入れてから書く
+function docFix() {
+  var d = docEl(); if (!d) return;
+  try { document.execCommand('defaultParagraphSeparator', false, 'div'); } catch (er) {}
+  var sel = getSelection(), caretNode = sel.rangeCount ? sel.anchorNode : null, caretOff = sel.rangeCount ? sel.anchorOffset : 0, changed = false;
+  Array.prototype.slice.call(d.childNodes).forEach(function (c) {
+    if (c.parentNode !== d) return;
+    if (c.nodeType === 3 && c.textContent.length || (c.nodeType === 1 && /^(B|STRONG|I|EM|U|S|A|SPAN|BR)$/.test(c.tagName))) {
+      changed = true; var w = document.createElement('div'); d.insertBefore(w, c); w.appendChild(c);
+      while (w.nextSibling && (w.nextSibling.nodeType === 3 || /^(B|STRONG|I|EM|U|S|A|SPAN)$/.test(w.nextSibling.tagName || ''))) w.appendChild(w.nextSibling);
+    }
+  });
+  if (!d.firstChild) { d.innerHTML = '<div><br></div>'; var r = document.createRange(); r.setStart(d.firstChild, 0); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); return; }
+  if (changed && caretNode && d.contains(caretNode)) { try { var r2 = document.createRange(); r2.setStart(caretNode, Math.min(caretOff, caretNode.nodeType === 3 ? caretNode.length : caretNode.childNodes.length)); r2.collapse(true); sel.removeAllRanges(); sel.addRange(r2); } catch (er) {} }
+}
+document.addEventListener('focusin', function (e) { if (e.target.id === 'fdoc' && e.target.getAttribute('contenteditable') === 'true') setTimeout(docFix, 0); });
+document.addEventListener('input', function (e) { if (e.target.id === 'fdoc') docFix(); }, true);
+function docLine(node) { // カーソルがある「行」の文字（リストなど別のブロックや改行は含めない）
+  var BLK = /^(UL|OL|DIV|P|H2|H3|BLOCKQUOTE|HR|BR|LI)$/;
+  if (node.nodeType === 1) return /^(LI|H2|H3|BLOCKQUOTE)$/.test(node.tagName) || !node.querySelector('ul,ol,div,h2,h3,blockquote,hr') ? node.textContent : '';
+  var t = node.textContent, x = node.previousSibling;
+  while (x && !(x.nodeType === 1 && BLK.test(x.tagName))) { t = x.textContent + t; x = x.previousSibling; }
+  x = node.nextSibling; while (x && !(x.nodeType === 1 && BLK.test(x.tagName))) { t += x.textContent; x = x.nextSibling; }
+  return t;
+}
+function docBlock() {
+  var sel = getSelection(); if (!sel.rangeCount) return null; var d = docEl(); var n = sel.anchorNode;
+  while (n && n !== d && !(n.nodeType === 1 && /^(P|DIV|H2|H3|LI|BLOCKQUOTE)$/.test(n.tagName))) n = n.parentNode;
+  return n === d ? null : n;
+}
+function docCmd(k) {
+  var d = docEl(); if (!d) return; if (document.activeElement !== d) d.focus();
+  var ex = function (c, v) { document.execCommand(c, false, v || null); };
+  if (k === 'h2' || k === 'h3' || k === 'p') ex('formatBlock', k === 'p' ? 'div' : k);
+  else if (k === 'b') ex('bold'); else if (k === 'i') ex('italic'); else if (k === 's') ex('strikeThrough');
+  else if (k === 'ul' || k === 'chk') {
+    var b0 = docBlock(), inChk = b0 && b0.closest && b0.closest('ul.todo');
+    if (k === 'chk' && inChk) { inChk.classList.remove('todo'); }
+    else {
+      var inUl = b0 && b0.closest && b0.closest('ul');
+      if (inUl) { inUl.classList.toggle('todo', k === 'chk'); }
+      else {
+        ex('insertUnorderedList');
+        var li = docBlock(); li = li && li.closest ? li.closest('li') : null; var ul = li && li.parentNode;
+        if (ul && ul.tagName === 'UL') {
+          if (ul.children.length > 1 && ul.classList.contains('todo') !== (k === 'chk')) { // 隣のリストとくっついたら分ける
+            var nu = document.createElement('ul'), x = li; ul.parentNode.insertBefore(nu, ul.nextSibling);
+            while (x) { var nx = x.nextSibling; nu.appendChild(x); x = nx; }
+            var r = document.createRange(); r.selectNodeContents(li); r.collapse(false); var sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); ul = nu;
+          }
+          ul.classList.toggle('todo', k === 'chk');
+        }
+      }
+    }
+  }
+  else if (k === 'ol') ex('insertOrderedList');
+  else if (k === 'q') ex('formatBlock', 'blockquote');
+  else if (k === 'hr') ex('insertHorizontalRule');
+  else if (k === 'a') {
+    var sel = getSelection(), txt = String(sel), url = window.prompt('リンク先のURL', /^https?:\/\//.test(txt) ? txt : 'https://');
+    if (url && /^(https?:|mailto:)/i.test(url)) { if (txt) ex('createLink', url); else ex('insertHTML', '<a href="' + esc(url) + '">' + esc(url) + '</a>&nbsp;'); }
+  }
+  docSave();
+}
+document.addEventListener('mousedown', function (e) { var b = e.target.closest && e.target.closest('[data-doc]'); if (b) e.preventDefault(); }, true);
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-doc]'); if (b) { e.preventDefault(); docCmd(b.dataset.doc); return; }
+  var d = docEl(); if (!d || !d.contains(e.target)) return;
+  var li = e.target.closest('ul.todo > li');
+  if (li && e.clientX - li.getBoundingClientRect().left < 24 && d.getAttribute('contenteditable') === 'true') { e.preventDefault(); li.toggleAttribute('data-done'); docSave(); return; }
+  var a = e.target.closest('a[href]');
+  if (a && d.getAttribute('contenteditable') === 'true') { e.preventDefault(); if (e.ctrlKey || e.metaKey) window.open(a.href, '_blank', 'noopener'); }
+}, true);
+document.addEventListener('input', function (e) { if (e.target.id === 'fdoc') docSave(); });
+document.addEventListener('focusout', function (e) { if (e.target.id === 'fdoc') docSave(true); });
+document.addEventListener('paste', function (e) {
+  if (e.target.closest && e.target.closest('#fdoc')) { e.preventDefault(); var t = (e.clipboardData || window.clipboardData).getData('text/plain'); document.execCommand('insertText', false, t); }
+});
+document.addEventListener('keydown', function (e) {
+  var d = docEl(); if (!d || e.target !== d) return;
+  var mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); docCmd('a'); return; }
+  if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); docSave(true); return; }
+  if (e.key === 'Escape') { d.blur(); return; }
+  if (e.key === 'Tab') { // リストの中は字下げ、それ以外は次へ
+    var bl = docBlock(); if (bl && bl.tagName === 'LI') { e.preventDefault(); document.execCommand(e.shiftKey ? 'outdent' : 'indent'); docSave(); }
+    return;
+  }
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { // 空の項目で Enter → リストを抜ける
+    var lb = docBlock();
+    if (lb && lb.tagName === 'LI' && !lb.textContent.trim()) { e.preventDefault(); var lst = lb.parentNode; if (lst.parentNode && lst.parentNode.tagName === 'LI') document.execCommand('outdent'); else document.execCommand(lst.tagName === 'OL' ? 'insertOrderedList' : 'insertUnorderedList'); docFix(); docSave(); return; }
+  }
+  if ((e.key === ' ' || e.key === 'Enter') && !e.isComposing && e.keyCode !== 229) {
+    var sel = getSelection(); if (!sel.rangeCount || !sel.isCollapsed) return;
+    var b = docBlock(), node = sel.anchorNode, off = sel.anchorOffset;
+    var before = (node.nodeType === 3 ? node.textContent.slice(0, off) : '').replace(/ /g, ' ');
+    var whole = docLine(node).replace(/\u00a0/g, ' ');
+    if (whole.trim() !== before.trim()) return; // 行頭の記号だけのとき
+    var mk = before.trim(), cmd = null;
+    if (e.key === ' ') cmd = { '#': 'h2', '##': 'h3', '-': 'ul', '*': 'ul', '1.': 'ol', '[]': 'chk', '[ ]': 'chk', '>': 'q' }[mk];
+    else if (mk === '---') cmd = 'hr';
+    if (!cmd) return;
+    e.preventDefault();
+    if (node.nodeType === 3 && off > 0) { var r = document.createRange(); r.setStart(node, 0); r.setEnd(node, off); sel.removeAllRanges(); sel.addRange(r); document.execCommand('delete'); }
+    docCmd(cmd);
+  }
+});
+// ほかの画面でメモを出すときは、書式を外した文字にする
+var _taskPop38 = taskPop;
+taskPop = function (n) { var m = n.memo; if (isDocHtml(m)) { n.memo = memoText(m).slice(0, 240); var h = _taskPop38(n); n.memo = m; return h; } return _taskPop38(n); };
+var _nodeModal38 = nodeModal;
+nodeModal = function (n) {
+  var h = _nodeModal38(n);
+  if (!n || isFolder(n)) return h;
+  return h.replace(/<div class="fld"><label for="wM">メモ<\/label><textarea id="wM"[\s\S]*?<\/textarea><\/div>/, '<div class="fld"><label>メモ</label><div class="muted" style="font-size:12px">ファイルを開くと書けます' + (n.memo ? '（' + esc(memoText(n.memo).slice(0, 40)) + '…）' : '') + '</div></div>');
+};
+
+
+// ---------- ux39 期間未定のファイル・バーを1クリックで選んで編集 ----------
+var _newNode39 = newNode;
+newNode = function (par, title) { var n = _newNode39(par, title); n.nodate = true; return n; }; // 新しいファイルは期間未定から
+var _addFolder39 = addFolder;
+addFolder = function (par, name) { var n = _addFolder39(par, name); delete n.nodate; return n; };
+function perText(n) { return n.nodate && !isFolder(n) ? '期間未定' : shortDate(n.start) + ' – ' + shortDate(n.end); }
+// カード：期間未定の表示、メモは書式を外した文字で（編集はファイルを開いて）
+var _fcard39 = fcard;
+fcard = function (n) {
+  var h = _fcard39(n); if (isFolder(n)) return h;
+  if (n.nodate) h = h.replace('>' + shortDate(n.end) + '<', '>期間未定<').replace('class="fcm num', 'class="fcm num nodt');
+  h = h.replace(/<div class="fmemo[^"]*"[^>]*>[\s\S]*?<\/div>/, n.memo ? '<div class="fmemo">' + esc(memoText(n.memo).slice(0, 160)) + '</div>' : '');
+  return h;
+};
+var _filePage39 = filePage;
+filePage = function (n) {
+  var h = _filePage39(n); if (!n.nodate) return h;
+  return h.replace(shortDate(n.start) + ' – ' + shortDate(n.end), '期間未定');
+};
+var _taskPop39 = taskPop;
+taskPop = function (n) { var h = _taskPop39(n); return n.nodate ? h.replace(shortDate(n.start) + ' – ' + shortDate(n.end), '期間未定') : h; };
+// 編集ダイアログで日付を触ったら期間未定を外す
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="wSave"]'); if (!b || !M || M.m !== 'edit') return;
+  var n = task(M.id); if (!n || !n.nodate) return;
+  var s0 = n.start, e0 = n.end, sI = document.getElementById('wS'), eI = document.getElementById('wE');
+  var touched = (sI && sI.dataset.touched) || (eI && eI.dataset.touched);
+  setTimeout(function () { if (touched || n.start !== s0 || n.end !== e0) { delete n.nodate; save(); render(); } }, 0);
+}, true);
+document.addEventListener('input', function (e) { if (e.target && (e.target.id === 'wS' || e.target.id === 'wE')) e.target.dataset.touched = '1'; }, true);
+
+// ガント：期間未定の行は点線のバー（クリック＝その日から1週間、ドラッグ＝その範囲）
+function ganttGeom() { var gg = document.querySelector('.gg'); return gg ? { px: +gg.dataset.px, lo: +gg.dataset.lo } : null; }
+function decorateBars39() {
+  var g = ganttGeom(); if (!g) return;
+  document.querySelectorAll('.gg .bar[data-bar]').forEach(function (b) {
+    var n = task(b.dataset.bar); if (!n) return;
+    if (n.nodate && !isFolder(n)) {
+      b.classList.add('nod'); var lb = b.querySelector('.lb'); if (lb) lb.textContent = b.classList.contains('lock') ? '期間未定' : 'クリックで期間を設定';
+      var x = Math.round((TODAY - g.lo) / DAY * g.px); b.style.left = Math.max(0, x) + 'px'; b.style.width = Math.max(g.px * 7, 140) + 'px';
+    }
+    if (UI.gsel === n.id && !b.classList.contains('lock')) { b.classList.add('bsel'); if (!b.querySelector('.hdl')) b.insertAdjacentHTML('afterbegin', '<span class="hdl" data-hdl="1"></span>'); }
+  });
+  if (UI.gsel) bpopShow(); else bpopHide();
+}
+var _render39 = render; render = function () { _render39.apply(this, arguments); decorateBars39(); };
+function bpopHide() { var p = document.getElementById('bpop'); if (p) p.remove(); }
+function bpopShow() {
+  var n = task(UI.gsel), b = n && document.querySelector('.gg .bar[data-bar="' + n.id + '"]');
+  if (!n || !b || S.view !== 'projects' || S.fmode !== 'gantt') { bpopHide(); return; }
+  var p = document.getElementById('bpop'); if (!p) { p = document.createElement('div'); p.id = 'bpop'; document.body.appendChild(p); }
+  p.innerHTML = '<input type="date" id="bpS" value="' + (n.nodate ? '' : esc(n.start)) + '" aria-label="開始"><span class="sep">–</span><input type="date" id="bpE" value="' + (n.nodate ? '' : esc(n.end)) + '" aria-label="期限">' +
+    (n.nodate ? '' : '<button data-bp="none" title="期間未定に戻す（Delete）">未定にする</button>') + '<button class="bpx" data-bp="x" aria-label="閉じる" title="閉じる（Esc）">✕</button>';
+  var r = b.getBoundingClientRect(), w = p.offsetWidth;
+  p.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px'; p.style.top = (r.bottom + 8 + p.offsetHeight > innerHeight ? r.top - p.offsetHeight - 8 : r.bottom + 8) + 'px';
+}
+function setPeriod(n, s, e) { if (!n) return; if (dayOf(e) < dayOf(s)) { var t = s; s = e; e = t; } snap(); n.start = s; n.end = e; delete n.nodate; save(); render(); }
+document.addEventListener('change', function (e) {
+  if (!e.target.closest || !e.target.closest('#bpop')) return;
+  var n = task(UI.gsel); if (!n) return;
+  var sv = document.getElementById('bpS').value, ev = document.getElementById('bpE').value;
+  if (!sv && !ev) return; if (!sv) sv = ev; if (!ev) ev = sv;
+  setPeriod(n, sv, ev);
+});
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-bp]'); if (!b) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  var n = task(UI.gsel);
+  if (b.dataset.bp === 'x') { UI.gsel = null; render(); return; }
+  if (b.dataset.bp === 'none' && n) { snap(); n.nodate = true; save(); UI.gsel = null; render(); toast('期間未定に戻しました'); }
+}, true);
+// クリック＝選ぶ（動かさずに離したとき）／期間未定のバーはクリック・ドラッグで期間を作る
+var bdn = null;
+document.addEventListener('pointerdown', function (e) {
+  if (e.button !== 0 || !e.target.closest) return;
+  var bar = e.target.closest('.gg [data-bar]');
+  if (!bar) { if (UI.gsel && !e.target.closest('#bpop')) { UI.gsel = null; bpopHide(); document.querySelectorAll('.bar.bsel').forEach(function (x) { x.classList.remove('bsel'); }); } return; }
+  var n = task(bar.dataset.bar); if (!n) return;
+  if (bar.classList.contains('lock')) { UI.gsel = null; bpopHide(); return; }
+  if (n.nodate && !isFolder(n)) { // 自分で処理（既存のドラッグは使わない）
+    e.preventDefault(); e.stopImmediatePropagation();
+    var g = ganttGeom(), gt = bar.parentElement.getBoundingClientRect();
+    var day = function (cx) { return g.lo + Math.floor((cx - gt.left) / g.px) * DAY; };
+    bdn = { n: n, d0: day(e.clientX), x0: e.clientX, day: day, el: bar, g: g, nod: true };
+    return;
+  }
+  if (e.target.dataset.hdl) { // 左端：開始日を変える
+    e.preventDefault(); e.stopImmediatePropagation();
+    bdn = { n: n, x0: e.clientX, el: bar, left: parseFloat(bar.style.left), width: parseFloat(bar.style.width), px: ganttGeom().px, start: true, dd: 0 };
+    bar.setPointerCapture(e.pointerId); return;
+  }
+  bdn = { n: n, x0: e.clientX, y0: e.clientY, sel: true };
+}, true);
+document.addEventListener('pointermove', function (e) {
+  if (!bdn) return;
+  if (bdn.nod) {
+    var a = bdn.d0, b = bdn.day(e.clientX), s0 = Math.min(a, b), e0 = Math.max(a, b);
+    if (Math.abs(e.clientX - bdn.x0) > 4) { bdn.moved = true; bdn.el.classList.remove('nod'); bdn.el.style.left = Math.round((s0 - bdn.g.lo) / DAY * bdn.g.px) + 'px'; bdn.el.style.width = Math.round((e0 - s0) / DAY * bdn.g.px + bdn.g.px) + 'px'; var lb = bdn.el.querySelector('.lb'); if (lb) lb.textContent = shortDate(isoOf(s0)) + ' – ' + shortDate(isoOf(e0)); }
+  } else if (bdn.start) {
+    var dd = Math.round((e.clientX - bdn.x0) / bdn.px); dd = Math.min(dd, Math.round(bdn.width / bdn.px) - 1); bdn.dd = dd;
+    bdn.el.style.left = (bdn.left + dd * bdn.px) + 'px'; bdn.el.style.width = (bdn.width - dd * bdn.px) + 'px';
+  }
+});
+document.addEventListener('pointerup', function (e) {
+  if (!bdn) return; var d = bdn; bdn = null;
+  if (d.nod) {
+    var a = d.d0, b = d.moved ? d.day(e.clientX) : d.d0 + 6 * DAY;
+    UI.gsel = d.n.id; setPeriod(d.n, isoOf(Math.min(a, b)), isoOf(Math.max(a, b))); toast('期間を設定しました'); return;
+  }
+  if (d.start) { if (d.dd) { snap(); d.n.start = isoOf(dayOf(d.n.start) + d.dd * DAY); save(); } render(); return; }
+  if (d.sel && Math.abs(e.clientX - d.x0) < 4 && Math.abs(e.clientY - d.y0) < 4) { setTimeout(function () { UI.gsel = d.n.id; render(); }, 0); }
+  else if (d.sel) setTimeout(function () { if (UI.gsel === d.n.id) { decorateBars39(); } }, 0);
+}, true);
+// 選んだバーはキーで動かせる：←→ 1日ずらす、Shift+←→ 期限、Alt+←→ 開始、Delete 期間未定、Esc 解除
+document.addEventListener('keydown', function (e) {
+  if (!UI.gsel || S.view !== 'projects' || S.fmode !== 'gantt') return;
+  if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) { if (e.key === 'Escape' && e.target.closest('#bpop')) { UI.gsel = null; render(); } return; }
+  var n = task(UI.gsel); if (!n || n.nodate) { if (e.key === 'Escape') { UI.gsel = null; render(); } return; }
+  var k = e.key, step = k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0;
+  if (k === 'Escape') { e.preventDefault(); UI.gsel = null; render(); return; }
+  if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); snap(); n.nodate = true; save(); UI.gsel = null; render(); toast('期間未定に戻しました'); return; }
+  if (!step) return; e.preventDefault(); snap();
+  var s0 = dayOf(n.start), e0 = dayOf(n.end);
+  if (e.shiftKey) e0 = Math.max(s0, e0 + step * DAY); else if (e.altKey) s0 = Math.min(e0, s0 + step * DAY); else { s0 += step * DAY; e0 += step * DAY; }
+  n.start = isoOf(s0); n.end = isoOf(e0); save(); render();
+});
+// 右クリック：期間未定に戻す
+var _cmItems39 = cmItems;
+cmItems = function (n) {
+  var h = _cmItems39(n); if (isFolder(n) || !editSelf(n) || n.nodate) return h;
+  var b = '<button role="menuitem" data-cm4="nodate">期間を未定にする</button>', k = h.indexOf('<button role="menuitem" data-cm="done"');
+  return k >= 0 ? h.slice(0, k) + b + h.slice(k) : h + b;
+};
+document.addEventListener('click', function (e) {
+  var c = e.target.closest && e.target.closest('[data-cm4]'); if (!c) return;
+  e.preventDefault(); e.stopImmediatePropagation(); var n = task(UI.cm); closeCM(); if (!n) return;
+  snap(); n.nodate = true; save(); render(); toast('期間未定にしました');
+}, true);
+// 書いている最中のメモは、ほかの人の更新で画面を作り直さない（書き終わったら反映）
+var _render39b = render;
+render = function () { var d = docEl(); if (d && document.activeElement === d) { UI.pendRender = true; return; } return _render39b.apply(this, arguments); };
+document.addEventListener('focusout', function (e) { if (e.target.id === 'fdoc' && UI.pendRender) { UI.pendRender = false; setTimeout(render, 0); } });
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
