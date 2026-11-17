@@ -144,6 +144,10 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgin.any{border-left-style:dashed}
 .pgin .pgk{left:-49px}
 .pgin .pgin .pgk{left:-71px}
+.pglk{display:inline-flex;margin-right:2px}
+.pgsub.lk>.pgsh .pgsn,.pgu .pgd.locked+.pgt .pgn{color:#7D7B76}
+.pgch{flex:none;transition:transform .15s}
+.pgkn{position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#F2A93B;box-shadow:0 0 0 3px #070707,0 0 12px rgba(242,169,59,.6);z-index:1}
 .pgout{display:flex;flex-direction:column;border-top:1px solid #1C1C1B;border-bottom:1px solid #1C1C1B;margin-bottom:8px}
 .pgout .pgu{min-height:50px}
 </style>
@@ -1907,7 +1911,7 @@ class Component extends DCLogic {
       const prog = [{ k: 't', id: 'B' }, { k: 'e', id: 'luna', name: 'LUNA', from: '2026-10-24', to: '2026-10-24', todo: '' },
         { k: 'g', id: 'roles', name: 'ロールトラック', order: 'one', items: ['S', 'N', 'A', 'E'].map((x) => ({ k: 't', id: x })) },
         { k: 'e', id: 'mira', name: 'MIRA', from: '2026-12-05', to: '2026-12-06', todo: 'チームを組んで事業案を1つ出す' }, { k: 'e', id: 'nova', name: 'NOVA', from: '2027-02-20', to: '', todo: '' }];
-      window.__PROG = { tracks: PT, program: prog, today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit', ufrom: 'course' }) };
+      window.__PROG = { tracks: PT, program: prog, today: '2026-11-18', cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
       const ct = PT.find((t) => t.id === cur), KN = { all: '全員', choose: '選択', opt: '任意' };
       var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
     }
@@ -2097,7 +2101,7 @@ document.addEventListener('click',function(e){
   // バー：かたまりごとの区間がつながった1本。済んだぶんは太い白、残りは細い灰（順不同は点線）。今いるかたまりは残りも太くする
   function rail(p, any, here, btn) {
     var w = here ? 6 : 2, rest = any ? 'repeating-linear-gradient(#4A4A46 0 3px,transparent 3px 6px)' : (here ? '#3A3A37' : '#2C2C2A');
-    return '<' + (btn ? 'button' : 'span') + ' class="pgrail"' + (btn ? ' data-pgf="' + esc(btn) + '" aria-label="開閉"' : ' aria-hidden="true"') + '><i class="rr" style="width:' + w + 'px;background:' + rest + '"></i><i class="rd" style="height:' + Math.round(p * 100) + '%"></i></' + (btn ? 'button' : 'span') + '>';
+    return '<' + (btn ? 'button' : 'span') + ' class="pgrail"' + (btn ? ' data-pgf="' + esc(btn) + '" aria-label="開閉"' : ' aria-hidden="true"') + '><i class="rr" style="width:' + w + 'px;background:' + rest + '"></i><i class="rd" style="height:' + Math.round(p * 100) + '%"></i>' + (here ? '<i class="pgkn" aria-hidden="true"></i>' : '') + '</' + (btn ? 'button' : 'span') + '>';
   }
   // ---------- トラックの中身 ----------
   function stats(t, items) { var cs = codes(items), d = cs.filter(function (c) { return t.units[c].st === 'done'; }).length; return { n: cs.length, d: d }; }
@@ -2123,64 +2127,76 @@ document.addEventListener('click',function(e){
       return '<div class="pgb' + (here ? ' here' : '') + '">' + rail(st.n ? st.d / st.n : 0, any, here, n.u ? null : k) + '<div class="pgbody">' + head + (open ? itemsHTML(t, items, cur, 0, k) : '') + '</div></div>';
     }).join('') + '</div>';
   }
-  // ---------- プログラム（トラック・イベント・グループ） ----------
+  // ---------- プログラム（運営画面のツリーそのまま。鍵＝上の項目が済むまで開かない） ----------
   function tById(P, id) { return P.tracks.filter(function (t) { return t.id === id; })[0]; }
-  function tProg(t) { var cs = Object.keys(t.units), d = cs.filter(function (c) { return t.units[c].st === 'done'; }).length; return { n: cs.length, d: d, p: cs.length ? d / cs.length : 0 }; }
-  function evDone(P, n) { var end = n.to || n.from; return !!end && end < P.today; }
-  function stepP(P, n) { // 0〜1
-    if (n.k === 't') { var t = tById(P, n.id); return t ? tProg(t).p : 0; }
-    if (n.k === 'e') return evDone(P, n) ? 1 : 0;
-    var kids = (n.items || []).filter(function (x) { return x.k !== 't' || tById(P, x.id); });
-    if (n.order === 'one') { var m = kids.filter(function (x) { var t = x.k === 't' && tById(P, x.id); return t && t.mine; })[0]; return m ? stepP(P, m) : 0; }
-    return kids.length ? kids.reduce(function (a, x) { return a + stepP(P, x); }, 0) / kids.length : 0;
-  }
-  function flat(P, items, out) { out = out || []; items.forEach(function (n) { if (n.k === 'g') { if (n.order === 'one') { var m = n.items.filter(function (x) { var t = x.k === 't' && tById(P, x.id); return t && t.mine; }); if (m.length) flat(P, m, out); else out.push(n); } else flat(P, n.items, out); } else out.push(n); }); return out; }
-  function curStep(P, tree) { var f = flat(P, tree); for (var i = 0; i < f.length; i++) if (stepP(P, f[i]) < 1) return f[i]; return null; }
   function md(x) { return x ? x.slice(5).replace('-', '.') : ''; }
-  function stepRow(P, n, cur, d, dim) {
-    var isCur = n === cur || (cur && cur.k === 'g' && n === cur), p = stepP(P, n), st = p >= 1 ? 'done' : (dim ? 'locked' : 'open');
-    var pad = ' style="padding-left:' + (d * 16) + 'px"', k = isCur ? '<i class="pgk" aria-hidden="true"></i>' : '';
-    if (n.k === 'e') {
-      var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
-      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '"' + pad + '>' + k + '<span class="pgd ' + st + '">' + (DOT[st] || '') + '</span><span class="pgt"><span class="pgc en">' + esc(when) + '</span><span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && p < 1 ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>';
-    }
-    var t = tById(P, n.id); if (!t) return ''; var g = tProg(t);
-    return '<button class="pgu tr' + (isCur ? ' cur' : '') + (dim ? ' dim' : '') + '" data-pgt="' + esc(t.id) + '"' + pad + '>' + k + '<span class="pgd ' + st + '">' + (DOT[st] || '') + '</span><span class="pgt"><span class="pgn en">' + esc(t.name) + '</span></span><span class="pgsc en">' + g.d + '/' + g.n + '</span>' + CHEV + '</button>';
+  function fromOld(P) { // 前の形（プログラム＋トラックの入れ子）から
+    var old = P.program || window.__progDefault(P.tracks), used = {}, gid = 0, nid = function () { return 'o' + (gid++); };
+    var tt = function (t, items, seq) { var out = []; items.forEach(function (n, i) { var lock = seq && i > 0; if (n.u) { out.push({ id: nid(), k: 'u', t: t.id, c: n.u, lock: lock }); return; } var kids = tt(t, n.items || [], n.order !== 'any'); if (n.name) { out.push({ id: nid(), k: 'f', name: n.name, lock: lock, items: kids }); return; } if (kids[0]) kids[0].lock = lock; out.push.apply(out, kids); }); return out; };
+    var conv = function (n) { if (n.k === 't') { var t = tById(P, n.id); if (!t) return null; used[t.id] = 1; return { id: nid(), k: 'f', name: t.name, t: t.id, items: tt(t, treeOf(t), true) }; } if (n.k === 'e') return Object.assign({ k: 'e' }, n); return { id: nid(), k: 'f', name: n.name || '', items: (n.items || []).map(conv).filter(Boolean) }; };
+    var T = old.map(conv).filter(Boolean), out = { id: 'out', k: 'f', out: true, name: 'プログラム外', items: [] };
+    P.tracks.forEach(function (t) { if (!used[t.id]) out.items.push({ id: nid(), k: 'f', name: t.name, t: t.id, items: tt(t, treeOf(t), false) }); });
+    T.push(out); return T;
   }
-  function progItems(P, items, cur, d) {
-    return items.map(function (n) {
-      if (n.k !== 'g') return stepRow(P, n, cur, d, false);
-      var one = n.order === 'one', anyMine = one && n.items.some(function (x) { var t = x.k === 't' && tById(P, x.id); return t && t.mine; });
-      return '<div class="pgsub">' + (n.name || n === cur ? '<div class="pgsh" style="position:relative;padding-left:' + (d * 16) + 'px">' + (n === cur ? '<i class="pgk" aria-hidden="true"></i>' : '') + '<span class="pgsn">' + esc(n.name || '') + '</span></div>' : '') +
-        '<div class="pgin' + (n.order === 'any' || one ? ' any' : '') + '">' + n.items.map(function (x) { if (x.k === 'g') return progItems(P, [x], cur, d + 1); var t = x.k === 't' && tById(P, x.id); return stepRow(P, x, cur, d + 1, one && anyMine && !(t && t.mine)); }).join('') + '</div></div>';
-    }).join('');
+  function leafOK(P, n) { if (n.k === 'u') { var t = tById(P, n.t); return !!(t && t.units[n.c]); } return n.k === 'e'; }
+  function mark(P, items, locked) { // 済んだか・鍵で閉じているか・数
+    var prev = true, d = 0, all = 0;
+    items.forEach(function (n) {
+      n._lk = locked || (!!n.lock && !prev);
+      if (n.k === 'f') { var r = mark(P, n.items || [], n._lk); n._d = r.d; n._n = r.n; n._done = r.n > 0 && r.d === r.n; }
+      else if (leafOK(P, n)) { n._n = 1; n._done = n.k === 'u' ? tById(P, n.t).units[n.c].st === 'done' : !!(n.to || n.from) && (n.to || n.from) < P.today; n._d = n._done ? 1 : 0; }
+      else { n._n = 0; n._d = 0; n._done = true; }
+      d += n._d; all += n._n; if (n._n) prev = prev && n._done;
+    });
+    return { d: d, n: all };
   }
+  function firstCur(items) { for (var i = 0; i < items.length; i++) { var n = items[i]; if (!n._n) continue; if (n.k === 'f') { var c = firstCur(n.items || []); if (c) return c; } else if (!n._done && !n._lk) return n; } return null; }
+  function has(n, c) { if (n === c) return true; return !!(n.items && n.items.some(function (x) { return has(x, c); })); }
+  var LOCK = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  function leafRow(P, n, cur) {
+    var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
+    var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
+    if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '';
+      return '<' + (n.link ? 'a href="' + esc(n.link) + '" target="_blank" rel="noopener"' : 'div') + ' class="pgu ev' + (isCur ? ' cur' : '') + '">' + k + dot + '<span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') + '<span class="pgn en">' + esc(n.name) + '</span>' + (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' + (n.link ? CHEV : '') + '</' + (n.link ? 'a' : 'div') + '>'; }
+    var u = tById(P, n.t).units[n.c];
+    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + k + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + esc(u.title) + '</span></span>' + CHEV + '</button>';
+  }
+  function nodeHTML(P, n, cur, top) {
+    if (!n._n) return '';
+    if (n.k !== 'f') return leafRow(P, n, cur);
+    var k = 'f:' + n.id, open = fold[k] === undefined ? (cur === null ? false : !(n._done && !top)) : !fold[k];
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '">' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
+    return top ? head + body : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
+  }
+  function v2Of(P) { if (!P._v2) P._v2 = JSON.parse(JSON.stringify(P.v2 || fromOld(P))); return P._v2; }
   function progHTML(P) {
-    var tree = P.program || window.__progDefault(P.tracks), cur = curStep(P, tree);
-    var inG = function (n) { return n === cur || (n.items && flat(P, [n]).indexOf(cur) >= 0); };
-    return '<div class="pgtree">' + tree.map(function (n, i) {
-      var here = inG(n), any = n.k === 'g' && n.order !== 'seq';
-      return '<div class="pgb' + (here ? ' here' : '') + '">' + rail(stepP(P, n), any, here) + '<div class="pgbody">' + progItems(P, [n], cur, 0).replace(/^<div class="pgsub"><div class="pgsh"/, '<div class="pgsub top"><div class="pgsh"') + '</div></div>';
+    var T = v2Of(P).filter(function (n) { return !n.out; }); mark(P, T, false); var cur = firstCur(T);
+    return '<div class="pgtree">' + T.filter(function (n) { return n._n; }).map(function (n) {
+      var here = has(n, cur);
+      return '<div class="pgb' + (here ? ' here' : '') + '">' + rail(n._n ? n._d / n._n : 0, false, here, n.k === 'f' ? 'f:' + n.id : null) + '<div class="pgbody">' + nodeHTML(P, n, cur, true) + '</div></div>';
     }).join('') + '</div>';
   }
   function outHTML(P) {
-    var inP = {}; (function w(a) { a.forEach(function (n) { if (n.k === 't') inP[n.id] = 1; if (n.items) w(n.items); }); })(P.program || window.__progDefault(P.tracks));
-    var out = P.tracks.filter(function (t) { return !inP[t.id]; }); if (!out.length) return '';
-    return '<div class="pgout">' + out.map(function (t) { var g = tProg(t); return '<button class="pgu tr" data-pgt="' + esc(t.id) + '"><span class="pgt"><span class="pgn">' + esc(t.name) + '</span></span><span class="pgsc en">' + g.d + '/' + g.n + '</span>' + CHEV + '</button>'; }).join('') + '</div>';
+    var o = v2Of(P).filter(function (n) { return n.out; })[0]; if (!o) return ''; mark(P, o.items, false);
+    var h = o.items.map(function (n) { return nodeHTML(P, n, null, false); }).join(''); return h ? '<div class="pgout">' + h + '</div>' : '';
   }
   function paint() {
     var P = window.__PROG; if (!P) return;
     var put = function (id, k, html) { var el = document.getElementById(id); if (el && el.dataset.k !== k) { el.dataset.k = k; el.innerHTML = html(); } };
-    put('progList', JSON.stringify([P.key, fold]), function () { return progHTML(P); });
-    put('progOut', JSON.stringify([P.key]), function () { return outHTML(P); });
+    P._v2 = null; put('progList', JSON.stringify([P.key, fold]), function () { return progHTML(P); });
+    put('progOut', JSON.stringify([P.key, fold]), function () { return outHTML(P); });
     var t = tById(P, P.cur) || P.tracks[0]; if (t) put('progTree', JSON.stringify([P.key, P.cur, fold]), function () { return trackHTML(t); });
   }
+  function knob() { Array.prototype.forEach.call(document.querySelectorAll('.pgb.here'), function (b) { var k = b.querySelector('.pgkn'), c = b.querySelector('.pgu.cur'), r = b.querySelector('.pgrail'); if (!k || !r) return; if (!c) { k.style.display = 'none'; return; } k.style.display = ''; k.style.top = (c.getBoundingClientRect().top - r.getBoundingClientRect().top + c.offsetHeight / 2 - 7) + 'px'; }); }
+  var _paint = paint; paint = function () { _paint(); knob(); };
+  window.addEventListener('resize', knob);
   window.__progPaint = paint;
   new MutationObserver(function () { paint(); }).observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener('click', function (e) {
     var f = e.target.closest && e.target.closest('[data-pgf]'), u = e.target.closest && e.target.closest('[data-pgu]'), c = e.target.closest && e.target.closest('[data-pgt]'), P = window.__PROG; if (!P) return;
-    if (f) { e.preventDefault(); fold[f.dataset.pgf] = !fold[f.dataset.pgf]; paint(); return; }
-    if (u) { e.preventDefault(); P.openUnit(P.cur, u.dataset.pgu); return; }
+    if (f) { e.preventDefault(); fold[f.dataset.pgf] = f.dataset.open ? f.dataset.open === 'true' : !fold[f.dataset.pgf]; paint(); return; }
+    if (u) { e.preventDefault(); P.openUnit(u.dataset.pgut || P.cur, u.dataset.pgu); return; }
     if (c) { e.preventDefault(); P.openTrack(c.dataset.pgt); window.scrollTo(0, 0); }
   });
   // 運営画面で並びを作っていないときの並び（基礎 → LUNA → ロール → MIRA → NOVA）
