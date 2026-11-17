@@ -1423,6 +1423,18 @@ svg.crown{fill:#F59E0B}
   .wk>.wkm,.tkwk>.wkm{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
   .wkm>.body{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
 }
+
+/* ux27 更新履歴 */
+.pnl{display:flex;flex-direction:column}
+.pnr{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 14px;border-top:1px solid #F0F1F3;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;color:inherit;width:100%}
+.pnr:first-child{border-top:0}
+.pnr.ed{cursor:pointer} .pnr.ed:hover{background:var(--hover,#F7F7F8)}
+.pnr .pd{font-size:12px;color:var(--muted);padding-top:1px}
+.pnr .pt b{display:block;font-weight:600;font-size:13px}
+.pnr .pt span{display:block;font-size:12px;color:var(--sub,#4B5563);white-space:pre-wrap;margin-top:2px}
+.pnr .ib{margin-top:-4px}
+.ch .cha{display:flex;gap:2px;align-items:center}
+.pmore{padding:8px 14px;border-top:1px solid #F0F1F3;font-size:12px;color:var(--muted);background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;cursor:pointer}
 </style>
 </head>
 <body>
@@ -4261,6 +4273,75 @@ placeFab = function () {
   var r = nav.getBoundingClientRect(); if (r.height) f.style.setProperty('bottom', (innerHeight - r.top + 16) + 'px', 'important');
 };
 addEventListener('resize', function () { placeFab(); });
+
+// ---------- ux27 ダッシュボード：今後の更新とパッチノート ----------
+var PATCH_SEED = [
+  ['2026-11-16', '運営画面を公開', 'Googleログイン・承認制・リアルタイム同期'],
+  ['2026-11-16', 'プライバシーポリシーを追加', ''],
+  ['2026-11-16', '部員アプリを公開', '運営画面の教材・外部告知・掲示板もデータベースに接続'],
+  ['2026-11-17', '業務をフォルダー/ファイル型に刷新', 'リーダー複数・メモ・カード/ガントチャート切替・右クリック・教材の新レイアウト・ダッシュボード3区分'],
+  ['2026-11-17', '承認制を一旦停止', '新しく入った人は最初から使える'],
+  ['2026-11-17', '告知を＋ボタンとポップアップで作成', '対象ロール・詳細も入力可。各行に編集ボタン'],
+  ['2026-11-17', 'スマホ表示の修正', '＋ボタンとタブバーの重なり、画面全体がスクロールする不具合、ログインを2回押す必要がある不具合'],
+  ['2026-11-17', 'ダッシュボードに更新履歴を追加', '今後の更新とパッチノートを記録できる（編集は代表のみ）']
+];
+function patchesInit() { if (!S.patches) S.patches = PATCH_SEED.map(function (x, i) { return { id: 'pt' + i, date: x[0], title: x[1], note: x[2], state: 'done' }; }); return S.patches; }
+function pRow(x) {
+  var ed = isAdmin(), d = x.date ? fmtDate(x.date) : '';
+  return '<div class="pnr' + (ed ? ' ed' : '') + '"' + (ed ? ' data-act="pEdit" data-id="' + x.id + '"' : '') + '><span class="pd num">' + (x.state === 'plan' && !d ? '未定' : d) + '</span><span class="pt"><b>' + esc(x.title) + '</b>' + (x.note ? '<span>' + esc(x.note) + '</span>' : '') + '</span>' +
+    (ed && x.state === 'plan' ? '<button class="ib" data-act="pDone" data-id="' + x.id + '" title="実施済みにする" aria-label="実施済みにする"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></button>' : '<span></span>') + '</div>';
+}
+function patchCards() {
+  var ps = patchesInit(), by = function (a, b) { return (b.date || '9999').localeCompare(a.date || '9999'); };
+  var plan = ps.filter(function (x) { return x.state === 'plan'; }).sort(function (a, b) { return (a.date || '9999').localeCompare(b.date || '9999'); });
+  var done = ps.filter(function (x) { return x.state !== 'plan'; }).sort(function (a, b) { return by(a, b) || ps.indexOf(b) - ps.indexOf(a); });
+  var add = function (st) { return isAdmin() ? '<button data-act="pNew" data-s="' + st + '" title="追加" aria-label="追加">' + ic('plus') + '</button>' : ''; };
+  var none = '<div class="empty sm">なし</div>', lim = UI.pAll ? done.length : 6;
+  var c1 = '<div class="card"><div class="ch"><span class="cht">今後の更新<span class="num" style="margin-left:6px;color:var(--muted);font-weight:400">' + plan.length + '</span></span>' + add('plan') + '</div><div class="pnl">' + (plan.length ? plan.map(pRow).join('') : none) + '</div></div>';
+  var c2 = '<div class="card"><div class="ch"><span class="cht">パッチノート<span class="num" style="margin-left:6px;color:var(--muted);font-weight:400">' + done.length + '</span></span>' + add('done') + '</div><div class="pnl">' + (done.length ? done.slice(0, lim).map(pRow).join('') : none) + '</div>' +
+    (done.length > 6 ? '<button class="pmore" data-act="pAll">' + (UI.pAll ? '閉じる' : 'すべて表示（' + done.length + '）') + '</button>' : '') + '</div>';
+  return '<div class="dg2" style="margin-top:12px">' + c1 + c2 + '</div>';
+}
+var _snap27 = snap; snap = function () { _snap27(); var u = JSON.parse(UI.undo); u.patches = S.patches; UI.undo = JSON.stringify(u); };
+var _viewDash27 = viewDash;
+viewDash = function () {
+  var h = _viewDash27(), pc = patchCards();
+  if (h.indexOf('<h2>統計</h2>') >= 0) { var j = h.lastIndexOf('</section>'); return h.slice(0, j) + pc + h.slice(j); }
+  var i = h.lastIndexOf('</div>'); return h.slice(0, i) + '<section class="dsec"><h2>統計</h2>' + pc + '</section>' + h.slice(i);
+};
+function patchDlg() {
+  var x = M.id ? patchesInit().filter(function (y) { return y.id === M.id; })[0] : null, d = x || { date: M.s === 'plan' ? '' : isoOf(TODAY), title: '', note: '', state: M.s || 'done' };
+  var body = '<div class="fld"><label for="pT">内容</label><input id="pT" class="input" value="' + esc(d.title) + '" autocomplete="off" placeholder="例：告知に画像を付けられるように"></div>' +
+    '<div class="two"><div class="fld"><label for="pS">状態</label><select id="pS" class="input"><option value="plan"' + (d.state === 'plan' ? ' selected' : '') + '>今後の更新</option><option value="done"' + (d.state !== 'plan' ? ' selected' : '') + '>実施済み</option></select></div>' +
+    '<div class="fld"><label for="pD">日付</label><input id="pD" type="date" class="input" value="' + esc(d.date || '') + '"></div></div>' +
+    '<div class="fld"><label for="pN">詳細</label><textarea id="pN" class="input" rows="4" placeholder="変更点・理由など">' + esc(d.note || '') + '</textarea></div>';
+  var foot = (x ? '<button class="btn ghost" data-act="pDel" data-id="' + x.id + '" style="margin-right:auto;color:var(--red,#DC2626)">削除</button>' : '') + '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="pSave">保存</button>';
+  return dlg(x ? '更新を編集' : (d.state === 'plan' ? '今後の更新を追加' : 'パッチを記録'), body, foot, true);
+}
+var _renderModal27 = renderModal;
+renderModal = function () {
+  if (M && M.m === 'patch') { document.getElementById('modal').innerHTML = patchDlg(); var t = document.getElementById('pT'); if (t && !M.id) t.focus(); return; }
+  return _renderModal27.apply(this, arguments);
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="pNew"],[data-act="pEdit"],[data-act="pSave"],[data-act="pDel"],[data-act="pDone"],[data-act="pAll"]'); if (!b) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = b.dataset.act, ps = patchesInit(), get = function (id) { return ps.filter(function (y) { return y.id === id; })[0]; };
+  if (a === 'pAll') { UI.pAll = !UI.pAll; render(); return; }
+  if (!isAdmin()) return;
+  if (a === 'pNew') { M = { m: 'patch', s: b.dataset.s }; renderModal(); return; }
+  if (a === 'pEdit') { M = { m: 'patch', id: b.dataset.id }; renderModal(); return; }
+  if (a === 'pDone') { var x0 = get(b.dataset.id); if (x0) { snap(); x0.state = 'done'; x0.date = isoOf(TODAY); save(); render(); toast('パッチノートに移しました'); } return; }
+  if (a === 'pDel') { var x1 = get(b.dataset.id); if (!x1) return; snap(); S.patches = ps.filter(function (y) { return y !== x1; }); M = null; save(); render(); toastUndo('「' + x1.title + '」を削除しました'); return; }
+  var t = document.getElementById('pT').value.trim(); if (!t) { toast('内容を入れてください'); return; }
+  var data = { title: t, state: document.getElementById('pS').value, date: document.getElementById('pD').value, note: document.getElementById('pN').value.trim() };
+  if (data.state === 'done' && !data.date) data.date = isoOf(TODAY);
+  snap();
+  if (M.id) Object.assign(get(M.id), data); else ps.push(Object.assign({ id: uid('pt') }, data));
+  M = null; save(); render(); toast('保存しました');
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M && M.m === 'patch') { M = null; renderModal(); } });
+
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
