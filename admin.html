@@ -5491,7 +5491,7 @@ viewNotices = function () {
   if (tab === 'ev') body = '<div class="body">' + viewEvents() + '</div>';
   else if (tab === 'cal') body = '<div class="body">' + viewCal() + '</div>';
   else { var h = _viewNotices42(); var k = h.indexOf('<div class="body">'); body = k >= 0 ? h.slice(k) : h; }
-  var evn = evNodes().filter(function (n) { return dayOf(n.end) >= TODAY; }).length;
+  var evn = (typeof p2Events === 'function' && S.program && S.program.v2 ? p2Events() : []).filter(function (n) { return !(n.to || n.from) || (n.to || n.from) >= isoOf(TODAY); }).length;
   return top('告知') + utabs('ntab', [['ev', 'イベント', evn], ['cal', 'カレンダー', null], ['list', '外部', S.notices.length], ['offer', '部員からの情報', wait]]) + body;
 };
 var _fabHTML42 = fabHTML;
@@ -6164,7 +6164,7 @@ function pmd(x) { return x ? x.slice(5).replace('-', '.') : ''; }
 var _viewEvents51 = viewEvents;
 viewEvents = function () {
   var h = _viewEvents51(), es = (S.program && S.program.v2) ? p2Events() : [];
-  if (!es.length) return h;
+  if (!es.length) return '<div class="empty big">イベントはまだありません。教材のプログラムで「イベント」を作ると、ここで公開できます</div>';
   var ok = can('tracks') && can('notices');
   var rows = es.map(function (n) {
     var past = !!(n.to || n.from) && (n.to || n.from) < isoOf(TODAY), when = n.from ? pmd(n.from) + (n.to && n.to !== n.from ? ' – ' + pmd(n.to) : '') : '<span class="dim">未定</span>';
@@ -6175,9 +6175,7 @@ viewEvents = function () {
       '<button class="ib" data-act="pevEdit" data-id="' + n.id + '" aria-label="教材で編集" title="教材で編集">' + PEN + '</button></div>';
   }).join('');
   var sec = '<div class="evsec">学ぶのイベント</div><div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>';
-  if (/^<div class="empty big">/.test(h)) h = '';
-  else h = '<div class="evsec">業務のイベント</div>' + h;
-  return h + sec;
+  return rows ? '<div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>' : '';
 };
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-act="pevPub"],[data-act="pevEdit"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
