@@ -1720,7 +1720,7 @@ body.mvin .mvline{display:none !important}
 .p2pv{position:sticky;top:0;background:#070707;color:#F3F1EC;border-radius:16px;overflow:hidden;max-height:calc(100vh - 120px);display:flex;flex-direction:column;box-shadow:0 0 0 1px #E4E7EC}
 .pvbar{display:flex;justify-content:space-between;align-items:center;height:40px;padding:0 16px;font-size:11px;color:#7D7B76;border-bottom:1px solid #1C1C1B;flex:none}
 .pvbar span{color:#BDBAB3;font-weight:600}
-.pvbody{overflow:auto;padding:8px 16px 24px 30px}
+.pvbody{scrollbar-color:#3A3A37 transparent;scrollbar-width:thin;overflow:auto;padding:8px 16px 24px 30px}
 .p2pv button{padding:0;display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;position:relative;border-bottom:1px solid #1C1C1B;border-radius:0}
 .p2pv button:hover{background:#121211}
 .p2pv button.on{background:#262218}
@@ -1739,6 +1739,7 @@ body.mvin .mvline{display:none !important}
 .pvl svg{width:11px;height:11px;fill:none;stroke:#7D7B76;stroke-width:2;display:block}
 .pvj{flex:none;font-size:10px;font-weight:700;color:#D2CFC8;border:1px solid #474744;border-radius:4px;padding:2px 6px}
 @media (max-width:1380px){.p2cols{grid-template-columns:minmax(0,1fr)}.p2pv{display:none}}
+.pvbody::-webkit-scrollbar{width:8px}.pvbody::-webkit-scrollbar-thumb{background:#3A3A37;border-radius:4px}.pvbody::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
 <body>
@@ -1793,6 +1794,9 @@ function sample() {
       { id: 'm8', name: '渡辺 蓮', grade: '理工 1年', unit: '—', roles: ['Engineer'], perms: [] },
       { id: 'm9', name: '中村 葵', grade: '都市 1年', unit: '—', roles: ['Advertiser'], perms: [] }
     ],
+    program: { tree: [{ k: 't', id: 'B' }, { k: 'e', id: 'luna', name: 'LUNA', from: '2026-10-24', to: '2026-10-24', todo: '', link: '' },
+      { k: 'g', id: 'roles', name: 'ロールトラック', order: 'one', items: [{ k: 't', id: 'S' }, { k: 't', id: 'N' }, { k: 't', id: 'A' }, { k: 't', id: 'E' }] },
+      { k: 'e', id: 'mira', name: 'MIRA', from: '2026-12-05', to: '2026-12-06', todo: '', link: '' }, { k: 'e', id: 'nova', name: 'NOVA', from: '2027-02-20', to: '', todo: '', link: '' }] },
     tracks: [
       { id: 'B', name: '基礎教育', owner: '佐藤 花子', status: 'pub', start: '入部', goal: 'LUNA（学内ビジコン）', updated: '11.12 18:20 · 佐藤 花子',
         text: 'B1 起業の地図\nB2 資金調達の基礎 ← B1\nB3 ロールと分業 ← B1\nB4 市場の分析 ← B1\nB5 ビジネスモデルの分析 [対面] ← B4\nS1 ビジネスマナー\nS2 Officeの実用 ← S1\nS3 企画書の書き方 [実習] ← B5, S2', units: {} },
