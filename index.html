@@ -2256,7 +2256,7 @@ document.addEventListener('click',function(e){
       return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
         (n.link ? '<a class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</a>' : '<span class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</span>') +
         (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' +
-        (!n._done && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '✓ 登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
+        (!n._done && n.pub && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '✓ 登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }

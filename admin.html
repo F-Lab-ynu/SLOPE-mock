@@ -1769,6 +1769,14 @@ body.mvin .mvline{display:none !important}
 .p2pvopen svg{width:16px !important;height:16px !important;flex:none}
 .p2pvopen span{writing-mode:vertical-rl;line-height:1}
 .p2reg{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted)}.p2reg b{font-size:22px;color:var(--text);font-weight:700}
+
+.evsec{display:flex;align-items:baseline;gap:10px;font-size:13px;font-weight:700;color:var(--text);margin:20px 0 8px}
+.evsec:first-child{margin-top:0}
+.evsec small{font-weight:400;color:var(--muted);font-size:12px}
+.p2pub{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:#F2F4F7;color:var(--muted);align-self:center}
+.p2pub.on{background:#ECFDF3;color:#067647}
+.p2golink{margin-left:auto;align-self:center;border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;padding:2px 4px}
+.p2golink:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -5901,7 +5909,7 @@ function p2Editor() {
     '<div class="p2grid"><label>開始<input type="date" class="input" data-p2f="from" value="' + esc(n.from || '') + '"></label><label>終了<input type="date" class="input" data-p2f="to" value="' + esc(n.to || '') + '"></label></div>' +
     '<label class="p2fld">部員がやること<textarea class="input" data-p2f="todo" rows="4" placeholder="例：事業案を1つ持ってくる">' + esc(n.todo || '') + '</textarea></label>' +
     '<label class="p2fld">リンク<input class="input" data-p2f="link" value="' + esc(n.link || '') + '" placeholder="https://" autocomplete="off"></label>' +
-    '<div class="p2reg"><span>参加登録</span><b class="num">' + ((S.joins || {})['pe:' + n.id] || 0) + '</b><span>人</span></div>';
+    '<div class="p2reg">' + (n.pub ? '<span class="p2pub on">告知で公開中</span><span>参加登録</span><b class="num">' + ((S.joins || {})['pe:' + n.id] || 0) + '</b><span>人</span>' : '<span class="p2pub">未公開（参加登録なし）</span>') + '<button class="p2golink" data-p2tonotice="1">告知で公開する</button></div>';
   var t = p2Track(n.t), u = p2Unit(n); if (!t || !u) return '';
   var d = unitData(t, u.code);
   var mats = (d.materials || []).map(function (m, i) { return '<div class="p2mat"><span class="tag">' + esc(m.type || '記事') + '</span><input class="cell" data-p2m="' + i + '" value="' + esc(m.memo || '') + '" placeholder="' + esc(m.url) + '" aria-label="タイトル" autocomplete="off"><a href="' + esc(m.url) + '" target="_blank" rel="noopener">' + esc(host(m.url)) + '</a><button class="ib" data-p2a="mdel" data-i="' + i + '" aria-label="削除">' + ic('x') + '</button></div>'; }).join('');
@@ -6149,6 +6157,36 @@ document.addEventListener('click', function (e) { var b = e.target.closest && e.
 // 教材を変えたら、少し待って部員の画面を読み込み直す（本番はデータベースへの保存を待つ）
 var P2RT = null, _save50 = save;
 save = function () { var r = _save50.apply(this, arguments); if (S.view === 'tracks' && P2F && P2F.style.display !== 'none') { clearTimeout(P2RT); P2RT = setTimeout(p2FrameReload, window.sb ? 2500 : 600); } return r; };
+
+// ---------- ux51 学ぶのイベントも告知タブで公開する（公開したら部員に参加登録ボタン） ----------
+function p2Events() { var out = []; if (!S.program || !S.program.v2) return out; p2Walk(S.program.v2, function (n, a, par) { if (n.k === 'e') out.push(n); }); return out.filter(function (n) { var f = p2Get(n.id); var p = f && f.parent; while (p) { if (p.out) return false; var pp = p2Get(p.id); p = pp && pp.parent; } return true; }); }
+function pmd(x) { return x ? x.slice(5).replace('-', '.') : ''; }
+var _viewEvents51 = viewEvents;
+viewEvents = function () {
+  var h = _viewEvents51(), es = (S.program && S.program.v2) ? p2Events() : [];
+  if (!es.length) return h;
+  var ok = can('tracks') && can('notices');
+  var rows = es.map(function (n) {
+    var past = !!(n.to || n.from) && (n.to || n.from) < isoOf(TODAY), when = n.from ? pmd(n.from) + (n.to && n.to !== n.from ? ' – ' + pmd(n.to) : '') : '<span class="dim">未定</span>';
+    return '<div class="evr" data-pevid="' + n.id + '"><span class="evn"><b>' + esc(n.name || 'イベント') + '</b><span>' + esc(n.todo || '学ぶ（プログラム）') + '</span></span>' +
+      '<span class="evq num">' + when + '</span><span class="evp">学ぶ</span>' +
+      '<span class="evg num">' + (n.pub ? ((S.joins || {})['pe:' + n.id] || 0) + ' 人' : '<span class="dim">—</span>') + '</span>' +
+      (past ? '<span class="muted nsw" style="font-size:12px">終了</span>' : '<button class="sw nsw" role="switch" data-act="pevPub" data-id="' + n.id + '" aria-checked="' + !!n.pub + '" aria-label="部員に公開"' + (ok ? '' : ' disabled title="教材と告知の権限が必要です"') + '><i></i></button>') +
+      '<button class="ib" data-act="pevEdit" data-id="' + n.id + '" aria-label="教材で編集" title="教材で編集">' + PEN + '</button></div>';
+  }).join('');
+  var sec = '<div class="evsec">学ぶのイベント</div><div class="evl"><div class="evr evh"><span>イベント</span><span>期間</span><span>場所</span><span>参加登録</span><span>公開</span><span></span></div>' + rows + '</div>';
+  if (/^<div class="empty big">/.test(h)) h = '';
+  else h = '<div class="evsec">業務のイベント</div>' + h;
+  return h + sec;
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="pevPub"],[data-act="pevEdit"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  var f = p2Get(b.dataset.id); if (!f) return;
+  if (b.dataset.act === 'pevEdit') { S.view = 'tracks'; UI.psel = f.n.id; UI.pren = null; save(); render(); return; }
+  if (b.disabled) return; snap(); f.n.pub = !f.n.pub; S.program.updated = Date.now(); save(); render(); toast(f.n.pub ? '「' + f.n.name + '」を公開しました。部員の学ぶタブに参加登録ボタンが出ます' : '「' + f.n.name + '」を非公開にしました');
+}, true);
+
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-p2tonotice]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation(); S.view = 'notices'; S.ntab = 'ev'; save(); render(); }, true);
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
