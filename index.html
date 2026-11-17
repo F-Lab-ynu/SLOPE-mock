@@ -208,6 +208,13 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgbh{min-height:52px;padding:8px 0 !important}
 .pgsh{min-height:48px;padding:8px 0 !important}
 .pgb>.pgbody>.pgbh:first-child{padding-top:8px !important}
+
+/* PC：見出しの右に進み具合のバー ／ スマホ：下のタブバーに隠れないよう余白 */
+.pgpb{display:none}
+body.wide .pgpb{display:block;flex:none;width:160px;height:4px;border-radius:2px;background:#2C2C2A;overflow:hidden;margin-left:16px}
+body.wide .pgpb i{display:block;height:100%;background:#F3F1EC;border-radius:2px}
+body.wide .pgsc{width:36px;text-align:right}
+body:not(.wide) #progList,body:not(.wide) #progOut{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
@@ -2227,7 +2234,7 @@ document.addEventListener('click',function(e){
     var vis = (n.items || []).filter(function (x) { return x._n; });
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgpb" aria-hidden="true"><i style="width:' + Math.round(n._n ? n._d / n._n * 100 : 0) + '%"></i></span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + (body ? '<div class="pgin">' + body + '</div>' : '') : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
