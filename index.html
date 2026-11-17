@@ -151,18 +151,20 @@ button.pgrail::before{content:"";position:absolute;inset:0 -10px}
 .pgout{display:flex;flex-direction:column;border-top:1px solid #1C1C1B;border-bottom:1px solid #1C1C1B;margin-bottom:8px}
 .pgout .pgu{min-height:50px}
 
-/* 見やすく：線をなくし、見出し＞小見出し＞単元の差をはっきり */
-.pgbh{padding:16px 0 8px !important;min-height:0}
-.pgbn{font-size:19px !important;font-weight:700}
-.pgb>.pgbody>.pgbh:first-child{padding-top:4px !important}
-.pgsh{min-height:48px;padding:6px 0 !important;color:#F3F1EC !important}
-.pgsn{font-size:16px !important;font-weight:700 !important}
-.pgin{border-left:0 !important;margin-left:0 !important;padding-left:14px !important}
-.pgn{font-size:15px;font-weight:500}
-.pgu.ev .pgn{font-size:19px;font-weight:700}
-.pgu.ev{min-height:60px}
+/* 見やすく：丸があるのがやること（単元・イベント）、丸がないのが見出し（フォルダ） */
+.pgbh{padding:14px 0 6px !important;min-height:0}
+.pgb>.pgbody>.pgbh:first-child{padding-top:2px !important}
+.pgbn{font-size:18px !important;font-weight:700;color:#F3F1EC}
+.pgsh{min-height:36px;padding:12px 0 4px !important;color:#A3A19B !important;border-top:0 !important}
+.pgsn{font-size:13px !important;font-weight:700 !important;letter-spacing:.04em;color:#A3A19B}
+.pgsub{border-top:0 !important}
+.pgin{border-left:0 !important;margin-left:0 !important;padding-left:0 !important}
+.pgu,.pgu.ev{min-height:52px !important}
+.pgn,.pgu.ev .pgn,.pgu.tr .pgn{font-size:15px !important;font-weight:500 !important}
+.pgc{font-size:11px;color:#7D7B76}
 .pgsc{font-size:12px;color:#7D7B76}
-.pgb+.pgb .pgbody{border-top:0}
+.pgu+.pgu{border-top:1px solid #1C1C1B}
+.pgsub+.pgu,.pgu+.pgsub{border-top:0}
 </style>
 </head>
 <body>
@@ -2179,6 +2181,8 @@ document.addEventListener('click',function(e){
   function nodeHTML(P, n, cur, top) {
     if (!n._n) return '';
     if (n.k !== 'f') return leafRow(P, n, cur);
+    var vis = (n.items || []).filter(function (x) { return x._n; });
+    if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
     var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '">' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="' + (top ? 'pgbn' : 'pgsn') + '">' + esc(n.name || '') + '</span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
