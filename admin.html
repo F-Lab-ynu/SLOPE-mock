@@ -1465,6 +1465,14 @@ html,body{touch-action:manipulation}
 .cm .cmk{float:right;color:var(--muted);font-size:11px;margin-left:16px}
 .cm .cml{padding:6px 10px 2px;font-size:11px;color:var(--muted)}
 .fcard.cut,.gr.cut{opacity:.45}
+
+/* ux32 ドラッグでフォルダーの中へ */
+.gr.mvinto .gl,.gr.mvinto .gt{background:rgba(37,99,235,.08) !important}
+.gr.mvinto{box-shadow:inset 0 0 0 2px var(--accent)}
+.ftn.mvinto{background:rgba(37,99,235,.10) !important;box-shadow:inset 0 0 0 2px var(--accent);border-radius:6px}
+.mvinto.mvno{box-shadow:inset 0 0 0 2px var(--red,#DC2626) !important}
+.gr.mvinto.mvno .gl,.gr.mvinto.mvno .gt,.ftn.mvinto.mvno{background:rgba(220,38,38,.06) !important}
+body.mvin .mvline{display:none !important}
 </style>
 </head>
 <body>
@@ -4504,6 +4512,39 @@ var _render31 = render;
 render = function () {
   _render31.apply(this, arguments);
   if (UI.clip && UI.clip.mode === 'cut') { var el = document.querySelector('.fcard[data-id="' + UI.clip.id + '"], .gr[data-row="' + UI.clip.id + '"]'); if (el) el.classList.add('cut'); }
+};
+
+
+// ---------- ux32 ドラッグ：フォルダー行（またはツリーのフォルダー）の真ん中に重ねると、その中へ移動 ----------
+function mvClear() { document.querySelectorAll('.mvinto').forEach(function (x) { x.classList.remove('mvinto', 'mvno'); }); document.body.classList.remove('mvin'); }
+var _mvPlan32 = mvPlan;
+mvPlan = function (e) {
+  mvClear();
+  var el = document.elementFromPoint(e.clientX, e.clientY), R = el && (el.closest(mv.scope + ' [data-row]') || el.closest('.ftn[data-id]'));
+  if (R) {
+    var t = task(R.dataset.row || R.dataset.id), rc = R.getBoundingClientRect(), tree = R.classList.contains('ftn');
+    var mid = tree || (e.clientY > rc.top + rc.height * 0.25 && e.clientY < rc.bottom - rc.height * 0.25);
+    if (t && isFolder(t) && t !== mv.n && mid) {
+      var ok = manages(t) && !within(mv.n, t);
+      R.classList.add('mvinto'); if (!ok) R.classList.add('mvno'); document.body.classList.add('mvin');
+      return { into: t, ok: ok, x: 0, y: 0, r: 0 };
+    }
+    if (tree) return null;
+  }
+  return _mvPlan32(e);
+};
+var _mvEnd32 = mvEnd;
+mvEnd = function (e, cancel) {
+  var m = mv, pl = m && m.plan; mvClear();
+  if (!m || cancel || !m.on || !pl || !pl.into) return _mvEnd32(e, cancel);
+  _mvEnd32(e, true); // 見た目の後片付けだけ
+  var n = m.n, t = pl.into;
+  if (!pl.ok) { toast(within(n, t) ? '自分の中には移動できません' : '「' + ttl(t) + '」のリーダーではないので入れられません'); return; }
+  snap();
+  if (!parentOf(n)) { manualRoots(); S.projects.splice(S.projects.indexOf(n), 1); toNested(n); } else removeNode(n);
+  if (!t.tasks && !t.kids) t.kids = [];
+  kids(t).push(n); expandTo(t.id);
+  rerender(); toastUndo('「' + ttl(n) + '」を「' + ttl(t) + '」の中に移動しました');
 };
 
 // ---------------- events ----------------
