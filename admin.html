@@ -1459,6 +1459,12 @@ html,body{touch-action:manipulation}
 .gl .check.wck{margin:0 4px 0 2px}
 .gr:not(.isf) .gname{cursor:pointer}
 .gr:not(.isf) .gname:hover{background:transparent;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+
+/* ux31 右クリック：何もない所・切り取り/コピー/貼り付け */
+.cm button .ck{display:inline-block;width:16px;color:var(--accent)}
+.cm .cmk{float:right;color:var(--muted);font-size:11px;margin-left:16px}
+.cm .cml{padding:6px 10px 2px;font-size:11px;color:var(--muted)}
+.fcard.cut,.gr.cut{opacity:.45}
 </style>
 </head>
 <body>
@@ -4403,6 +4409,102 @@ function accessCard() {
 }
 var _patchCards30 = patchCards;
 patchCards = function () { return (isAdmin() ? accessCard() : '') + _patchCards30(); };
+
+
+// ---------- ux31 右クリック：何もない所で新規作成、切り取り・コピー・貼り付けなど ----------
+function toNested(c) { if (c.tasks) { c.kids = c.tasks; delete c.tasks; c.title = c.name; delete c.name; c.folder = true; } return c; }
+function deepCopy(n) {
+  var c = toNested(JSON.parse(JSON.stringify(n)));
+  (function re(x) { x.id = uid('k'); delete x.fresh; (x.kids || []).forEach(re); })(c);
+  c.title = nextName(ttl(n)); return c;
+}
+function under(a, b) { return a === b || ancestors(a).indexOf(b) >= 0; } // a が b の中（または同じ）
+function clipNode() { return UI.clip ? task(UI.clip.id) : null; }
+function canPasteInto(f) {
+  var c = clipNode(); if (!c || !f || !isFolder(f) || !manages(f)) return false;
+  if (UI.clip.mode === 'cut') return parentOf(c) !== f && !under(f, c);
+  return true;
+}
+function pasteInto(f) {
+  var c = clipNode(); if (!canPasteInto(f)) return;
+  snap();
+  var n;
+  if (UI.clip.mode === 'cut') { removeNode(c); n = c; UI.clip = null; }
+  else n = deepCopy(c);
+  if (!f.tasks && !f.kids) f.kids = [];
+  kids(f).push(n); expandTo(f.id); save(); render(); toast('「' + ttl(n) + '」を「' + ttl(f) + '」に' + (n === c ? '移動しました' : '貼り付けました'));
+}
+var _cmItems31 = cmItems;
+cmItems = function (n) {
+  var h = _cmItems31(n), f = isFolder(n), it = [];
+  var add = function (act, label, key) { it.push('<button role="menuitem" data-cm2="' + act + '">' + label + (key ? '<span class="cmk">' + key + '</span>' : '') + '</button>'); };
+  if (!f && canAssign(n) && n.who !== S.me) add('me', '自分が担当する');
+  if (f && !kids(n).length && parentOf(n) && editSelf(n)) add('toFile', 'ファイルに変える');
+  var clip = [];
+  if (parentOf(n) && editSelf(n)) clip.push(['cut', '切り取り', 'Ctrl+X']);
+  clip.push(['copy', 'コピー', 'Ctrl+C']);
+  if (f && canPasteInto(n)) clip.push(['paste', '「' + esc(ttl(clipNode())).slice(0, 14) + '」を貼り付け', 'Ctrl+V']);
+  var extra = it.join('') + '<i class="cmsep"></i>' + clip.map(function (c) { return '<button role="menuitem" data-cm2="' + c[0] + '">' + c[1] + '<span class="cmk">' + c[2] + '</span></button>'; }).join('');
+  var k = h.indexOf('<i class="cmsep"></i><button role="menuitem" data-cm="del"');
+  return k >= 0 ? h.slice(0, k) + extra + h.slice(k) : h + extra;
+};
+function bgCM(x, y) {
+  var f = curFolder(), it = [], add = function (act, label, key) { it.push('<button role="menuitem" data-bcm="' + act + '">' + label + (key ? '<span class="cmk">' + key + '</span>' : '') + '</button>'); };
+  if (S.fcur === 'mine') return;
+  if (manages(f)) { add('newF', '新しいフォルダー'); if (f) add('newT', '新しいファイル'); }
+  if (f && canPasteInto(f)) add('paste', '「' + esc(ttl(clipNode())).slice(0, 14) + '」を貼り付け', 'Ctrl+V');
+  if (it.length) it.push('<i class="cmsep"></i>');
+  add('mode', S.fmode === 'gantt' ? 'カード表示にする' : 'ガントチャートで見る');
+  if (S.fmode !== 'gantt') { var cur = sortOf(f); it.push('<div class="cml">並べ替え</div>'); SORTS.forEach(function (o) { it.push('<button role="menuitem" data-bcm="sort" data-v="' + o[0] + '"><span class="ck">' + (cur === o[0] ? '✓' : '') + '</span>' + o[1] + '</button>'); }); }
+  if (f) { it.push('<i class="cmsep"></i>'); if (editSelf(f)) add('edit', 'このフォルダーを編集'); add('up', parentOf(f) ? '上のフォルダーへ' : 'すべてへ'); }
+  var m = document.getElementById('cm'); if (!m) { m = document.createElement('div'); m.id = 'cm'; m.className = 'cm'; m.setAttribute('role', 'menu'); document.body.appendChild(m); }
+  UI.cm = null; m.innerHTML = '<div class="cmh">' + FOLD + '<span>' + esc(f ? ttl(f) : 'すべて') + '</span></div>' + it.join('');
+  m.style.left = '0px'; m.style.top = '0px'; var w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.min(x, window.innerWidth - w - 8) + 'px'; m.style.top = Math.min(y, window.innerHeight - h - 8) + 'px';
+}
+document.addEventListener('contextmenu', function (e) {
+  if (S.view !== 'projects' || !e.target.closest) return;
+  if (e.target.closest('.ftn[data-id], .fcard[data-id], .gg .gr[data-row], input, textarea, [contenteditable], a, .cm')) return;
+  if (!e.target.closest('.wkm, .ftree')) return;
+  e.preventDefault(); closePop && closePop(); bgCM(e.clientX, e.clientY);
+});
+document.addEventListener('click', function (e) {
+  var c = e.target.closest && e.target.closest('[data-cm2],[data-bcm]'); if (!c) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var a = c.dataset.cm2 || c.dataset.bcm, n = c.dataset.cm2 ? task(UI.cm) : null, f = curFolder();
+  closeCM();
+  if (c.dataset.cm2) {
+    if (!n) return;
+    if (a === 'me') { snap(); n.who = S.me; save(); render(); toast('担当になりました'); }
+    else if (a === 'toFile') { snap(); delete n.folder; n.kids = undefined; delete n.kids; n.done = false; save(); render(); toast('ファイルに変えました'); }
+    else if (a === 'cut') { UI.clip = { mode: 'cut', id: n.id }; render(); toast('切り取りました。貼り付け先のフォルダーで右クリック'); }
+    else if (a === 'copy') { UI.clip = { mode: 'copy', id: n.id }; toast('コピーしました'); }
+    else if (a === 'paste') pasteInto(n);
+    return;
+  }
+  if (a === 'newF' || a === 'newT') { snap(); var k = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
+  else if (a === 'paste') pasteInto(f);
+  else if (a === 'mode') { S.fmode = S.fmode === 'gantt' ? 'card' : 'gantt'; UI.sp = null; save(); render(); }
+  else if (a === 'sort') { UI.sorts = UI.sorts || {}; UI.sorts[f ? f.id : '_'] = c.dataset.v; render(); }
+  else if (a === 'edit' && f) { M = { m: 'edit', id: f.id }; renderModal(); }
+  else if (a === 'up') goFolder(f && parentOf(f) ? parentOf(f).id : '');
+}, true);
+// キーボード：Ctrl/⌘ + X・C・V（選んでいるカード／行、貼り付けは今のフォルダー）
+document.addEventListener('keydown', function (e) {
+  if (S.view !== 'projects' || !(e.ctrlKey || e.metaKey) || e.altKey) return;
+  var t = e.target; if (t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+  var k = e.key.toLowerCase(); if (k !== 'x' && k !== 'c' && k !== 'v') return;
+  if (k === 'v') { var f = curFolder(); if (f && canPasteInto(f)) { e.preventDefault(); pasteInto(f); } return; }
+  var el = document.activeElement && document.activeElement.closest && document.activeElement.closest('.fcard[data-id], .gr[data-row]'); if (!el) return;
+  var n = task(el.dataset.id || el.dataset.row); if (!n) return;
+  if (k === 'x' && !(parentOf(n) && editSelf(n))) return;
+  e.preventDefault(); UI.clip = { mode: k === 'x' ? 'cut' : 'copy', id: n.id }; if (k === 'x') render(); toast(k === 'x' ? '切り取りました' : 'コピーしました');
+});
+var _render31 = render;
+render = function () {
+  _render31.apply(this, arguments);
+  if (UI.clip && UI.clip.mode === 'cut') { var el = document.querySelector('.fcard[data-id="' + UI.clip.id + '"], .gr[data-row="' + UI.clip.id + '"]'); if (el) el.classList.add('cut'); }
+};
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
