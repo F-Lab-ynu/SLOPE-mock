@@ -1540,6 +1540,10 @@ body.mvin .mvline{display:none !important}
 .gr .bar.sum,.gr.g0 .bar.sum{top:7px;height:26px;border-radius:5px}
 .ftn.mine span{font-weight:600}
 .ftn.mine::after{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px}
+/* ux41 ドラッグ中の元の行：行ごと透かさず、中身だけ薄く（固定の名前欄の後ろが透けないように） */
+.gg .gr.mvsrc{opacity:1}
+.gg .gr.mvsrc > .gl > *:not(.lwh),.gg .gr.mvsrc > .gt > *{opacity:.35}
+.gg .gr.mvsrc > .gl{background:#F9FAFB !important}
 </style>
 </head>
 <body>
