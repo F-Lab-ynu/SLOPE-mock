@@ -1581,6 +1581,28 @@ body.mvin .mvline{display:none !important}
   .evr.evh{display:none}.evr .evn{grid-area:n}.evr .evq{grid-area:d;font-size:12px;color:var(--muted)}.evr .evp{grid-area:p}.evr .evg{display:none}.evr .nsw{grid-area:s}.evr .ib{grid-area:e}
   .calg .cd{min-height:64px}.cchip{font-size:10px;padding:1px 4px}
 }
+
+/* ux43 トラックを入れ子（グループ＋単元）で編集 */
+.utree .uh,.utree .ur{grid-template-columns:auto 64px minmax(0,1fr) auto 32px !important}
+.utree .ur .uind{display:flex;align-items:center;justify-content:flex-end;height:100%;min-width:24px}
+.utree .ur .uind i{display:inline-block;width:18px;height:100%;border-left:2px solid #E5E7EB;margin-left:6px}
+.utree .ur.ugrp{background:#FAFAFB}
+.utree .ur.ugrp .ugn{grid-column:2 / 4;display:flex;align-items:center;gap:6px;min-width:0}
+.utree .ur.ugrp .ugn input{font-weight:600;flex:1;min-width:0}
+.utree .ugc{width:22px;height:22px;border:0;background:transparent;border-radius:4px;cursor:pointer;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.utree .ugc:hover{background:#EEF0F3}
+.utree .ugc svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.utree .ugo{display:inline-flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden;flex:none}
+.utree .ugo button{height:24px;padding:0 8px;border:0;background:#fff;font:inherit;font-size:11px;color:var(--muted);cursor:pointer}
+.utree .ugo button[aria-pressed="true"]{background:var(--text);color:#fff}
+.utree .ugcnt{font-size:11px;color:var(--muted);white-space:nowrap}
+.utree .uadd{display:flex;gap:6px;padding:8px 10px}
+.utree .uadd button{height:28px;padding:0 10px;border:1px dashed var(--line2);border-radius:6px;background:#fff;font:inherit;font-size:12px;color:var(--muted);cursor:pointer}
+.utree .uadd button:hover{border-color:var(--accent);color:var(--accent)}
+.utree .ur.ghost.ing{background:transparent}
+#detail .udeps [data-act="uDepX"],#detail select[data-udep]{display:none !important}
+#detail .udeps::after{content:"並び方から自動で決まります";display:block;font-size:11px;color:var(--muted);margin-top:4px}
+.tkf.kind select{min-width:92px}
 </style>
 </head>
 <body>
@@ -1940,7 +1962,7 @@ function mapSVG(g, sel, avail) {
     if (n.kind === 'unit') out += '<rect x="' + (p.x - 12) + '" y="' + (p.y - 20) + '" width="' + (COL - 6) + '" height="40" rx="6" fill="' + (isSel ? 'rgba(37,99,235,0.07)' : 'transparent') + '"/>';
     out += '<circle class="ring" cx="' + p.x + '" cy="' + p.y + '" r="' + (big ? 8 : 6) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="2"' + (n.kind === 'ext' ? ' stroke-dasharray="2 2.5"' : '') + '/>';
     out += '<text x="' + (p.x + 16) + '" y="' + (p.y - 4) + '" font-family="Inter,Arial,sans-serif" font-size="11" fill="' + (isSel ? '#2563EB' : '#667085') + '">' + esc(sub) + '</text>';
-    out += '<text x="' + (p.x + 16) + '" y="' + (p.y + 12) + '" font-size="13" font-weight="700" fill="' + (n.kind === 'ext' ? '#667085' : '#101828') + '">' + esc(label) + '<title>SLOPE mock 運営画面</title></text>';
+    out += '<text x="' + (p.x + 16) + '" y="' + (p.y + 12) + '" font-size="13" font-weight="700" fill="' + (n.kind === 'ext' ? '#667085' : '#101828') + '">' + esc(label) + '<title>' + esc(n.label) + '</title></text>';
     out += '</g>';
   });
   return out + '</svg>';
@@ -5358,6 +5380,152 @@ document.addEventListener('click', function (e) {
 }, true);
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && M && (M.m === 'cal' || M.m === 'ev')) { M = null; renderModal(); } });
 var _snap42 = snap; snap = function () { _snap42(); var u = JSON.parse(UI.undo); u.cals = S.cals; UI.undo = JSON.stringify(u); };
+
+
+// ---------- ux43 トラックを入れ子（グループ＋単元）で作る。前提は並び方から自動 ----------
+var GID = function () { return 'g' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); };
+function treeCodes(items, out) { out = out || []; (items || []).forEach(function (n) { if (n.u) out.push(n.u); else treeCodes(n.items, out); }); return out; }
+function treeMigrate(t) { // 前提（deps）から段に分けて、同じ段が複数なら「順不同」グループに
+  var L = tl(t), by = {}, lv = {}; L.forEach(function (u) { by[u.code] = u; });
+  var f = function (c, seen) { if (lv[c] != null) return lv[c]; if (seen[c]) return 0; seen[c] = 1; var ds = (by[c].deps || []).filter(function (d) { return by[d]; }); return lv[c] = ds.length ? 1 + Math.max.apply(null, ds.map(function (d) { return f(d, seen); })) : 0; };
+  L.forEach(function (u) { f(u.code, {}); });
+  var mx = L.length ? Math.max.apply(null, L.map(function (u) { return lv[u.code]; })) : -1, tree = [], step = 0;
+  for (var l = 0; l <= mx; l++) { var us = L.filter(function (u) { return lv[u.code] === l; });
+    if (us.length === 1) tree.push({ u: us[0].code });
+    else if (us.length > 1) { step++; tree.push({ g: GID(), name: '', order: 'any', items: us.map(function (u) { return { u: u.code }; }) }); } }
+  return tree;
+}
+function treeOf(t) {
+  if (!t.tree) t.tree = treeMigrate(t);
+  var have = {}, codes = tl(t).map(function (u) { return u.code; });
+  (function clean(items) { for (var i = items.length - 1; i >= 0; i--) { var n = items[i];
+    if (n.u) { if (codes.indexOf(n.u) < 0 || have[n.u]) items.splice(i, 1); else have[n.u] = 1; }
+    else { n.items = n.items || []; clean(n.items); } } })(t.tree);
+  codes.forEach(function (c) { if (!have[c]) t.tree.push({ u: c }); });
+  return t.tree;
+}
+function treeDerive(t) { // 並び方から前提を作る（ほかのトラックの前提はそのまま残す）
+  var tree = treeOf(t), mine = {}, deps = {};
+  tl(t).forEach(function (u) { mine[u.code] = 1; });
+  var walk = function (items, order, inc) {
+    if (order === 'any') { var outs = []; items.forEach(function (n) { outs = outs.concat(node(n, inc)); }); return outs.length ? outs : inc; }
+    var cur = inc; items.forEach(function (n) { cur = node(n, cur); }); return cur;
+  };
+  var node = function (n, inc) { if (n.u) { deps[n.u] = inc.slice(); return [n.u]; } return n.items.length ? walk(n.items, n.order, inc) : inc; };
+  walk(tree, 'seq', []);
+  tl(t).forEach(function (u) { var ext = (u.deps || []).filter(function (d) { return !mine[d]; }); u.deps = (deps[u.code] || []).concat(ext); });
+}
+function treeFind(items, pred, parent) { for (var i = 0; i < items.length; i++) { var n = items[i]; if (pred(n)) return { arr: items, i: i, n: n, parent: parent || null }; if (n.items) { var r = treeFind(n.items, pred, n); if (r) return r; } } return null; }
+var _changedTrack43 = changedTrack;
+changedTrack = function (t) { treeOf(t); treeDerive(t); return _changedTrack43.apply(this, arguments); };
+var CHEV = function (open) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (open ? 'M7 10l5 5 5-5' : 'M10 7l5 5-5 5') + '"/></svg>'; };
+function treeRowsHTML(t, items, d, errs, doneOf) {
+  var h = '';
+  items.forEach(function (n) {
+    var ind = '<span class="uind">' + new Array(d + 1).join('<i></i>') + '</span>';
+    if (n.u) {
+      var i = unitIdx(t, n.u); if (i < 0) return;
+      var r = unitRow(t, tl(t)[i], i, errs);
+      r = r.replace(/<span class="dh"[\s\S]*?<\/svg><\/span>/, ind).replace(/<span class="ud">[\s\S]*?<\/span><\/span>/, '').replace(/<span class="ud">[\s\S]*?<\/button><\/span>/, '');
+      h += r; return;
+    }
+    var cs = treeCodes(n.items), open = n.open !== false;
+    h += '<div class="ur ugrp" data-gid="' + n.g + '">' + ind +
+      '<span class="ugn"><button class="ugc" data-act="tgOpen" data-gid="' + n.g + '" aria-label="' + (open ? '畳む' : '開く') + '">' + CHEV(open) + '</button>' +
+      '<input class="cell" data-tg="name" data-gid="' + n.g + '" value="' + esc(n.name || '') + '" placeholder="グループ名（なくても可）" aria-label="グループ名" autocomplete="off"></span>' +
+      '<span style="display:flex;align-items:center;gap:8px"><span class="ugo" role="group" aria-label="並び方"><button data-act="tgOrder" data-gid="' + n.g + '" data-v="seq" aria-pressed="' + (n.order !== 'any') + '">順番</button><button data-act="tgOrder" data-gid="' + n.g + '" data-v="any" aria-pressed="' + (n.order === 'any') + '">順不同</button></span><span class="ugcnt num">' + cs.length + '</span></span>' +
+      '<button class="ib udel" data-act="tgUngroup" data-gid="' + n.g + '" aria-label="グループを解除" title="グループを解除（中の単元は残る）"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+    if (open) h += treeRowsHTML(t, n.items, d + 1, errs, doneOf) + '<div class="ur ghost ing" data-gin="' + n.g + '">' + '<span class="uind">' + new Array(d + 2).join('<i></i>') + '</span><input class="cell uc num" data-u="newcode" data-gin="' + n.g + '" placeholder="コード" autocomplete="off"><input class="cell ut" data-u="new" data-gin="' + n.g + '" placeholder="＋ ' + esc(n.name || 'このグループ') + 'に単元を追加" autocomplete="off"></div>';
+  });
+  return h;
+}
+unitsHTML = function (t) {
+  var g = layout(t), errs = {}; g.errs.forEach(function (e) { if (!errs[e.line]) errs[e.line] = e.msg; });
+  treeOf(t);
+  var fix = function (lab, key, ph) { return '<div class="ur ufix"><span class="uind"></span><span class="uc num ufl">' + lab + '</span><input class="cell ut ufin" data-bind="' + key + '" value="' + esc(t[key] || '') + '" placeholder="' + ph + '" aria-label="' + lab + '" autocomplete="off"><span></span><span></span></div>'; };
+  return '<div class="utree"><div class="uh"><span></span><span>コード</span><span>単元名</span><span>種類</span><span></span></div>' + fix('START', 'start', '始点（前提となる状態）') +
+    '<div data-list="tree">' + treeRowsHTML(t, t.tree, 0, errs) + '</div>' +
+    '<div class="ur ghost"><span class="uind"></span><input class="cell uc num" data-u="newcode" placeholder="コード" autocomplete="off"><input class="cell ut" data-u="new" placeholder="＋ 単元を追加" aria-label="単元を追加" autocomplete="off"></div>' +
+    '<div class="uadd"><button data-act="tgNew">＋ グループ</button></div>' + fix('GOAL', 'goal', '終点（到達する状態）') + '</div>';
+};
+// グループの中に追加したときは、そのグループの最後に入れる
+var _addUnit43 = addUnit;
+addUnit = function (t, title, at) {
+  var gin = UI.addGin; UI.addGin = null;
+  var u = _addUnit43.apply(this, arguments);
+  if (gin) { treeOf(t); var top = treeFind(t.tree, function (n) { return n.u === u.code; }), g = treeFind(t.tree, function (n) { return n.g === gin; });
+    if (top && g) { top.arr.splice(top.i, 1); g.n.items.push({ u: u.code }); changedTrack(t); } }
+  return u;
+};
+document.addEventListener('keydown', function (e) { var el = e.target; if (el && el.dataset && (el.dataset.u === 'new' || el.dataset.u === 'newcode')) UI.addGin = el.dataset.gin || null; }, true);
+document.addEventListener('focusout', function (e) { var el = e.target; if (el && el.dataset && (el.dataset.u === 'new' || el.dataset.u === 'newcode')) UI.addGin = el.dataset.gin || null; }, true);
+var _renameUnit43 = renameUnit;
+renameUnit = function (t, old, nu) { var f = t.tree && treeFind(t.tree, function (n) { return n.u === old; }); if (f) f.n.u = nu; return _renameUnit43.apply(this, arguments); };
+function treeIndent(t, code, out) {
+  treeOf(t); var f = treeFind(t.tree, function (n) { return n.u === code; }); if (!f) return false;
+  if (!out) {
+    if (f.i === 0) return false;
+    var prev = f.arr[f.i - 1]; f.arr.splice(f.i, 1);
+    if (prev.items) { prev.items.push(f.n); prev.open = true; }
+    else { f.arr.splice(f.i - 1, 1, { g: GID(), name: '', order: 'any', items: [prev, f.n] }); }
+  } else {
+    if (!f.parent) return false;
+    var pf = treeFind(t.tree, function (n) { return n === f.parent; }); f.arr.splice(f.i, 1); pf.arr.splice(pf.i + 1, 0, f.n);
+    if (!f.parent.items.length) pf.arr.splice(pf.i, 1);
+    else if (f.parent.items.length === 1 && !f.parent.name) pf.arr.splice(pf.i, 1, f.parent.items[0]);
+  }
+  return true;
+}
+function treeMove(t, code, dir) {
+  treeOf(t); var f = treeFind(t.tree, function (n) { return n.u === code; }); if (!f) return false;
+  var j = f.i + dir; if (j < 0 || j >= f.arr.length) return false; var x = f.arr[j]; f.arr[j] = f.n; f.arr[f.i] = x; return true;
+}
+// Tab：ひとつ上の単元と同じグループへ（なければ2つをまとめて新しいグループに）／ Shift+Tab：グループから出す ／ Alt+↑↓：入れ替え
+document.addEventListener('keydown', function (e) {
+  var el = e.target; if (!el || !el.dataset || S.view !== 'tracks' || !el.closest || !el.closest('.utree')) return;
+  var code = el.dataset.code; if (!code || !(el.dataset.u === 'title' || el.dataset.u === 'code')) return;
+  var t = track();
+  if (e.key === 'Tab' && !e.isComposing) { e.preventDefault(); e.stopImmediatePropagation(); snap(); if (treeIndent(t, code, e.shiftKey)) { changedTrack(t); renderUnits('.cell[data-u="title"][data-code="' + CSS.escape(code) + '"]'); } return; }
+  if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) { e.preventDefault(); e.stopImmediatePropagation(); snap(); if (treeMove(t, code, e.key === 'ArrowUp' ? -1 : 1)) { changedTrack(t); renderUnits('.cell[data-u="title"][data-code="' + CSS.escape(code) + '"]'); } }
+}, true);
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="tgOpen"],[data-act="tgOrder"],[data-act="tgUngroup"],[data-act="tgNew"]'); if (!b) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  var t = track(); treeOf(t); var a = b.dataset.act, f = b.dataset.gid && treeFind(t.tree, function (n) { return n.g === b.dataset.gid; });
+  if (a === 'tgNew') { snap(); var ng = { g: GID(), name: '', order: 'seq', items: [] }; t.tree.push(ng); changedTrack(t); renderUnits('.cell[data-tg="name"][data-gid="' + ng.g + '"]'); return; }
+  if (!f) return;
+  if (a === 'tgOpen') { f.n.open = f.n.open === false; save(); renderUnits(); return; }
+  if (a === 'tgOrder') { snap(); f.n.order = b.dataset.v; changedTrack(t); renderUnits(); return; }
+  if (a === 'tgUngroup') { snap(); var args = [f.i, 1].concat(f.n.items); Array.prototype.splice.apply(f.arr, args); changedTrack(t); renderUnits(); toastUndo('グループを解除しました（中の単元は残っています）'); }
+}, true);
+document.addEventListener('input', function (e) { var el = e.target; if (el.dataset && el.dataset.tg === 'name') { var t = track(), f = treeFind(treeOf(t), function (n) { return n.g === el.dataset.gid; }); if (f) { f.n.name = el.value; touch(t); save(); } } });
+// 単元の右クリックに「グループにまとめる／グループから出す」を足す
+var _unitCM43 = unitCM;
+unitCM = function (code, x, y) {
+  _unitCM43(code, x, y);
+  var m = document.getElementById('cm'); if (!m) return; var t = track(), f = treeFind(treeOf(t), function (n) { return n.u === code; });
+  var extra = '<i class="cmsep"></i>' + (f && f.i > 0 ? '<button data-ucm2="in" data-code="' + esc(code) + '">ひとつ上とまとめる（Tab）</button>' : '') + (f && f.parent ? '<button data-ucm2="out" data-code="' + esc(code) + '">グループから出す（Shift+Tab）</button>' : '');
+  var del = m.querySelector('[data-ucm="del"]'); if (del && extra.length > 30) del.insertAdjacentHTML('beforebegin', extra);
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-ucm2]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation(); closeCM();
+  var t = track(); snap(); if (treeIndent(t, b.dataset.code, b.dataset.ucm2 === 'out')) { changedTrack(t); renderUnits(); }
+}, true);
+// 上へ／下へ（右クリック）も入れ子の中で動かす
+window.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-ucm="up"],[data-ucm="down"]'); if (!b || S.view !== 'tracks') return;
+  var code = UI.cmU; if (!code) return;
+  e.preventDefault(); e.stopImmediatePropagation(); closeCM(); var t = track(); snap(); if (treeMove(t, code, b.dataset.ucm === 'up' ? -1 : 1)) { changedTrack(t); renderUnits(); }
+}, true);
+// トラックの種類（名前で決めず、選ぶ）
+var _viewTracks43 = viewTracks;
+viewTracks = function () {
+  var h = _viewTracks43(), t = track(); if (!t) return h;
+  var kinds = [['all', '全員'], ['choose', '選択'], ['opt', '任意']], k = t.kind || (/基礎/.test(t.name) ? 'all' : 'choose');
+  var sel = '<label class="tkf kind"><span>種類</span><select id="tKind" class="input sm" aria-label="トラックの種類">' + kinds.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === k ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label>';
+  return h.replace('<label class="tkf"><span>担当</span>', sel + '<label class="tkf"><span>担当</span>');
+};
+document.addEventListener('change', function (e) { if (e.target.id === 'tKind') { var t = track(); snap(); t.kind = e.target.value; touch(t); save(); toast('種類を「' + e.target.selectedOptions[0].text + '」にしました'); } });
 
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {

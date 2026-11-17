@@ -107,6 +107,60 @@ body.wide .crsl{flex:0 1 auto}
 body.wide .crsr{flex:0 0 340px}
 body.wide .crsr{position:sticky;top:16px}
 body.wide .app > main > .crspg{max-width:1160px}
+
+/* プログラム（入れ子＋左のバー） */
+.pgsec{display:flex;flex-direction:column;gap:10px}
+.pgsec+.pgsec{margin-top:22px}
+.pgcards{display:flex;flex-direction:column;gap:10px}
+body.wide .pgcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.pgcard{display:flex;align-items:stretch;gap:14px;width:100%;padding:16px 16px 16px 14px;background:#131313;border:1px solid #252524;border-radius:10px;color:#F3F1EC;text-align:left;font:inherit}
+.pgcard.mine{border-color:#5F5E5A}
+.pgcr{display:flex;flex-direction:column;gap:3px;width:6px;flex:none;min-height:64px}
+.pgcr i{display:block;border-radius:3px;min-height:6px}
+.pgct{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.pgck{font-size:12px;color:#A3A19B;letter-spacing:.04em}.pgck b{color:#F2A93B;font-weight:700}
+.pgcn{font-size:19px;font-weight:700;line-height:1.2}
+.pgcj{font-size:13px;color:#BDBAB3;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pgcm{font-size:13px;color:#A3A19B;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pgcp{font-size:22px;font-weight:700;align-self:center;flex:none}.pgcp small{font-size:12px;color:#A3A19B;margin-left:1px}
+#progTree{max-width:720px}
+.pgsum{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px;color:#A3A19B;margin-bottom:14px}
+.pgsum .en{font-size:28px;font-weight:700;color:#F3F1EC}.pgsum small{font-size:14px;color:#7D7B76}
+.pgleg{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px}
+.pgleg i{display:inline-block;width:6px;height:14px;border-radius:3px;margin-left:8px}
+.pgleg i.s{background:#3A3A37}.pgleg i.a{background:repeating-linear-gradient(135deg,#4A4A46 0 3px,#1D1D1C 3px 7px)}.pgleg i.k{width:10px;height:10px;border-radius:50%;background:#F2A93B}
+.pgtree{display:flex;flex-direction:column;gap:8px}
+.pgb{display:flex;gap:14px;align-items:stretch}
+.pgrail{width:6px;flex:none;border:0;border-radius:3px;padding:0;margin:4px 0;cursor:pointer;position:relative}
+.pgrail:disabled{cursor:default}
+.pgrail:not(:disabled)::before{content:"";position:absolute;inset:-4px -10px}
+.pgbody{flex:1;min-width:0;display:flex;flex-direction:column}
+.pgbh{display:flex;align-items:center;gap:8px;width:100%;padding:8px 0 4px;background:transparent;border:0;color:#F3F1EC;text-align:left;font:inherit}
+.pgbn{font-size:15px;font-weight:700;flex:1;min-width:0}
+.pgo{flex:none;font-size:11px;padding:1px 6px;border-radius:4px;border:1px solid #383836;color:#BDBAB3}
+.pgo.any{border-style:dashed}
+.pgsc{font-size:12px;color:#7D7B76;flex:none}
+.pgch{flex:none;transition:transform .15s}
+.pgu{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:8px 0;background:transparent;border:0;color:#F3F1EC;text-align:left;font:inherit}
+.pgu+.pgu,.pgsub+.pgu,.pgu+.pgsub{border-top:1px solid #1C1C1B}
+.pgd{flex:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #474744;box-sizing:border-box}
+.pgd.done{background:#F3F1EC;border-color:#F3F1EC}.pgd.open{border-color:#BDBAB3}.pgd.locked{border-color:#2C2C2A}
+.pgu.cur .pgd{border-color:#F2A93B;background:rgba(242,169,59,.25)}
+.pgt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.pgc{font-size:11px;color:#7D7B76;letter-spacing:.04em}.pgc b{color:#F2A93B;font-weight:700}
+.pgn{font-size:15px;font-weight:600;line-height:1.4}
+.pgu .pgd.locked+.pgt .pgn{color:#A3A19B}
+.pgm{font-size:12px;color:#7D7B76;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pgr{flex:none}
+.pgk{position:absolute;left:-24px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#F2A93B;box-shadow:0 0 0 3px #070707,0 0 12px rgba(242,169,59,.6)}
+.pgin .pgu{padding-left:0}
+.pgsub{border-top:1px solid #1C1C1B}
+.pgsh{display:flex;align-items:center;gap:8px;width:100%;padding:10px 0 6px;background:transparent;border:0;color:#D2CFC8;text-align:left;font:inherit}
+.pgsn{font-size:13px;font-weight:700;flex:1;min-width:0}
+.pgin{border-left:1px solid #2C2C2A;margin-left:9px;padding-left:12px}
+.pgin.any{border-left-style:dashed}
+.pgfold{width:100%;text-align:left;padding:10px 0;background:transparent;border:0;color:#7D7B76;font:inherit;font-size:13px}.pgfold b{color:#F2A93B}
+.pgb.fin .pgbn{color:#BDBAB3}
 </style>
 </head>
 <body>
@@ -265,116 +319,14 @@ body.wide .app > main > .crspg{max-width:1160px}
 <div style="padding: 6px 20px 32px; display: flex; flex-direction: column; gap: 24px">
 <h1 style="margin: 0; font-size: 28px; font-weight: 700">学ぶ</h1>
 <div style="position: sticky; top: 0; z-index: 10; background: #070707; margin: -6px -20px 0; padding: 6px 20px 8px; border-bottom: 1px solid #171716">
-<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: #131313; border: 1px solid #252524; border-radius: 8px">
-<button onClick="{{ lsStudy }}" style="height: 40px; border: 0; border-radius: 6px; font-weight: 700; font-size: 15px; background: {{ lseg.sBg }}; color: {{ lseg.sFg }}">学習</button>
-<button onClick="{{ lsPractice }}" style="height: 40px; border: 0; border-radius: 6px; font-weight: 700; font-size: 15px; background: {{ lseg.pBg }}; color: {{ lseg.pFg }}">演習<span class="en" style="margin-left: 6px; font-size: 13px; padding: 1px 6px; border-radius: 6px; background: #F2A93B; color: #070707">2</span></button>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: #131313; border: 1px solid #252524; border-radius: 8px">
+<button onClick="{{ lsStudy }}" style="height: 40px; border: 0; border-radius: 6px; font-weight: 700; font-size: 15px; background: {{ lseg.sBg }}; color: {{ lseg.sFg }}">プログラム</button>
 <button onClick="{{ lsLib }}" style="height: 40px; border: 0; border-radius: 6px; font-weight: 700; font-size: 15px; background: {{ lseg.lBg }}; color: {{ lseg.lFg }}">教材</button>
 </div>
 </div>
 
 <sc-if value="{{ show.study }}" hint-placeholder-val="{{ true }}">
-<div class="card" style="padding: 18px; display: flex; align-items: center; gap: 18px">
-<div style="width: 76px; height: 76px; border-radius: 12px; border: 1.5px solid #F3F1EC; display: flex; flex-direction: column; align-items: center; justify-content: center">
-<span class="en" style="font-size: 13px; letter-spacing: 0.12em; color: #BDBAB3">LEVEL</span>
-<span class="en" style="font-size: 30px; font-weight: 700; line-height: 1; color: #F3F1EC">02</span>
-</div>
-<div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
-<div style="font-weight: 700">Strategist 受講中</div>
-<div style="font-size: 13px; color: #BDBAB3">マイルストーン 6 / 14 達成</div>
-<div style="height: 6px; border-radius: 3px; background: #2C2C2A; overflow: hidden"><div style="width: 43%; height: 100%; background: #F3F1EC"></div></div>
-</div>
-</div>
-
-<div class="card" style="border-radius: 10px; overflow: hidden">
-<button onClick="{{ tgBase }}" aria-label="基礎教育を開閉" style="width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px; background: transparent; border: 0; color: #F3F1EC; text-align: left">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
-<span class="lbl">全員共通</span>
-<span style="font-size: 18px; font-weight: 700">基礎教育</span>
-<span style="font-size: 13px; color: #BDBAB3">8 / 8 修了 · LUNA 修了</span>
-</span>
-<span class="en" style="font-size: 16px; font-weight: 700; color: #F3F1EC">100%</span>
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; transform: rotate({{ acc.baseRot }}); transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
-</button>
-<div style="height: 3px; background: #222221"><div style="width: 100%; height: 100%; background: #F3F1EC"></div></div>
-<sc-if value="{{ acc.base }}" hint-placeholder-val="{{ false }}">
-<div style="padding: 18px 16px 0">
-<sc-for list="{{ baseUnits }}" as="u" hint-placeholder-count="5">
-<button onClick="{{ openUnit }}" style="display: flex; gap: 14px; width: 100%; background: transparent; border: 0; padding: 0; color: #F3F1EC; text-align: left">
-<span style="display: flex; flex-direction: column; align-items: center; width: 32px; flex: none">
-<span style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: {{ u.nodeBg }}; border: 1.5px solid {{ u.nodeBd }}; color: {{ u.nodeFg }}">
-<sc-if value="{{ u.done }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
-<sc-if value="{{ u.doing }}" hint-placeholder-val="{{ false }}"><span style="width: 10px; height: 10px; border-radius: 50%; background: #F2A93B"></span></sc-if>
-<sc-if value="{{ u.locked }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></sc-if>
-</span>
-<span style="width: 1.5px; flex: 1; min-height: 22px; background: {{ u.lineColor }}"></span>
-</span>
-<span style="flex: 1; padding: 4px 0 22px; display: flex; flex-direction: column; gap: 2px">
-<span class="en" style="font-size: 13px; color: #A3A19B; letter-spacing: 0.08em">UNIT {{ u.no }} · {{ u.status }}</span>
-<span style="font-weight: 700; font-size: 16px; color: {{ u.titleColor }}">{{ u.title }}</span>
-<span style="font-size: 13px; color: #A3A19B">{{ u.meta }}</span>
-</span>
-</button>
-</sc-for>
-</div>
-</sc-if>
-</div>
-
-<div class="card" style="border-radius: 10px; overflow: hidden">
-<button onClick="{{ tgRole }}" aria-label="ロールトラックを開閉" style="width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px; background: transparent; border: 0; color: #F3F1EC; text-align: left">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
-<span class="lbl">受講中：Strategist</span>
-<span style="font-size: 18px; font-weight: 700">ロールトラック</span>
-</span>
-<span class="en" style="font-size: 16px; font-weight: 700; color: #F3F1EC">29%</span>
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; transform: rotate({{ acc.roleRot }}); transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
-</button>
-<sc-if value="{{ acc.role }}" hint-placeholder-val="{{ false }}">
-<div style="padding: 0 16px 16px">
-<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-<sc-for list="{{ courses }}" as="c" hint-placeholder-count="6">
-<button onClick="{{ c.open }}" class="card" style="background: #191918; padding: 14px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 128px; border-color: {{ c.bd }}; color: #F3F1EC; text-align: left; width: 100%">
-<span style="display: flex; justify-content: space-between; align-items: center; width: 100%">
-<span style="font-size: 13px; color: {{ c.tagColor }}">{{ c.tag }}</span>
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-</span>
-<span class="en" style="font-weight: 700; font-size: 17px">{{ c.name }}</span>
-<span style="font-size: 13px; color: #BDBAB3; line-height: 1.5">{{ c.jp }}</span>
-<span style="font-size: 13px; color: #A3A19B; margin-top: auto">{{ c.count }}</span>
-</button>
-</sc-for>
-</div>
-</div>
-</sc-if>
-</div>
-
-<div class="card" style="border-radius: 10px; overflow: hidden">
-<button onClick="{{ tgPrac }}" aria-label="実務教育を開閉" style="width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px; background: transparent; border: 0; color: #F3F1EC; text-align: left">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
-<span class="lbl">必要になったら受講</span>
-<span style="font-size: 18px; font-weight: 700">実務教育</span>
-<span style="font-size: 13px; color: #BDBAB3">{{ pracNote }}</span>
-</span>
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; transform: rotate({{ acc.pracRot }}); transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
-</button>
-<sc-if value="{{ acc.prac }}" hint-placeholder-val="{{ true }}">
-<div style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 14px">
-<sc-for list="{{ pracGroups }}" as="g" hint-placeholder-count="2">
-<div style="display: flex; flex-direction: column; gap: 6px">
-<span style="font-size: 13px; font-weight: 700; color: #BDBAB3">{{ g.name }}</span>
-<div style="border: 1px solid #252524; border-radius: 8px; overflow: hidden; background: #191918">
-<sc-for list="{{ g.items }}" as="u" hint-placeholder-count="5">
-<button onClick="{{ openUnit }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; background: transparent; border: 0; border-bottom: {{ u.sep }}; color: #F3F1EC; text-align: left">
-<span class="en" style="flex: none; width: 24px; font-size: 13px; color: #A3A19B; font-weight: 500">{{ u.code }}</span>
-<span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500; line-height: 1.45">{{ u.title }}</span>
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"></path></svg>
-</button>
-</sc-for>
-</div>
-</div>
-</sc-for>
-</div>
-</sc-if>
-</div>
+<div id="progList"></div>
 
 <button onClick="{{ openAll }}" class="card" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 10px; color: #F3F1EC; text-align: left; width: 100%">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></svg>
@@ -415,7 +367,8 @@ body.wide .app > main > .crspg{max-width:1160px}
 </div>
 </sc-if>
 
-<sc-if value="{{ show.practice }}" hint-placeholder-val="{{ false }}">
+<sc-if value="{{ show.study }}" hint-placeholder-val="{{ true }}">
+<h2 class="h2" style="margin-top: 12px">演習</h2>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
 <sc-for list="{{ pStats }}" as="k" hint-placeholder-count="3">
 <div class="card" style="padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px">
@@ -579,51 +532,7 @@ body.wide .app > main > .crspg{max-width:1160px}
 </div>
 </div>
 
-<div class="crsw">
-<div class="crsl">
-<div class="crsx" data-k="{{ crs.key }}" style="overflow-x: auto; overflow-y: hidden; max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: 12px">
-<div class="grid" style="position: relative; width: {{ crs.w }}; height: {{ crs.h }}; border-radius: 12px; border: 1px solid #1C1C1B; overflow: hidden">
-<svg width="{{ crs.wn }}" height="{{ crs.hn }}" viewBox="0 0 {{ crs.wn }} {{ crs.hn }}" style="position: absolute; left: 0; top: 0" aria-hidden="true">
-<path d="{{ crs.edges }}" fill="none" stroke="#474744" stroke-width="2" stroke-linecap="round"></path>
-<path d="{{ crs.edgesExt }}" fill="none" stroke="#686762" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"></path>
-<path d="{{ crs.edgesGoal }}" fill="none" stroke="#F3F1EC" stroke-width="2" stroke-linecap="round" opacity="0.7"></path>
-<path d="{{ crs.edgesDone }}" fill="none" stroke="#F3F1EC" stroke-width="2.5" stroke-linecap="round"></path>
-</svg>
-<sc-for list="{{ crs.nodes }}" as="n" hint-placeholder-count="5">
-<button onClick="{{ n.pick }}" style="position: absolute; left: {{ n.x }}; top: {{ n.y }}; width: {{ n.w }}; height: 56px; padding: 0 8px; border: 0; border-radius: 8px; background: {{ n.btnBg }}; color: {{ n.fg }}; display: flex; align-items: center; gap: 14px; text-align: left">
-<span style="flex: none; box-sizing: border-box; width: {{ n.size }}; height: {{ n.size }}; border-radius: 50%; background: {{ n.dotBg }}; border: 2px {{ n.dotBs }} {{ n.dotBd }}; box-shadow: {{ n.glow }}"></span>
-<span style="display: flex; flex-direction: column; min-width: 0">
-<span class="en" style="font-size: 11px; letter-spacing: 0.04em; font-weight: 500; color: {{ n.subColor }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ n.sub }}</span>
-<span style="font-size: {{ n.fs }}; font-weight: 700; line-height: 1.25; white-space: {{ n.ws }}; overflow: hidden; text-overflow: ellipsis; color: {{ n.labelColor }}">{{ n.label }}</span>
-</span>
-</button>
-</sc-for>
-</div>
-</div>
-
-<div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: #BDBAB3">
-<span style="display: flex; align-items: center; gap: 6px"><span style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; background: #F3F1EC"></span>修了</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #F2A93B; background: rgba(242,169,59,0.25)"></span>受講中</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #BDBAB3"></span>受講可</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #474744"></span>未解放</span>
-<span style="display: flex; align-items: center; gap: 6px"><span style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 50%; border: 2px dashed #7D7B76"></span>他トラック・外部</span>
-</div>
-
-</div>
-<div class="crsr">
-<div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 10px">
-<div style="display: flex; justify-content: space-between; align-items: center">
-<span class="lbl">{{ cSel.sub }}</span>
-<span class="chip">{{ cSel.status }}</span>
-</div>
-<div style="font-weight: 700; font-size: 17px">{{ cSel.label }}</div>
-<div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); row-gap: 6px; font-size: 13px; line-height: 1.5">
-<span style="color: #A3A19B">前提</span><span style="color: #E9E6DF">{{ cSel.deps }}</span>
-<span style="color: #A3A19B">後続</span><span style="color: #E9E6DF">{{ cSel.next }}</span>
-</div>
-</div>
-</div>
-</div>
+<div id="progTree"></div>
 </div>
 </sc-if>
 
@@ -2078,6 +1987,23 @@ class Component extends DCLogic {
     });
     const meAv = main && s.tab === 'me' ? { bg: '#F3F1EC', fg: INK, bd: '#F3F1EC' } : { bg: '#2C2C2A', fg: '#F3F1EC', bd: '#474744' };
 
+    // ---- プログラム（入れ子＋左のバー）に渡すデータ ----
+    {
+      const stM = (x) => (x === 'doing' ? 'open' : (x === 'done' || x === 'open' ? x : 'locked'));
+      const PT = [{ id: 'B', name: '基礎教育', jp: '起業の地図・資金・ロール・分析・ビジネスの基本', kind: 'all', mine: true,
+        units: Object.fromEntries(units.map((u) => [u.no, { title: u.title, meta: u.meta, st: stM(u.st) }])),
+        tree: [{ g: 'b1', name: '起業を知る', order: 'seq', items: [{ u: 'B1' }, { u: 'B2' }, { u: 'B3' }] }, { g: 'b2', name: '分析の型', order: 'any', items: [{ u: 'B4' }, { u: 'B5' }] }, { g: 'b3', name: '社会人の基本', order: 'any', items: [{ u: 'S1' }, { u: 'S2' }, { u: 'S3' }] }] }];
+      courseKeys.forEach((k) => { const c = COURSES[k], us = c.nodes.filter((n) => !n.k);
+        const tr = { id: k, name: c.name, jp: c.short, kind: c.opt ? 'opt' : 'choose', mine: k === 'S', units: {}, list: us.map((n) => ({ code: n.sub.split(' ')[0], deps: n.deps.filter((d) => d !== 'in').map((d) => { const m = c.nodes.find((x) => x.id === d); return m && !m.k ? m.sub.split(' ')[0] : null; }).filter(Boolean) })) };
+        us.forEach((n) => { tr.units[n.sub.split(' ')[0]] = { title: n.label, meta: n.sub.split(' · ').slice(1).join(' · '), st: stM(n.st) }; });
+        if (k === 'S') tr.tree = [{ g: 's1', name: '土台', order: 'any', items: [{ u: 'ST1' }, { u: 'ST3' }] }, { g: 's2', name: '理論と財務', order: 'any', items: [{ u: 'ST2' }, { g: 's2b', name: 'お金まわり', order: 'seq', items: [{ u: 'ST4' }, { u: 'ST5' }] }] }, { g: 's3', name: '実践', order: 'seq', items: [{ u: 'ST6' }, { u: 'ST7' }] }];
+        PT.push(tr); });
+      pracRaw.forEach((g, i) => PT.push({ id: 'P' + i, name: g.name, jp: '', kind: 'opt', mine: false, tree: [{ g: 'p' + i, name: '', order: 'any', items: g.items.map((x) => ({ u: x[0] })) }], units: Object.fromEntries(g.items.map((x) => [x[0], { title: x[1], meta: '', st: 'open' }])) }));
+      const cur = PT.find((t) => t.id === s.course) ? s.course : 'S';
+      window.__PROG = { tracks: PT, cur: cur, key: 'mock', openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit', ufrom: 'course' }) };
+      const ct = PT.find((t) => t.id === cur), KN = { all: '全員が受ける', choose: 'ロールトラック', opt: '必要になったら' };
+      var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
+    }
     // ---- Markets (sample figures) ----
     const UP = '#34C77B', DN = '#FF5C66';
     const chgOf = (v) => ({ c: v >= 0 ? UP : DN, chgText: (v >= 0 ? '▲ +' : '▼ ') + v.toFixed(2) + '%' });
@@ -2157,13 +2083,13 @@ class Component extends DCLogic {
         recruit: s.seg === 'recruit', pain: s.seg === 'pain', event: s.seg === 'event', other: s.seg === 'other',
         fab: main && s.tab === 'board' && s.seg !== 'other'
       },
-      subTitle: s.sub === 'course' ? 'ロールトラック' : (s.sub === 'post' ? (cur.isIdea ? 'アイデアの詳細' : '募集の詳細') : (s.sub === 'postNew' ? '投稿する' : s.sub === 'eventNew' ? 'イベントを共有' : s.sub === 'allUnits' ? 'すべての単元' : (titles[s.sub] || ''))),
+      subTitle: s.sub === 'course' ? 'プログラム' : (s.sub === 'post' ? (cur.isIdea ? 'アイデアの詳細' : '募集の詳細') : (s.sub === 'postNew' ? '投稿する' : s.sub === 'eventNew' ? 'イベントを共有' : s.sub === 'allUnits' ? 'すべての単元' : (titles[s.sub] || ''))),
       ti: { home: s.tab === 'home' ? RT : 'transparent', learn: s.tab === 'learn' ? RT : 'transparent', board: s.tab === 'board' ? RT : 'transparent', cal: s.tab === 'cal' ? RT : 'transparent', news: s.tab === 'news' ? RT : 'transparent' },
       tc: { home: s.tab === 'home' ? A : M, learn: s.tab === 'learn' ? A : M, board: s.tab === 'board' ? A : M, cal: s.tab === 'cal' ? A : M, news: s.tab === 'news' ? A : M },
       seg: { oBg: s.seg === 'other' ? '#F3F1EC' : 'transparent', oFg: s.seg === 'other' ? INK : '#BDBAB3', rBg: s.seg === 'recruit' ? '#F3F1EC' : 'transparent', rFg: s.seg === 'recruit' ? INK : '#BDBAB3', pBg: s.seg === 'pain' ? '#F3F1EC' : 'transparent', pFg: s.seg === 'pain' ? INK : '#BDBAB3', eBg: s.seg === 'event' ? '#F3F1EC' : 'transparent', eFg: s.seg === 'event' ? INK : '#BDBAB3' },
       goHome: go('home'), goLearn: go('learn'), goBoard: () => this.setState({ tab: 'board', sub: null, seg: 'recruit' }), goCal: go('cal'), goMe: go('me'), goNews: go('news'), goPractice: () => this.setState({ tab: 'learn', sub: null, lseg: 'practice' }),
       goBoardPain: () => this.setState({ tab: 'board', sub: null, seg: 'pain' }),
-      back: () => this.setState({ sub: null }),
+      back: () => this.setState({ sub: s.sub === 'unit' && s.ufrom === 'course' ? 'course' : null, ufrom: null }),
       openUnit: () => this.setState({ sub: 'unit' }),
       openAdmin: () => this.setState({ sub: 'admin' }),
       openPainNew: () => this.setState({ sub: 'painNew' }),
@@ -2179,7 +2105,7 @@ class Component extends DCLogic {
       recruits: recruits, recruitsTop: recruits.slice(0, 2).map((r, i) => Object.assign({}, r, { sep: i < 1 ? '1px solid #252524' : '0' })), cur: cur,
       pains: pains, painTop: painTop,
       baseUnits: baseUnits, courses: courses, materials: materials,
-      crs: crs, cSel: cSel,
+      crs: Object.assign({}, crs, { kind: crsKind, name: crsName, jp: crsJp, count: crsDone + ' / ' + crsTot + ' 修了', lock: crsMine ? '受講中' : '受講可', lockColor: crsMine ? RT : '#BDBAB3' }), cSel: cSel,
       unitGroups: unitGroups, uFilters: uFilters, allCount: allCount, noUnits: unitGroups.length === 0,
       openAll: () => this.setState({ sub: 'allUnits' }),
       acc: { prac: s.accPrac, pracRot: s.accPrac ? '180deg' : '0deg', base: s.accBase, role: s.accRole, baseRot: s.accBase ? '180deg' : '0deg', roleRot: s.accRole ? '180deg' : '0deg' },
@@ -2238,6 +2164,90 @@ document.addEventListener('click',function(e){
     fade(el);
   }, 300);
   document.addEventListener('scroll', function (e) { if (e.target.classList && e.target.classList.contains('crsx')) fade(e.target); }, true);
+})();
+</script>
+<script>
+// プログラム：トラック一覧と、トラックの中身（入れ子＋左のバー）。データは描画のたびに window.__PROG に入る
+(function () {
+  var fold = {}, esc = function (x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var KIND = { all: '全員', choose: '選択', opt: '任意' };
+  function codes(items, out) { out = out || []; (items || []).forEach(function (n) { if (n.u) out.push(n.u); else codes(n.items, out); }); return out; }
+  function migrate(us) { // 前提から段を作り、同じ段が複数なら「順不同」のグループに
+    var by = {}, lv = {}; us.forEach(function (u) { by[u.code] = u; });
+    var f = function (c, seen) { if (lv[c] != null) return lv[c]; if (seen[c]) return 0; seen[c] = 1; var ds = (by[c].deps || []).filter(function (d) { return by[d]; }); return lv[c] = ds.length ? 1 + Math.max.apply(null, ds.map(function (d) { return f(d, seen); })) : 0; };
+    us.forEach(function (u) { f(u.code, {}); });
+    var mx = -1; us.forEach(function (u) { mx = Math.max(mx, lv[u.code]); }); var tree = [];
+    for (var l = 0; l <= mx; l++) { var row = us.filter(function (u) { return lv[u.code] === l; }); if (row.length === 1) tree.push({ u: row[0].code }); else if (row.length) tree.push({ g: 'm' + l, name: '', order: 'any', items: row.map(function (u) { return { u: u.code }; }) }); }
+    return tree;
+  }
+  function treeOf(t) { // 運営画面で作った入れ子。なければ前提から作る。抜けている単元は最後に足す
+    var tree = t.tree && t.tree.length ? JSON.parse(JSON.stringify(t.tree)) : migrate(t.list || []), have = {}, U = t.units;
+    (function clean(items) { for (var i = items.length - 1; i >= 0; i--) { var n = items[i]; if (n.u) { if (!U[n.u] || have[n.u]) items.splice(i, 1); else have[n.u] = 1; } else { n.items = n.items || []; clean(n.items); if (!n.items.length) items.splice(i, 1); } } })(tree);
+    Object.keys(U).forEach(function (c) { if (!have[c]) tree.push({ u: c }); });
+    return tree;
+  }
+  function stats(t, items) { var cs = codes(items), d = cs.filter(function (c) { return t.units[c].st === 'done'; }).length; return { n: cs.length, d: d }; }
+  function curCode(t, tree) { var cs = codes(tree); for (var i = 0; i < cs.length; i++) if (t.units[cs[i]].st === 'open') return cs[i]; return null; }
+  var DOT = { done: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#070707" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>', locked: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>' };
+  // バーの区間：上から修了ぶんだけ白で満たす。順不同はしま模様
+  function railBg(st, any) {
+    var p = st.n ? Math.round(st.d / st.n * 100) : 0, rest = any ? 'repeating-linear-gradient(135deg,#3A3A37 0 3px,#1D1D1C 3px 7px)' : '#2E2E2C';
+    return 'linear-gradient(#F3F1EC,#F3F1EC) top/100% ' + p + '% no-repeat,' + rest;
+  }
+  function unitRow(t, c, cur, d) {
+    var u = t.units[c], st = u.st, isCur = c === cur;
+    return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-pgu="' + esc(c) + '" style="padding-left:' + (d * 16) + 'px">' +
+      (isCur ? '<i class="pgk" aria-hidden="true"></i>' : '') +
+      '<span class="pgd ' + st + '">' + (DOT[st] || '') + '</span>' +
+      '<span class="pgt"><span class="pgc en">' + esc(c) + (isCur ? ' · <b>次はここ</b>' : (st === 'done' ? ' · 修了' : (st === 'locked' ? ' · 未解放' : ' · 受講可'))) + '</span><span class="pgn">' + esc(u.title) + '</span>' + (u.meta ? '<span class="pgm">' + esc(u.meta) + '</span>' : '') + '</span>' +
+      '<svg class="pgr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5F5E5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
+  }
+  function itemsHTML(t, items, cur, d, key) {
+    return items.map(function (n, i) {
+      if (n.u) return unitRow(t, n.u, cur, d);
+      var k = key + '/' + (n.g || i), st = stats(t, n.items), open = !fold[k], any = n.order === 'any';
+      return '<div class="pgsub"><button class="pgsh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '" style="padding-left:' + (d * 16) + 'px"><span class="pgo ' + (any ? 'any' : 'seq') + '">' + (any ? '順不同' : '順番') + '</span><span class="pgsn">' + esc(n.name || (any ? 'どれからでも' : '上から順に')) + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>' +
+        (open ? '<div class="pgin' + (any ? ' any' : '') + '">' + itemsHTML(t, n.items, cur, d + 1, k) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+  // トラックの中身：最上位の1かたまりごとにバーの1区間
+  function trackHTML(t) {
+    var tree = treeOf(t), cur = curCode(t, tree), all = stats(t, tree);
+    var blocks = tree.map(function (n, i) {
+      var items = n.u ? [n] : n.items, st = stats(t, items), any = !n.u && n.order === 'any', k = t.id + '/' + (n.g || i), open = n.u || !fold[k], has = codes(items).indexOf(cur) >= 0;
+      var head = n.u ? '' : '<button class="pgbh" data-pgf="' + esc(k) + '" aria-expanded="' + open + '"><span class="pgbn">' + esc(n.name || (any ? 'どれからでも' : 'ステップ')) + '</span><span class="pgo ' + (any ? 'any' : 'seq') + '">' + (any ? '順不同' : '順番') + '</span><span class="pgsc en">' + st.d + '/' + st.n + '</span><svg class="pgch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+      var body = open ? itemsHTML(t, items, cur, 0, k) : '<button class="pgfold" data-pgf="' + esc(k) + '">' + st.n + ' 単元を表示' + (has ? ' · <b>次はこの中</b>' : '') + '</button>';
+      return '<div class="pgb' + (st.d === st.n ? ' fin' : '') + (has ? ' has' : '') + '"><button class="pgrail" ' + (n.u ? 'tabindex="-1" disabled' : 'data-pgf="' + esc(k) + '"') + ' aria-label="' + (open ? '畳む' : '開く') + '" style="background:' + railBg(st, any) + '"></button><div class="pgbody">' + head + body + '</div></div>';
+    }).join('');
+    return '<div class="pgsum"><span class="pgleg"><i class="s"></i>順番<i class="a"></i>順不同<i class="k"></i>次はここ</span></div><div class="pgtree">' + blocks + '</div>';
+  }
+  // 一覧：種類ごと。カードの左にも同じバー（最上位のかたまりごとの区間）
+  function listHTML(P) {
+    return ['all', 'choose', 'opt'].map(function (kd) {
+      var ts = P.tracks.filter(function (t) { return t.kind === kd; }); if (!ts.length) return '';
+      return '<section class="pgsec"><h2 class="h2">' + (kd === 'all' ? '全員が受ける' : kd === 'choose' ? 'ロールを選んで受ける' : '必要になったら') + '</h2><div class="pgcards">' + ts.map(function (t) {
+        var tree = treeOf(t), all = stats(t, tree), pc = all.n ? Math.round(all.d / all.n * 100) : 0, cur = curCode(t, tree);
+        var segs = tree.map(function (n) { var st = stats(t, n.u ? [n] : n.items); return '<i style="flex:' + st.n + ';background:' + railBg(st, !n.u && n.order === 'any') + '"></i>'; }).join('');
+        return '<button class="pgcard' + (t.mine ? ' mine' : '') + '" data-pgt="' + esc(t.id) + '"><span class="pgcr">' + segs + '</span><span class="pgct"><span class="pgck">' + (t.mine ? '<b>受講中</b> · ' : '') + KIND[t.kind] + '</span><span class="pgcn en">' + esc(t.name) + '</span>' + (t.jp ? '<span class="pgcj">' + esc(t.jp) + '</span>' : '') +
+          '<span class="pgcm">' + (all.n ? all.d + ' / ' + all.n + ' 修了' + (cur ? ' · 次は ' + esc(cur) + ' ' + esc(t.units[cur].title) : (all.d === all.n ? ' · 完了' : '')) : 'まだ単元がありません') + '</span></span><span class="pgcp en">' + pc + '<small>%</small></span></button>';
+      }).join('') + '</div></section>';
+    }).join('');
+  }
+  function paint() {
+    var P = window.__PROG; if (!P) return;
+    var L = document.getElementById('progList'), T = document.getElementById('progTree');
+    if (L) { var k = JSON.stringify([P.key, fold]); if (L.dataset.k !== k) { L.dataset.k = k; L.innerHTML = listHTML(P); } }
+    if (T) { var t = P.tracks.filter(function (x) { return x.id === P.cur; })[0] || P.tracks[0]; var k2 = JSON.stringify([P.key, P.cur, fold]); if (t && T.dataset.k !== k2) { T.dataset.k = k2; T.innerHTML = trackHTML(t); } }
+  }
+  window.__progPaint = paint;
+  new MutationObserver(function () { paint(); }).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('click', function (e) {
+    var f = e.target.closest && e.target.closest('[data-pgf]'), u = e.target.closest && e.target.closest('[data-pgu]'), c = e.target.closest && e.target.closest('[data-pgt]'), P = window.__PROG; if (!P) return;
+    if (f) { e.preventDefault(); fold[f.dataset.pgf] = !fold[f.dataset.pgf]; paint(); return; }
+    if (u) { e.preventDefault(); P.openUnit(P.cur, u.dataset.pgu); return; }
+    if (c) { e.preventDefault(); P.openTrack(c.dataset.pgt); window.scrollTo(0, 0); }
+  });
+  window.__progTree = treeOf;
 })();
 </script>
 </body>
