@@ -2335,9 +2335,11 @@ function ganttOf(rows) {
   if (!rows.length) { lo = TODAY; hi = TODAY; }
   var d1 = new Date(Math.min(lo, TODAY)); lo = Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth(), 1);
   hi = Math.max(hi + 14 * DAY, Date.UTC(d1.getUTCFullYear() + 1, d1.getUTCMonth(), 1) - DAY);
+  var avail = Math.max(320, UI.gw ? UI.gw - LW : window.innerWidth - (narrow ? 0 : 220) - LW - 4); // UI.gw＝実際に見えている幅（描いたあとに測る）
+  var PX = Math.max(2, Math.min(48, S.zoom || (narrow ? 8 : 12)));
+  hi = Math.max(hi, lo + (Math.ceil(avail / PX) - 1) * DAY); // 縮めても右端まで日付のマスで埋める
   var days = Math.round((hi - lo) / DAY) + 1;
-  var avail = Math.max(320, window.innerWidth - (narrow ? 0 : 220) - LW - 4);
-  var PX = Math.max(2, Math.min(48, S.zoom || (narrow ? 8 : 12))), TW = Math.max(days * PX, avail), DAYS = PX >= 30, WK = ['日', '月', '火', '水', '木', '金', '土'];
+  var TW = Math.max(days * PX, avail), DAYS = PX >= 30, WK = ['日', '月', '火', '水', '木', '金', '土'];
   var x = function (iso) { return Math.round(Math.round((dayOf(iso) - lo) / DAY) * PX); };
   var hd = '', ln = '';
   // grid density follows the zoom: months only when far out, + weeks in the middle, + every day when close
@@ -3178,7 +3180,7 @@ function autosize(el) { el.style.height = 'auto'; el.style.height = el.scrollHei
 function autosizeAll() { document.querySelectorAll('textarea.cell.ct').forEach(autosize); }
 var _render0 = render; render = function () { _render0.apply(this, arguments); autosizeAll(); };
 document.addEventListener('input', function (e) { if (e.target.matches && e.target.matches('textarea.cell.ct')) { e.target.value = e.target.value.replace(/\n/g, ''); autosize(e.target); } });
-window.addEventListener('resize', function () { autosizeAll(); });
+window.addEventListener('resize', function () { autosizeAll(); clearTimeout(UI._gwt); UI._gwt = setTimeout(function () { var g = document.getElementById('gs'); if (g && Math.abs((UI.gw || 0) - g.clientWidth) > 2) render(); }, 150); });
 
 
 // ---------------- 複数人の担当（リーダー＋メンバー） ----------------
@@ -6482,7 +6484,7 @@ function fwSwap() {
     var w = document.createElement('span'); w.innerHTML = teamBtn(n, dis, el.classList.contains('gsel')); el.replaceWith(w.firstChild);
   });
 }
-var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); if (!drag) Array.prototype.forEach.call(document.querySelectorAll('.dguide'), function (g) { g.remove(); }); return r; };
+var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); var gs0 = document.getElementById('gs'); if (gs0 && gs0.clientWidth && Math.abs((UI.gw || 0) - gs0.clientWidth) > 2 && !render._gw) { UI.gw = gs0.clientWidth; render._gw = true; try { render(); } finally { render._gw = false; } } if (!drag) Array.prototype.forEach.call(document.querySelectorAll('.dguide'), function (g) { g.remove(); }); return r; };
 // ガントの編集を確定しても、担当は上で直接変わっているので上書きしない
 var _gEnd54 = gEnd; gEnd = function (saveIt) { var n = task(UI.gedit), d = UI.gdraft; if (n && d && !isFolder(n)) d.who = n.who || ''; return _gEnd54(saveIt); };
 
