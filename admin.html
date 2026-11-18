@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
-<title>SLOPE mock 運営画面</title>
+<title>SLOPE 運営画面</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet">
@@ -2336,17 +2336,19 @@ function ganttOf(rows) {
   var x = function (iso) { return Math.round(Math.round((dayOf(iso) - lo) / DAY) * PX); };
   var hd = '', ln = '';
   // grid density follows the zoom: months only when far out, + weeks in the middle, + every day when close
-  var GX = function (i) { return Math.round(i * PX); };
+  var GX = function (i) { return Math.round(i * PX); }, GML = [];
   for (var i = 0; i < days; i++) {
     var d = new Date(lo + i * DAY), wd = d.getUTCDay(), first = d.getUTCDate() === 1;
-    if (i === 0) { var dim0 = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); var skip0 = (dim0 - d.getUTCDate() + 1) * PX < 96; } // 月末近くから始まると次の月の見出しと重なるので、最初の見出しは省く
-    if ((first || i === 0) && !(i === 0 && skip0)) { hd += '<div class="gm" style="left:' + GX(i) + 'px">' + (d.getUTCMonth() === 0 || i === 0 || (skip0 && hd.indexOf('class="gm"') < 0) ? d.getUTCFullYear() + '年' : '') + (d.getUTCMonth() + 1) + '月</div>'; }
+    if (first || i === 0) GML.push({ x: GX(i), y: d.getUTCFullYear(), m: d.getUTCMonth() + 1 }); // 月の見出しは後で重ならないように並べる
     if (first && i) ln += '<div class="gmo" style="left:' + GX(i) + 'px"></div>';
     if (DAYS) {
       hd += '<div class="gd day' + (wd === 0 ? ' sun' : wd === 6 ? ' sat' : '') + '" style="left:' + GX(i) + 'px;width:' + Math.round(PX) + 'px">' + d.getUTCDate() + '<small>' + WK[wd] + '</small></div>';
       if (wd === 0 || wd === 6) ln += '<div class="gwe" style="left:' + GX(i) + 'px;width:' + (GX(i + 1) - GX(i)) + 'px"></div>';
     }
   }
+  // 月の見出し：前の見出しと重なるものは出さない。年が付くはずだった見出しを省いたら、次に出す見出しに年を付ける
+  (function () { var end = -1e9, py = null, wOf = function (t) { return 6 + t.replace(/[0-9]/g, '').length * 12 + t.replace(/[^0-9]/g, '').length * 7.5 + 6; };
+    GML.forEach(function (g) { var t = (py !== g.y ? g.y + '年' : '') + g.m + '月', w = wOf(t); if (g.x < end) return; hd += '<div class="gm" style="left:' + g.x + 'px">' + t + '</div>'; end = g.x + w; py = g.y; }); })();
   var cf = S.view === 'projects' && typeof curFolder === 'function' ? curFolder() : null;
   if (cf) { var bx = x(cf.start), bw = x(cf.end) + PX - bx; ln += '<div class="gband" style="left:' + bx + 'px;width:' + bw + 'px"></div>'; hd += '<div class="gbh" style="left:' + bx + 'px;width:' + bw + 'px" title="' + esc(ttl(cf)) + '：' + shortDate(cf.start) + ' – ' + shortDate(cf.end) + '"><span>' + shortDate(cf.start) + '</span><span>' + shortDate(cf.end) + '</span></div>'; }
   var tx = Math.round((TODAY - lo) / DAY * PX);
@@ -6406,12 +6408,13 @@ p2Editor = function () {
 };
 
 // ---------- ux54 ファイルも担当を複数に。下の段の担当は、上のフォルダのメンバーからだけ選べる ----------
-function pickable(n) { var p = parentOf(n), pt = p ? teamOf(p) : []; return (pt.length && !isAdmin()) ? pt : null; } // null＝制限なし
+function pickFrom(n) { for (var a = parentOf(n); a; a = parentOf(a)) { if (teamOf(a).length) return a; } return null; }
+function pickable(n) { if (isAdmin()) return null; var a = pickFrom(n); return a ? teamOf(a) : []; } // null＝制限なし。代表以外は、自分に与えられた（上の段の）メンバーからだけ選べる
 function fwNames(n) { return fileWho(n).map(function (id) { var m = member(id); return m ? m.name : ''; }).join('・'); }
 function fileWho(n) { var t = (n.team || []).slice(); if (n.who && t.indexOf(n.who) < 0) t.unshift(n.who); return t; }
 function setFileWho(n, list) { n.team = list.slice(); n.who = list[0] || ''; delete n.leads; }
 var _whoOpts54 = whoOpts;
-whoOpts = function (n) { var pk = pickable(n); if (!pk) return _whoOpts54(n); return '<option value="">未定</option>' + S.members.filter(function (m) { return pk.indexOf(m.id) >= 0; }).map(function (m) { return '<option value="' + m.id + '"' + (n.who === m.id ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join(''); };
+whoOpts = function (n) { var pk = pickable(n); if (!pk) return _whoOpts54(n); return '<option value="">未定</option>' + S.members.filter(function (m) { return pk.indexOf(m.id) >= 0 || n.who === m.id; }).map(function (m) { return '<option value="' + m.id + '"' + (n.who === m.id ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join(''); };
 var _teamBtn54 = teamBtn;
 teamBtn = function (n, dis, compact) {
   if (isFolder(n)) return _teamBtn54(n, dis, compact);
@@ -6424,11 +6427,11 @@ var _openTeam54 = openTeam;
 openTeam = function (id, keep) {
   _openTeam54(id, keep);
   var n = task(id), tp = document.getElementById('tp'); if (!n || !tp) return;
-  var pk = pickable(n), p = parentOf(n);
+  var pk = pickable(n), p = pickFrom(n);
   if (pk) { // フォルダのメンバー以外は出さない
     var keep = isFolder(n) ? teamOf(n) : fileWho(n); Array.prototype.forEach.call(tp.querySelectorAll('.tpi'), function (r) { var c = r.querySelector('[data-tm]'); if (c && pk.indexOf(c.dataset.tm) < 0 && keep.indexOf(c.dataset.tm) < 0) r.remove(); });
     Array.prototype.forEach.call(tp.querySelectorAll('.tph'), function (h) { if (/その他/.test(h.textContent)) { var nx = h.nextElementSibling; if (!nx || !nx.classList.contains('tpi')) h.remove(); else h.innerHTML = '<span>フォルダのメンバー外（外すだけできます）</span>'; } });
-    tp.querySelector('.tpl').insertAdjacentHTML('beforeend', '<div class="tpnote">「' + esc(ttl(p)) + '」のメンバーから選べます。ほかの人を入れるときは、先にフォルダのメンバーに加えてください</div>');
+    tp.querySelector('.tpl').insertAdjacentHTML('beforeend', '<div class="tpnote">' + (p ? '「' + esc(ttl(p)) + '」のメンバーから選べます' : 'いちばん上の業務のメンバーは、代表が決めます') + '</div>');
   }
   if (!isFolder(n)) { // ファイル：リーダーはなし。今の担当にチェック
     var cur = fileWho(n);
@@ -6453,7 +6456,7 @@ function fwSwap() {
     var w = document.createElement('span'); w.innerHTML = teamBtn(n, dis, el.classList.contains('gsel')); el.replaceWith(w.firstChild);
   });
 }
-var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); return r; };
+var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); if (!drag) Array.prototype.forEach.call(document.querySelectorAll('.dguide'), function (g) { g.remove(); }); return r; };
 // ガントの編集を確定しても、担当は上で直接変わっているので上書きしない
 var _gEnd54 = gEnd; gEnd = function (saveIt) { var n = task(UI.gedit), d = UI.gdraft; if (n && d && !isFolder(n)) d.who = n.who || ''; return _gEnd54(saveIt); };
 
@@ -6761,6 +6764,17 @@ document.addEventListener('pointerup', function () {
   save(); render();
   toast(fmtDate(d.k.start) + ' – ' + fmtDate(d.k.end));
 });
+
+// ドラッグ中にほかの画面（スクショなど）へ移ってボタンを離したことが届かなかったときは、ドラッグをやめて元に戻す
+function dragAbort() {
+  if (drag) { var d = drag; drag = null; d.el.classList.remove('drag'); if (d.gd) d.gd.forEach(function (g) { g.remove(); }); render(); }
+  Array.prototype.forEach.call(document.querySelectorAll('.dguide'), function (g) { g.remove(); });
+}
+document.addEventListener('pointercancel', function () { if (drag) dragAbort(); });
+document.addEventListener('lostpointercapture', function (e) { if (drag && e.target === drag.el) setTimeout(function () { if (drag) dragAbort(); }, 0); }, true);
+window.addEventListener('blur', function () { if (drag) dragAbort(); });
+document.addEventListener('visibilitychange', function () { if (document.hidden && drag) dragAbort(); });
+document.addEventListener('pointermove', function (e) { if (drag && e.buttons === 0 && e.pointerType === 'mouse') dragAbort(); }, true);
 
 
 // ---------------- 業務リスト: spreadsheet-style editing ----------------
