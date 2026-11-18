@@ -5370,7 +5370,8 @@ nodeModal = function (n) {
 
 // ---------- ux39 期間未定のファイル・バーを1クリックで選んで編集 ----------
 var _newNode39 = newNode;
-newNode = function (par, title) { var n = _newNode39(par, title); n.nodate = true; return n; }; // 新しいファイルは期間未定から
+newNode = function (par, title) { var n = _newNode39(par, title); n.start = n.end = isoOf(TODAY); delete n.nodate; return n; }; // 新しいファイルは、期間を決めるまでは作った日だけ
+(function () { var t = isoOf(TODAY), ch = false; allNodes().forEach(function (n) { if (n.nodate) { n.start = n.end = t; delete n.nodate; ch = true; } }); if (ch) save(); })(); // 期間未定だったものは今日だけに
 var _addFolder39 = addFolder;
 addFolder = function (par, name) { var n = _addFolder39(par, name); delete n.nodate; return n; };
 function perText(n) { return n.nodate && !isFolder(n) ? '期間未定' : shortDate(n.start) + ' – ' + shortDate(n.end); }
@@ -5420,7 +5421,7 @@ function bpopShow() {
   if (!n || !b || S.view !== 'projects' || S.fmode !== 'gantt') { bpopHide(); return; }
   var p = document.getElementById('bpop'); if (!p) { p = document.createElement('div'); p.id = 'bpop'; document.body.appendChild(p); }
   p.innerHTML = '<input type="date" id="bpS" value="' + (n.nodate ? '' : esc(n.start)) + '" aria-label="開始"><span class="sep">–</span><input type="date" id="bpE" value="' + (n.nodate ? '' : esc(n.end)) + '" aria-label="期限">' +
-    (n.nodate ? '' : '<button data-bp="none" title="期間未定に戻す（Delete）">未定にする</button>') + '<button class="bpx" data-bp="x" aria-label="閉じる" title="閉じる（Esc）">✕</button>';
+'<button class="bpx" data-bp="x" aria-label="閉じる" title="閉じる（Esc）">✕</button>';
   var r = b.getBoundingClientRect(), w = p.offsetWidth, gs = document.getElementById('gs'), gl = document.querySelector('.gg .ghead .gl');
   // 見えている時間軸の範囲に合わせて置く（バーが左右にはみ出していても、見えている部分の下に出す）
   var vl = (gl ? gl.getBoundingClientRect().right : 0) + 8, vr = gs ? gs.getBoundingClientRect().right - 8 : innerWidth - 8, vt = gs ? gs.getBoundingClientRect().top : 0, vb = gs ? gs.getBoundingClientRect().bottom : innerHeight;
@@ -5441,7 +5442,7 @@ document.addEventListener('click', function (e) {
   e.preventDefault(); e.stopImmediatePropagation();
   var n = task(UI.gsel);
   if (b.dataset.bp === 'x') { UI.gsel = null; render(); return; }
-  if (b.dataset.bp === 'none' && n) { snap(); n.nodate = true; save(); UI.gsel = null; render(); toast('期間未定に戻しました'); }
+
 }, true);
 // クリック＝選ぶ（動かさずに離したとき）／期間未定のバーはクリック・ドラッグで期間を作る
 var bdn = null;
@@ -5492,7 +5493,7 @@ document.addEventListener('keydown', function (e) {
   var n = task(UI.gsel); if (!n || n.nodate) { if (e.key === 'Escape') { UI.gsel = null; render(); } return; }
   var k = e.key, step = k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0;
   if (k === 'Escape') { e.preventDefault(); UI.gsel = null; render(); return; }
-  if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); snap(); n.nodate = true; save(); UI.gsel = null; render(); toast('期間未定に戻しました'); return; }
+  if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); return; } // 期間未定はなくした（未設定はその日だけ）
   if (!step) return; e.preventDefault(); snap();
   var s0 = dayOf(n.start), e0 = dayOf(n.end);
   if (e.shiftKey) e0 = Math.max(s0, e0 + step * DAY); else if (e.altKey) s0 = Math.min(e0, s0 + step * DAY); else { s0 += step * DAY; e0 += step * DAY; }
