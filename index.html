@@ -231,6 +231,8 @@ a.pgn{color:inherit}
 .pgin>.pgu .pgn>.nd{left:-14px}
 .tvld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#5F5E5A;pointer-events:none;transition:opacity .25s}.tvld.out{opacity:0}.tvld .bootlogo{width:28px;height:28px}
 .tradingview-widget-container{background:transparent}
+.tvhits{position:relative;z-index:2;display:flex}.tvhits button{flex:1;height:100%;border:0;background:transparent;cursor:pointer;padding:0}
+.tvhit{position:absolute;inset:0;z-index:2;border:0;background:transparent;cursor:pointer;padding:0}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -349,6 +351,7 @@ a.pgn{color:inherit}
 
 <div style="display: flex; flex-direction: column; gap: 4px; padding: 4px 4px 0">
 <div class="tv" ref="{{ mk.homeRef }}" style="min-height: 72px; border-bottom: 1px solid #252524"></div>
+<div class="tvhits" style="margin-top: -76px; height: 72px"><sc-for list="{{ mk.homeHits }}" as="h" hint-placeholder-count="3"><button onClick="{{ h.open }}" aria-label="{{ h.name }}の詳細"></button></sc-for></div>
 <button onClick="{{ newsHome.open }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 0; border: 0; background: transparent; color: #F3F1EC; text-align: left">
 <span style="flex: none; font-size: 11px; font-weight: 700; color: #A3A19B; border: 1px solid #383836; border-radius: 6px; padding: 2px 7px">NEWS</span>
 <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 500; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ newsHome.title }}</span>
@@ -549,9 +552,10 @@ a.pgn{color:inherit}
 </div>
 <div class="scroll" style="display: flex; gap: 10px; overflow-x: auto; margin: 0 -20px; padding: 0 20px">
 <sc-for list="{{ mk.tiles }}" as="m" hint-placeholder-count="4">
-<div class="card" style="flex: none; width: 184px; overflow: hidden">
+<div class="card" style="flex: none; width: 184px; overflow: hidden; position: relative">
 <div style="padding: 10px 12px 0; font-size: 12px; color: #A3A19B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ m.name }}</div>
 <div class="tv" ref="{{ m.ref }}" style="height: 150px; padding: 0 2px"></div>
+<button class="tvhit" onClick="{{ m.open }}" aria-label="{{ m.name }}の詳細"></button>
 </div>
 </sc-for>
 </div>
@@ -2069,12 +2073,13 @@ class Component extends DCLogic {
     const mkName = s.mkSym ? ((mkFind(s.mkSym) || {}).d || s.mkSym) : '';
     const mkMove = (i, d) => { const l = mkList.slice(); const x = l[i]; l[i] = l[i + d]; l[i + d] = x; mkSave(l); };
     const mk = {
-      tiles: mkList.map((x) => ({ name: x.d, ref: (el) => window.__tvEmbed(el, 'mini-symbol-overview', {
+      homeHits: mkList.slice(0, 3).map((x) => ({ name: x.d, open: () => this.setState({ sub: 'mk', mkSym: x.s }) })),
+      tiles: mkList.map((x) => ({ name: x.d, open: () => this.setState({ sub: 'mk', mkSym: x.s }), ref: (el) => window.__tvEmbed(el, 'mini-symbol-overview', {
         symbol: x.s, width: '100%', height: 150, locale: 'ja', dateRange: '1M', colorTheme: 'dark', theme: 'dark',
-        isTransparent: true, autosize: false, largeChartUrl: LCU, noTimeScale: true, chartOnly: false }) })),
+        isTransparent: true, autosize: false, noTimeScale: true, chartOnly: false }) })),
       homeRef: (el) => window.__tvEmbed(el, 'tickers', {
         symbols: mkList.slice(0, 3).map((x) => ({ proName: x.s, title: x.d })),
-        colorTheme: 'dark', theme: 'dark', isTransparent: true, showSymbolLogo: false, locale: 'ja', largeChartUrl: LCU }),
+        colorTheme: 'dark', theme: 'dark', isTransparent: true, showSymbolLogo: false, locale: 'ja' }),
       bigRef: (el) => { if (s.mkSym) window.__tvEmbed(el, 'advanced-chart', {
         symbol: s.mkSym, interval: 'D', timezone: 'Asia/Tokyo', theme: 'dark', colorTheme: 'dark', style: '1', locale: 'ja',
         autosize: true, hide_side_toolbar: true, allow_symbol_change: false, save_image: false, calendar: false,
