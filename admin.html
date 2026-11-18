@@ -1790,6 +1790,39 @@ body.mvin .mvline{display:none !important}
 .p2cols.nopv{grid-template-columns:minmax(0,1fr) !important}
 .p2cols.nopv .p2ed,.p2wk.notree .p2ed{max-width:none}
 @media (max-width:1380px){.p2cols{grid-template-columns:minmax(0,1fr) !important}}
+
+/* ux55 ダッシュボード */
+.kpis{grid-template-columns:repeat(auto-fill,minmax(200px,1fr)) !important}
+.dself .card{display:flex;flex-direction:column}
+.mlist{max-height:336px;overflow:auto}
+.mr,.nr2{display:grid;grid-template-columns:minmax(0,1fr) 120px 32px;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 14px;border:0;border-bottom:1px solid var(--line);background:#fff;font:inherit;color:inherit;text-align:left}
+.nr2{grid-template-columns:10px minmax(0,1fr) 28px}
+button.mr{cursor:pointer}button.mr:hover{background:var(--hover)}
+.mr .mt,.nr2 .mt{display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:8px;align-items:center;min-width:0}
+.nr2 .mt{grid-template-columns:minmax(0,1fr)}
+.mr .mt>svg{width:16px;height:16px;color:#9CA3AF;grid-row:1 / span 2}
+.mr .mt b,.nr2 .mt b{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nr2 .mt b{white-space:normal;font-weight:500;line-height:1.5}
+.ms{display:flex;gap:8px;font-size:11px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap}
+.ms .dp{overflow:hidden;text-overflow:ellipsis}
+.dd{flex:none}.dd.ddb{color:#DC2626;font-weight:600}.dd.ddw{color:#B45309;font-weight:600}.dd.ddm{color:#9CA3AF}
+.mr .mt.lk{cursor:pointer}.mr .mt.lk:hover b{text-decoration:underline}
+.mprog{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.mprog .b{flex:1;height:4px;border-radius:2px;background:#EEF0F3;overflow:hidden}.mprog .b i{display:block;height:100%;background:var(--text);border-radius:2px}
+.mprog .num{font-size:12px;font-weight:600;min-width:36px;text-align:right}.mprog small{color:var(--muted);font-weight:400}
+.mact{display:flex;justify-content:center;color:var(--muted)}.mact svg.i{width:16px;height:16px}
+.mdone{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line2);background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:transparent;padding:0}
+.mdone svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.mdone:hover{border-color:#16A34A;color:#16A34A}
+.mr.dn .mt b{text-decoration:line-through;color:var(--muted)}
+.ndot{width:8px;height:8px;border-radius:50%;background:var(--accent)}.ndot.ndw{background:#F59E0B}
+.nr2.al{background:#FFFBEB}
+.nr2 .nx{width:28px;height:28px;opacity:.4}.nr2:hover .nx{opacity:1}
+.card .ch button.nclr{width:auto;height:auto}
+.nclr{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:4px}.nclr:hover{color:#DC2626;background:#FEF2F2}
+@media (max-width:760px){.mr{grid-template-columns:minmax(0,1fr) 84px 32px}.nr2 .nx{opacity:1}}
+.mr.soon{grid-template-columns:minmax(0,1fr) 140px 32px}
+.mwho{display:flex;align-items:center;gap:6px;min-width:0;font-size:12px;color:var(--sub)}.mwho>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mwho .av{width:20px;height:20px;font-size:10px}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -3424,12 +3457,13 @@ function viewDash() {
     ks.push(kpi('進行中のイベント', lv.length, 'projects', false, lateN ? '遅れ ' + lateN : ''));
     var soon = scope.filter(function (o) { return !o.k.done && !o.k.nodate && dayOf(o.k.end) <= TODAY + 14 * DAY; }).sort(function (a, b) { return dayOf(a.k.end) - dayOf(b.k.end); }).slice(0, 6);
     cards.push(card('期限が近いファイル', soon.length ? soon.map(function (o) {
-      return '<button class="li" data-act="open" data-id="' + o.k.id + '">' + (o.k.who ? av(o.k.who) : '<span class="av nob"></span>') + '<span class="t"><b>' + esc(ttl(o.k)) + '</b><span>' + esc(ttl(o.p)) + '</span></span><span class="r num' + (late(o.k) ? ' bad' : '') + '">' + fmtDate(o.k.end) + '</span></button>';
+      var du = dueLabel(o.k), who = fileWho(o.k);
+      return '<button class="mr soon" data-act="open" data-id="' + o.k.id + '"><span class="mt">' + FILE + '<b>' + esc(ttl(o.k)) + '</b><span class="ms"><span class="dd ' + du.c + '">' + du.t + '</span><span class="dp">' + esc(ttl(parentOf(o.k) || o.p)) + '</span></span></span><span class="mwho">' + (who.length ? avStack(who) + '<span>' + esc(fwNames(o.k)) + '</span>' : '<span class="dim">担当未定</span>') + '</span><span class="mact">' + GO + '</span></button>';
     }).join('') : none, 'projects'));
     var ps = lv.slice().sort(function (a, b) { return dayOf(a.end) - dayOf(b.end); });
     cards.push(card('イベント', ps.length ? ps.map(function (p) {
       var g = progress(p);
-      return '<button class="li" data-act="open" data-id="' + p.id + '"><span class="t"><b>' + esc(p.name) + '</b><span class="num">' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + '</span></span><span class="prog"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num muted" style="font-size:12px">' + g.d + '/' + g.n + '</span></span>' + (g.late ? '<span class="r bad num">!' + g.late + '</span>' : '') + '</button>';
+      return '<button class="li" data-act="open" data-id="' + p.id + '"><span class="t"><b>' + esc(p.name) + '</b><span class="num">' + fmtDate(p.start) + ' – ' + fmtDate(p.end) + '</span></span><span class="prog"><span class="b"><i style="width:' + (g.n ? Math.round(g.d / g.n * 100) : 0) + '%"></i></span><span class="num muted" style="font-size:12px">' + g.d + '/' + g.n + '</span></span>' + (g.late ? '<span class="r cc bad">遅れ ' + g.late + '</span>' : '') + '</button>';
     }).join('') : none, 'projects'));
   }
   if (can('board') || can('notices') || can('tracks')) {
@@ -6422,6 +6456,51 @@ function fwSwap() {
 var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); return r; };
 // ガントの編集を確定しても、担当は上で直接変わっているので上書きしない
 var _gEnd54 = gEnd; gEnd = function (saveIt) { var n = task(UI.gedit), d = UI.gdraft; if (n && d && !isFolder(n)) d.who = n.who || ''; return _gEnd54(saveIt); };
+
+// ---------- ux55 ダッシュボード：自分の担当を見やすく、通知は消せる、数字は横一列 ----------
+var _notify55 = window.notify;
+window.notify = function (to, text, sub) { var r = _notify55.apply(this, arguments); if (S.notifs && S.notifs[0] && !S.notifs[0].id) S.notifs[0].id = uid('nt'); return r; };
+window.__delNotif = window.__delNotif || function (id) { var me0 = S.me; S.notifs = (S.notifs || []).filter(function (n) { return id === 'all' ? n.to !== me0 : n.id !== id; }); };
+function dueLabel(k) {
+  if (k.nodate || !k.end) return { t: '期限未定', c: 'ddm' };
+  var d = Math.round((dayOf(k.end) - TODAY) / DAY);
+  if (!isFolder(k) && !k.done && d < 0) return { t: fmtDate(k.end) + '・' + (-d) + '日遅れ', c: 'ddb' };
+  if (d === 0) return { t: '今日まで', c: 'ddw' };
+  if (d > 0 && d <= 3) return { t: 'あと' + d + '日（' + fmtDate(k.end) + '）', c: 'ddw' };
+  return { t: fmtDate(k.end) + 'まで', c: '' };
+}
+function dashSelf() {
+  var m = me(), mine = myTasks(m.id), open = mine.filter(function (o) { return !isDone(o.k); }), lateN = open.filter(function (o) { return late(o.k); }).length;
+  (S.notifs || []).forEach(function (n) { if (!n.id) n.id = uid('nt'); });
+  var ns = (S.notifs || []).filter(function (n) { return n.to === m.id; }).slice(0, 20);
+  var rows = mine.length ? mine.map(function (o) {
+    var k = o.k, f = isFolder(k), du = dueLabel(k), par = parentOf(k);
+    var sub = '<span class="dd ' + du.c + '">' + du.t + '</span>' + (par ? '<span class="dp">' + esc(ttl(par)) + '</span>' : (o.p && o.p !== k ? '<span class="dp">' + esc(ttl(o.p)) + '</span>' : ''));
+    if (f) { var g = progress(k), pc = g.n ? Math.round(g.d / g.n * 100) : 0;
+      return '<button class="mr" data-act="open" data-id="' + k.id + '"><span class="mt">' + FOLD + '<b>' + esc(ttl(k)) + '</b><span class="ms">' + sub + '</span></span><span class="mprog" title="完了 ' + g.d + ' / ' + g.n + '"><span class="b"><i style="width:' + pc + '%"></i></span><span class="num">' + g.d + '<small>/' + g.n + '</small></span></span><span class="mact">' + GO + '</span></button>'; }
+    return '<div class="mr' + (k.done ? ' dn' : '') + '"><span class="mt lk" data-act="open" data-id="' + k.id + '">' + FILE + '<b>' + esc(ttl(k)) + '</b><span class="ms">' + sub + '</span></span><span class="mprog"></span><span class="mact">' +
+      (k.done ? '<button class="ib" data-act="undo" data-id="' + k.id + '" title="完了を取り消す" aria-label="完了を取り消す"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/></svg></button>' : '<button class="mdone" data-act="done" data-id="' + k.id + '" title="完了にする" aria-label="完了にする"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></button>') + '</span></div>';
+  }).join('') : '<div class="empty sm">担当している業務はありません</div>';
+  var alerts = open.filter(function (o) { return !late(o.k) && !o.k.nodate && !isFolder(o.k) && dayOf(o.k.end) - TODAY <= 3 * DAY; });
+  var nrows = alerts.map(function (o) { var d = Math.round((dayOf(o.k.end) - TODAY) / DAY); return '<div class="nr2 al"><span class="ndot ndw"></span><span class="mt"><b>「' + esc(ttl(o.k)) + '」の期限が' + (d ? 'あと' + d + '日' : '今日') + 'です</b><span class="ms"><span class="dp">' + esc(ttl(o.p)) + '</span></span></span></div>'; }).join('') +
+    ns.map(function (n) { return '<div class="nr2"><span class="ndot"></span><span class="mt"><b>' + esc(n.text) + '</b><span class="ms">' + (n.sub ? '<span class="dp">' + esc(n.sub) + '</span>' : '') + '<span class="dp num">' + esc(n.at || '') + '</span></span></span><button class="ib nx" data-act="ndel" data-id="' + n.id + '" title="削除" aria-label="この通知を削除">' + ic('x') + '</button></div>'; }).join('');
+  var cnt = function (n, bad) { return n ? '<span class="cc' + (bad ? ' bad' : '') + '">' + n + '</span>' : ''; };
+  return '<section class="dsec"><h2>' + av(m.id) + esc(m.name) + '</h2><div class="dg2 dself">' +
+    '<div class="card"><div class="ch"><span class="cht">自分の担当' + cnt(open.length) + cnt(lateN && '遅れ ' + lateN, true) + '</span><button data-act="fgo2" aria-label="業務の自分の担当を開く" title="開く">' + GO + '</button></div><div class="cb mlist">' + rows + '</div></div>' +
+    '<div class="card"><div class="ch"><span class="cht">通知' + cnt(alerts.length + ns.length) + '</span>' + (ns.length ? '<button class="nclr" data-act="ndel" data-id="all">すべて削除</button>' : '') + '</div><div class="cb mlist">' + (nrows || '<div class="empty sm">通知はありません</div>') + '</div></div>' +
+    '</div></section>';
+}
+var _viewDash55 = viewDash;
+viewDash = function () {
+  var h = _viewDash55(), i = h.indexOf('<section class="dsec">'); if (i < 0) return h; var j = h.indexOf('</section>', i) + 10;
+  return (h.slice(0, i) + dashSelf() + h.slice(j)).replace(/<div class="kpi ghostk" aria-hidden="true"><\/div>/g, '');
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="ndel"],[data-act="fgo2"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
+  if (b.dataset.act === 'fgo2') { S.view = 'projects'; S.fcur = 'mine'; save(); render(); return; }
+  var id = b.dataset.id; if (id === 'all' && !confirmOnce('nclr')) { toast('もう一度押すと、通知をすべて削除します'); return; }
+  window.__delNotif(id); save(); render(); toast(id === 'all' ? '通知をすべて削除しました' : '通知を削除しました');
+}, true);
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
