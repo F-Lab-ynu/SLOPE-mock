@@ -1674,7 +1674,7 @@ class Component extends DCLogic {
     const clubSrc = admC && admC.cals ? (function () { // 運営画面（モック）の告知で公開したイベント
       const okD = (c) => /^\d{4}-\d{2}-\d{2}$/.test(c.date || '');
       return admC.cals.filter((c) => c.title && (!okD(c) || (c.to || c.date) >= '2026-11-18') && c.state === 'pub' && c.inNotice !== false).sort((a, b) => okD(a) !== okD(b) ? (okD(a) ? -1 : 1) : (a.date < b.date ? -1 : 1))
-        .map((c) => okD(c) ? ({ id: c.id, mon: MON[+c.date.slice(5, 7) - 1], day: +c.date.slice(8), title: c.title, sub: [c.to && c.to !== c.date ? '〜' + c.to.slice(5).replace('-', '.') : '', c.time, c.place].filter(Boolean).join(' · '), pub: c.state === 'pub' && c.inNotice !== false }) : ({ id: c.id, mon: '日程', day: '未定', tbd: true, title: c.title, sub: [c.time, c.place].filter(Boolean).join(' · '), pub: c.state === 'pub' && c.inNotice !== false }));
+        .map((c) => okD(c) ? ({ id: c.id, mon: MON[+c.date.slice(5, 7) - 1], day: +c.date.slice(8), title: c.title, sub: [c.to && c.to !== c.date ? '〜' + c.to.slice(5).replace('-', '.') : '', c.time, c.place].filter(Boolean).join(' · '), pub: c.state === 'pub' && c.inNotice !== false }) : ({ id: c.id, mon: '日程', day: '未定', tbd: true, title: c.title, sub: [c.time, c.place].filter(Boolean).join(' · '), pub: false }));
     })() : events.filter((e) => e.type === '部内' && e.day >= 13).map((e) => ({ id: e.id, mon: 'NOV', day: e.day, title: e.title, sub: e.time + ' · ' + e.place, pub: true }));
     const clubEvents = clubSrc.map((e) => { const on = !!s.joined[e.id];
       return { mon: e.mon, d: String(e.day), dfs: e.tbd ? '15px' : '22px', title: e.title, sub: e.sub, jd: e.pub ? 'inline-flex' : 'none', joinLabel: on ? '✓ 登録済み' : '参加登録', joinBd: on ? 'transparent' : '#474744', joinFg: on ? '#7D7B76' : '#D2CFC8',
@@ -2304,7 +2304,7 @@ document.addEventListener('click',function(e){
       return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
         (n.link ? '<a class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</a>' : '<span class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</span>') +
         (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' +
-        (!n._done && n.pub && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '✓ 登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
+        (!n._done && n.pub && n.from && P.join ? '<button class="pgjoin' + (on ? ' on' : '') + '" data-pgj="' + esc(jid) + '">' + (on ? '✓ 登録済み' : '参加登録') + '</button>' : '') + '</div>'; }
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
