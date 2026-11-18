@@ -6501,6 +6501,13 @@ document.addEventListener('click', function (e) {
   var id = b.dataset.id;
   window.__delNotif(id); save(); render(); toast(id === 'all' ? '通知をすべて削除しました' : '通知を削除しました');
 }, true);
+
+// ---------- ux56 権限：自分がリーダーか担当になっているところと、その下は全部編集できる（引き継いだ権限は表示しない） ----------
+function hasRight(x) { for (var a = x; a; a = parentOf(a)) { if (isLead(a, S.me) || a.who === S.me || (a.team || []).indexOf(S.me) >= 0) return true; } return false; }
+manages = function (x) { return isAdmin() || (x ? hasRight(x) : false); };
+editSelf = function (n) { return isAdmin() || hasRight(n); };
+canEdit = function (n) { return isAdmin() || hasRight(n); };
+canAssign = function (n) { return isAdmin() || hasRight(n); };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
