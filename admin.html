@@ -1780,6 +1780,7 @@ body.mvin .mvline{display:none !important}
 .p2grid3 label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
 .evtag{font-style:normal;font-size:10px;font-weight:700;margin-left:8px;padding:1px 6px;border-radius:4px;background:#FFF4E5;color:#B45309;vertical-align:1px}
 .p2same{margin-left:auto;font-size:11px;color:var(--muted)}
+.evdupc{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#FAFAFB}.evdupc small{font-size:11px;color:var(--muted)}.evdupc b{font-size:14px}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -5477,7 +5478,7 @@ function viewEvents() {
 }
 function calItems(y, m) {
   var out = {}, add = function (iso, o) { (out[iso] = out[iso] || []).push(o); };
-  calsInit().forEach(function (c) { add(c.date, { k: 'cal', id: c.id, t: (c.time ? c.time + ' ' : '') + c.title, draft: c.state !== 'pub' }); });
+  calsInit().filter(function (c) { return c.inNotice !== false; }).forEach(function (c) { add(c.date, { k: 'cal', id: c.id, t: (c.time ? c.time + ' ' : '') + c.title, draft: c.state !== 'pub' }); });
   evNodes().forEach(function (n) { add(n.end, { k: 'ev', id: n.id, t: ttl(n), draft: n.announce !== 'done' }); }); // 部員のカレンダーと同じく、当日（終了日）に出す
   S.notices.forEach(function (n) { if (n.state === 'pub' && /^\d{4}-\d{2}-\d{2}$/.test(n.due || '')) add(n.due, { k: 'ext', id: n.id, t: '締切 ' + n.title }); });
   return out;
@@ -5504,7 +5505,7 @@ viewNotices = function () {
   if (tab === 'ev') body = '<div class="body">' + viewEvents() + '</div>';
   else if (tab === 'cal') body = '<div class="body">' + viewCal() + '</div>';
   else { var h = _viewNotices42(); var k = h.indexOf('<div class="body">'); body = k >= 0 ? h.slice(k) : h; }
-  var evn = (S.cals || []).filter(function (c) { return (c.to || c.date || '9') >= isoOf(TODAY); }).length;
+  var evn = (S.cals || []).filter(function (c) { return c.inNotice !== false && (c.to || c.date || '9') >= isoOf(TODAY); }).length;
   return top('告知') + utabs('ntab', [['ev', 'イベント', evn], ['cal', 'カレンダー', null], ['list', '外部', S.notices.length], ['offer', '部員からの情報', wait]]) + body;
 };
 var _fabHTML42 = fabHTML;
@@ -5522,7 +5523,7 @@ function calDlg() {
     '<div class="fld"><label for="cM">部員がやること・説明</label><textarea id="cM" class="input" rows="3" placeholder="例：事業案を1つ持ってくる"' + (ro ? ' disabled' : '') + '>' + esc(d.memo || '') + '</textarea></div>' +
     '<div class="fld"><label for="cL">リンク</label><input id="cL" class="input" value="' + esc(d.link || '') + '" placeholder="https://" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
     '<label style="display:flex;align-items:center;gap:8px"><input id="cS" type="checkbox" class="check"' + (d.state === 'pub' ? ' checked' : '') + (ro ? ' disabled' : '') + '>部員に公開する（予定タブの部内イベントに出て、参加登録できる）</label>' +
-    '<label style="display:flex;align-items:center;gap:8px;margin-top:8px"><input id="cG" type="checkbox" class="check"' + (inPg ? ' checked' : '') + (ro || !can('tracks') ? ' disabled' : '') + '>学ぶ（プログラム）にも入れる</label>';
+    (c && !ro && can('tracks') ? '<div style="margin-top:10px"><button class="btn sm" data-act="' + (inPg ? 'evOutProg' : 'evToProg') + '" data-id="' + c.id + '">' + (inPg ? '学ぶから外す' : '学ぶにも追加') + '</button></div>' : '');
   var foot = ro ? '<button class="btn" data-act="close">閉じる</button>' : (c ? '<button class="btn ghost" data-act="calDel" data-id="' + c.id + '" style="margin-right:auto;color:var(--red,#DC2626)">削除</button>' : '') + '<button class="btn" data-act="close">キャンセル</button><button class="btn primary" data-act="calSave">保存</button>';
   return dlg(c ? 'イベントを編集' : 'イベントを追加', body, foot, true);
 }
@@ -5562,7 +5563,7 @@ document.addEventListener('click', function (e) {
     var to = v('cE'); if (to && to < v('cD')) { toast('終了日が開始日より前です'); return; }
     var data = { title: v('cT'), date: v('cD'), to: to === v('cD') ? '' : to, time: v('cH'), place: v('cP'), memo: v('cM'), link: v('cL'), state: document.getElementById('cS').checked ? 'pub' : 'draft' };
     snap(); var cid = M.id; if (cid) Object.assign(calsInit().filter(function (x) { return x.id === cid; })[0], data); else { cid = uid('c'); calsInit().push(Object.assign({ id: cid }, data)); }
-    var g = document.getElementById('cG'); if (g && !g.disabled) { if (g.checked && !evInProg(cid)) { var T = p2(); T.splice(T.length - 1, 0, { id: GID(), k: 'e', ref: cid }); } if (!g.checked && evInProg(cid)) evOutProg(cid); }
+    var cc = evCal(cid); if (cc && cc.inNotice === false) cc.inNotice = true;
     evSync(); M = null; save(); render(); toast('保存しました'); return;
   }
   if (a === 'evSave') {
@@ -6279,6 +6280,84 @@ viewEvents = function () {
       (past ? '<span class="muted nsw" style="font-size:12px">終了</span>' : '<button class="sw nsw" role="switch" data-act="calPub" data-id="' + c.id + '" aria-checked="' + pub + '" aria-label="部員に公開"' + (okc ? '' : ' disabled') + '><i></i></button>') +
       '<button class="ib" data-act="calItem" data-k="cal" data-id="' + c.id + '" aria-label="編集" title="編集">' + PEN + '</button></div>';
   }).join('') + '</div>';
+};
+
+// ---------- ux53 学ぶと告知はそれぞれでイベントを作り、右クリック・詳細から「お互いに追加」。同じ名前があれば置き換えるか聞く ----------
+function evInNotice(c) { return c && c.inNotice !== false; }
+function evSameName(a, b) { return (a || '').replace(/\s+/g, '').toLowerCase() === (b || '').replace(/\s+/g, '').toLowerCase(); }
+function evDupDlg(dir, cid, other) { M = { m: 'evdup', dir: dir, cid: cid, other: other }; renderModal(); }
+function evToProg(cid, force) {
+  var c = evCal(cid); if (!c) return; if (evInProg(cid)) { toast('もう学ぶに入っています'); return; }
+  if (!force) { var d = p2Find(function (n) { return n.k === 'e' && n.ref !== cid && evSameName(n.name, c.title); }); if (d) return evDupDlg('prog', cid, d.n.id); }
+  snap(); var T = p2(); T.splice(T.length - 1, 0, { id: GID(), k: 'e', ref: cid }); evSync(); save(); render(); toast('「' + c.title + '」を学ぶ（プログラムの最後）に追加しました');
+}
+function evToNotice(cid, force) {
+  var c = evCal(cid); if (!c) return; if (evInNotice(c)) { toast('もう告知に入っています'); return; }
+  if (!force) { var d = (S.cals || []).filter(function (x) { return x.id !== cid && evInNotice(x) && evSameName(x.title, c.title); })[0]; if (d) return evDupDlg('notice', cid, d.id); }
+  snap(); c.inNotice = true; save(); render(); toast('「' + c.title + '」を告知に追加しました。告知で公開すると部員に出ます');
+}
+function evOutNotice(cid) { var c = evCal(cid); if (!c) return; snap(); c.inNotice = false; c.state = 'draft'; evSync(); save(); render(); toast('告知から外しました（学ぶには残っています）'); }
+function evGc(cid) { var c = evCal(cid); if (c && !evInNotice(c) && !evInProg(cid)) S.cals = S.cals.filter(function (x) { return x !== c; }); }
+var _renderModal53 = renderModal;
+renderModal = function () {
+  if (!M || M.m !== 'evdup') return _renderModal53.apply(this, arguments);
+  var c = evCal(M.cid), toP = M.dir === 'prog', o = toP ? p2Get(M.other) : null, oc = toP ? (o && evCal(o.n.ref)) : evCal(M.other);
+  var where = toP ? '学ぶ（プログラム）' : '告知', nm = esc(c ? c.title : '');
+  var oInfo = oc ? esc(oc.title) + '　' + (oc.date ? pmd(oc.date) + (oc.to ? ' – ' + pmd(oc.to) : '') : '日程未定') + (oc.place ? '・' + esc(oc.place) : '') : '';
+  var body = '<p style="margin:0 0 12px;line-height:1.7">' + where + 'に、同じ名前のイベント「' + nm + '」がすでにあります。</p>' +
+    '<div class="evdupc"><small>' + where + 'にあるもの</small><b>' + oInfo + '</b></div>' +
+    '<p class="muted" style="margin:12px 0 0;font-size:12px;line-height:1.7">置き換えると、' + where + 'のそのイベントは今追加しようとしているものになります' + (!toP && oc && oc.state === 'pub' ? '（公開中・参加登録 ' + ((S.joins || {})[oc.id] || 0) + '人は引き継がれません）' : '') + '。</p>';
+  var foot = '<button class="btn" data-act="close">やめる</button><button class="btn" data-act="evdupBoth">両方残す</button><button class="btn primary" data-act="evdupRep">置き換える</button>';
+  document.getElementById('modal').innerHTML = dlg('同じ名前のイベントがあります', body, foot); var f = document.querySelector('[data-act="evdupRep"]'); if (f) f.focus();
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="evdupRep"],[data-act="evdupBoth"],[data-act="evToProg"],[data-act="evOutProg"],[data-act="evToNotice"],[data-act="evOutNotice"]'); if (!b) return;
+  e.preventDefault(); e.stopImmediatePropagation(); var a = b.dataset.act;
+  if (a === 'evToProg') { M = null; renderModal(); return evToProg(b.dataset.id); }
+  if (a === 'evOutProg') { snap(); evOutProg(b.dataset.id); M = null; evGc(b.dataset.id); save(); render(); toast('学ぶから外しました（告知には残っています）'); return; }
+  if (a === 'evToNotice') return evToNotice(b.dataset.id);
+  if (a === 'evOutNotice') return evOutNotice(b.dataset.id);
+  var m = M; M = null; renderModal(); if (!m) return;
+  if (a === 'evdupBoth') return m.dir === 'prog' ? evToProg(m.cid, true) : evToNotice(m.cid, true);
+  snap();
+  if (m.dir === 'prog') { var o = p2Get(m.other); if (o) { var old = o.n.ref; o.n.ref = m.cid; evGc(old); } }
+  else { var c = evCal(m.cid), oc = evCal(m.other); if (c) c.inNotice = true; if (oc) { p2Walk(p2(), function (n) { if (n.k === 'e' && n.ref === oc.id) n.ref = m.cid; }); S.cals = S.cals.filter(function (x) { return x !== oc; }); } }
+  evSync(); save(); render(); toast('置き換えました');
+}, true);
+// 学ぶで作るイベントは、まだ告知に入っていない
+var _p2New53 = p2New;
+p2New = function (k, where) { _p2New53(k, where); if (k === 'e') { var f = p2Get(UI.psel), c = f && evCal(f.n.ref); if (c) { c.inNotice = false; save(); } } };
+// 告知の一覧：告知に入っているものだけ
+var _viewEvents53 = viewEvents;
+viewEvents = function () {
+  calsInit(); p2(); var all = S.cals; S.cals = all.filter(evInNotice);
+  try { var h = _viewEvents53(); } finally { S.cals = all; }
+  return h;
+};
+// 告知の行の右クリック
+window.addEventListener('contextmenu', function (e) {
+  if (S.view !== 'notices' || !e.target.closest) return; var r = e.target.closest('.evr[data-calid]'); if (!r) return;
+  e.preventDefault(); e.stopImmediatePropagation(); var c = evCal(r.dataset.calid); if (!c) return; var pg = evInProg(c.id), ok = can('notices');
+  openMenu(c.title, [['編集', function () { M = { m: 'cal', id: c.id }; renderModal(); }],
+    [c.state === 'pub' ? '部員に非公開にする' : '部員に公開する', function () { snap(); c.state = c.state === 'pub' ? 'draft' : 'pub'; evSync(); save(); render(); }, false, ok ? '' : '告知の権限が必要'],
+    'sep', [pg ? '学ぶから外す' : '学ぶにも追加', function () { if (pg) { snap(); evOutProg(c.id); evSync(); save(); render(); toast('学ぶから外しました'); } else evToProg(c.id); }, false, can('tracks') ? '' : '教材の権限が必要'],
+    'sep', ['削除', function () { snap(); evOutProg(c.id); S.cals = S.cals.filter(function (x) { return x !== c; }); save(); render(); toastUndo('「' + c.title + '」を削除しました'); }, true, ok ? '' : '告知の権限が必要']], e.clientX, e.clientY);
+}, true);
+// 学ぶのツリーのイベントの右クリックに「告知に追加／外す」
+var _p2Menu53 = p2Menu;
+p2Menu = function (id, x, y) {
+  _p2Menu53(id, x, y); var f = p2Get(id); if (!f || f.n.k !== 'e') return; var c = evCal(f.n.ref), m = document.getElementById('cm'); if (!c || !m) return;
+  var lab = evInNotice(c) ? '告知から外す' : '告知にも追加', fn = evInNotice(c) ? function () { evOutNotice(c.id); } : function () { evToNotice(c.id); };
+  UI.cmFns.push(fn); var del = m.querySelector('.cmdel'); var html = '<button role="menuitem" data-gcm="' + (UI.cmFns.length - 1) + '">' + lab + '</button><i class="cmsep"></i>';
+  if (del) del.insertAdjacentHTML('beforebegin', html); else m.insertAdjacentHTML('beforeend', html);
+};
+// 教材のイベントの詳細：告知に入っていなければ公開はできず、「告知にも追加」を出す
+var _p2Editor53 = p2Editor;
+p2Editor = function () {
+  var h = _p2Editor53(), f = p2Get(UI.psel); if (!f || f.n.k !== 'e') return h; var c = evCal(f.n.ref); if (!c) return h;
+  if (evInNotice(c)) return h.replace('<span class="p2same">告知のイベントと同じものです</span>', '<button class="p2golink" data-act="evOutNotice" data-id="' + c.id + '">告知から外す</button>');
+  return h.replace(/<label class="p2sw"><input type="checkbox" data-ce="state"[\s\S]*?<\/label>/, '<button class="btn sm" data-act="evToNotice" data-id="' + c.id + '">告知にも追加</button><small class="muted" style="font-size:12px">告知に入れると、そこで部員に公開できます</small>')
+    .replace(/<div class="p2reg">[\s\S]*?<\/div>$/, '');
 };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
