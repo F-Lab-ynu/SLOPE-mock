@@ -419,7 +419,7 @@ body{box-sizing:border-box;padding-top:env(safe-area-inset-top)}
 .cell:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
 .cell[disabled]{color:var(--muted);opacity:1;cursor:default}
 select.cell{appearance:none;-webkit-appearance:none;cursor:pointer}
-select.cell:not([disabled]):hover,select.cell:focus{appearance:auto;-webkit-appearance:auto}
+select.cell:not([disabled]):hover,select.cell:focus{padding-right:26px;background-repeat:no-repeat;background-position:right 8px center;background-size:12px 12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")}
 input[type=date].cell{font-size:12px;color:var(--sub)}
 input[type=date].cell.bad{color:var(--bad)}
 .ct{font-weight:400}
