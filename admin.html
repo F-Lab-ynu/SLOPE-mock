@@ -3938,7 +3938,7 @@ document.addEventListener('click', function (e) {
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
     var n = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル');
-    save(); render(); M = { m: 'edit', id: n.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); }
+    save(); render(); editNew(n);
     return;
   }
   if (a === 'toFolder') { var t = task(b.dataset.id); if (!t) return; t.folder = true; t.kids = t.kids || []; delete t.done; if (t.who) setLeads(t, [t.who]); M = null; save(); render(); toast('フォルダーに変えました'); return; }
@@ -4128,6 +4128,17 @@ document.addEventListener('click', function (e) {
   UI.fmNew = true; render(); UI.fmNew = false;
   var t = document.querySelector('.fhmt[data-act="ied"]'); if (t) t.click();
 }, true);
+// 新しく作ったフォルダー・ファイルは、ポップアップを出さずにその場で名前を書き換えられる状態にする
+function editNew(n) {
+  if (!n) return;
+  var q = '[data-act="ied"][data-f="t"][data-id="' + n.id + '"]', el = document.querySelector('.fcn' + q) || document.querySelector(q);
+  if (el) { el.scrollIntoView({ block: 'nearest' }); el.click(); return; }
+  if (document.querySelector('.gname[data-id="' + n.id + '"]') && typeof gStart === 'function') { gStart(n); var gi = document.activeElement; if (gi && gi.select) gi.select(); return; }
+  var c = document.querySelector('.cell[data-c="t"][data-id="' + n.id + '"]');
+  if (c) { c.scrollIntoView({ block: 'nearest' }); c.focus(); if (c.select) c.select(); return; }
+  var p = parentOf(n); if (p && S.fcur !== p.id && !editNew._go) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); S.fcur = p.id; UI.fopen = {}; save(); render(); editNew._go = true; try { return editNew(n); } finally { editNew._go = false; } }
+  M = { m: 'edit', id: n.id }; renderModal(); var w = document.getElementById('wT'); if (w) { w.focus(); w.select(); }
+}
 function iedSave(el) {
   var n = task(el.dataset.id); if (!n) return;
   var v = el.innerText.replace(/ /g, ' ');
@@ -4273,7 +4284,7 @@ document.addEventListener('click', function (e) {
     if (a === 'open') goFolder(n.id);
     else if (a === 'gantt') goFolder(n.id, 'gantt');
     else if (a === 'edit') { M = { m: 'edit', id: n.id }; renderModal(); }
-    else if (a === 'newF' || a === 'newT') { var k = a === 'newF' ? addFolder(n, '新しいフォルダー') : addUnder(n, '新しいファイル'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
+    else if (a === 'newF' || a === 'newT') { var k = a === 'newF' ? addFolder(n, '新しいフォルダー') : addUnder(n, '新しいファイル'); save(); render(); editNew(k); }
     else if (a === 'done') { n.done = !n.done; if (n.done) reportUp(n); save(); render(); }
     else if (a === 'toF') { n.folder = true; n.kids = n.kids || []; delete n.done; if (n.who) setLeads(n, [n.who]); save(); render(); toast('フォルダーに変えました'); }
     else if (a === 'evt') { if (isEvent(n)) n.kind = 'folder'; else { n.kind = 'event'; if (!n.announce) n.announce = 'before'; if (n.reg == null) n.reg = 0; } save(); render(); }
@@ -4864,7 +4875,7 @@ document.addEventListener('click', function (e) {
     else if (a === 'paste') pasteInto(n);
     return;
   }
-  if (a === 'newF' || a === 'newT') { snap(); var k = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } }
+  if (a === 'newF' || a === 'newT') { snap(); var k = a === 'newF' ? addFolder(f, '新しいフォルダー') : addUnder(f, '新しいファイル'); save(); render(); editNew(k); }
   else if (a === 'paste') pasteInto(f);
   else if (a === 'mode') { S.fmode = S.fmode === 'gantt' ? 'card' : 'gantt'; UI.sp = null; save(); render(); }
   else if (a === 'sort') { UI.sorts = UI.sorts || {}; UI.sorts[f ? f.id : '_'] = c.dataset.v; render(); }
@@ -5133,7 +5144,7 @@ document.addEventListener('contextmenu', function (e) {
   var tr = e.target.closest('.ftree'); if (!tr || e.target.closest('.ftn[data-id], input, textarea, .cm')) return;
   e.preventDefault(); e.stopImmediatePropagation();
   var f = curFolder(), it = [];
-  var mk = function (par) { snap(); var k = addFolder(par, '新しいフォルダー'); save(); render(); M = { m: 'edit', id: k.id }; renderModal(); var el = document.getElementById('wT'); if (el) { el.focus(); el.select(); } };
+  var mk = function (par) { snap(); var k = addFolder(par, '新しいフォルダー'); save(); render(); editNew(k); };
   it.push(['新しいフォルダー（一番上）', function () { mk(null); }, false, isAdmin() ? '' : '代表のみ']);
   if (f) it.push(['「' + ttl(f).slice(0, 12) + '」に新しいフォルダー', function () { mk(f); }, false, manages(f) ? '' : 'リーダーのみ']);
   if (f && canPasteInto(f)) it.push(['「' + ttl(clipNode()).slice(0, 12) + '」を貼り付け', function () { pasteInto(f); }]);
