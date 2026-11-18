@@ -1783,6 +1783,13 @@ body.mvin .mvline{display:none !important}
 .evdupc{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#FAFAFB}.evdupc small{font-size:11px;color:var(--muted)}.evdupc b{font-size:14px}
 .tpnote{padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line)}
 .tbtn.fw .avs{display:inline-flex}.tbtn.fw .avs .av+.av{margin-left:-6px}
+
+/* 部員の画面・ツリーを畳んだら、真ん中を広げる */
+.p2cols{grid-template-columns:minmax(0,1fr) 360px !important}
+.p2cols .p2ed{max-width:720px}
+.p2cols.nopv{grid-template-columns:minmax(0,1fr) !important}
+.p2cols.nopv .p2ed,.p2wk.notree .p2ed{max-width:none}
+@media (max-width:1380px){.p2cols{grid-template-columns:minmax(0,1fr) !important}}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
