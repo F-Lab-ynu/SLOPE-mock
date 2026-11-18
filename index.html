@@ -1214,7 +1214,7 @@ a.pgn{color:inherit}
 <span style="font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ e.title }}</span>
 <span style="font-size: 12px; color: #A3A19B; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ e.sub }}</span>
 </span>
-<button onClick="{{ e.toggle }}" style="flex: none; height: 30px; padding: 0 10px; border-radius: 6px; border: 1px solid {{ e.joinBd }}; background: transparent; color: {{ e.joinFg }}; font-size: 12px; font-weight: 700; font-family: inherit">{{ e.joinLabel }}</button>
+<button onClick="{{ e.toggle }}" style="display: {{ e.jd }}; align-items: center; flex: none; height: 30px; padding: 0 10px; border-radius: 6px; border: 1px solid {{ e.joinBd }}; background: transparent; color: {{ e.joinFg }}; font-size: 12px; font-weight: 700; font-family: inherit">{{ e.joinLabel }}</button>
 </div>
 </sc-for>
 <sc-if value="{{ noClubEvents }}" hint-placeholder-val="{{ false }}">
@@ -1669,8 +1669,15 @@ class Component extends DCLogic {
       { id: 'e5', day: 25, type: '外部', title: 'スタートアップ インターン説明会', time: '19:00–20:00', place: 'オンライン' },
       { id: 'e6', day: 28, type: '部内', title: 'MIRA 本選', time: '13:00–18:00', place: '[会場]' }
     ];
-    const clubEvents = events.filter((e) => e.type === '部内' && e.day >= 13).map((e) => { const on = !!s.joined[e.id];
-      return { mon: 'NOV', d: String(e.day), title: e.title, sub: e.time + ' · ' + e.place, joinLabel: on ? '✓ 登録済み' : '参加登録', joinBd: on ? 'transparent' : '#474744', joinFg: on ? '#7D7B76' : '#D2CFC8',
+    let admC = null; try { admC = JSON.parse(localStorage.getItem('slope-admin-v10') || 'null'); } catch (er) {}
+    const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const clubSrc = admC && admC.cals ? (function () { // 運営画面（モック）の告知で公開したイベント＋教材に入っているイベント
+      const inP = {}; (function w(a) { (a || []).forEach((n) => { if (n.out) return; if (n.k === 'e' && n.ref) inP[n.ref] = 1; if (n.items) w(n.items); }); })(admC.program && admC.program.v2);
+      return admC.cals.filter((c) => /^\d{4}-\d{2}-\d{2}$/.test(c.date || '') && (c.to || c.date) >= '2026-11-18' && (c.state === 'pub' || inP[c.id])).sort((a, b) => a.date < b.date ? -1 : 1)
+        .map((c) => ({ id: c.id, mon: MON[+c.date.slice(5, 7) - 1], day: +c.date.slice(8), title: c.title, sub: [c.to && c.to !== c.date ? '〜' + c.to.slice(5).replace('-', '.') : '', c.time, c.place].filter(Boolean).join(' · '), pub: c.state === 'pub' && c.inNotice !== false }));
+    })() : events.filter((e) => e.type === '部内' && e.day >= 13).map((e) => ({ id: e.id, mon: 'NOV', day: e.day, title: e.title, sub: e.time + ' · ' + e.place, pub: true }));
+    const clubEvents = clubSrc.map((e) => { const on = !!s.joined[e.id];
+      return { mon: e.mon, d: String(e.day), title: e.title, sub: e.sub, jd: e.pub ? 'inline-flex' : 'none', joinLabel: on ? '✓ 登録済み' : '参加登録', joinBd: on ? 'transparent' : '#474744', joinFg: on ? '#7D7B76' : '#D2CFC8',
         toggle: () => { const j = Object.assign({}, this.state.joined); j[e.id] = !on; this.setState({ joined: j }); } }; });
     const days = [];
     for (let i = 0; i < 35; i++) {
