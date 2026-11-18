@@ -1823,6 +1823,9 @@ button.mr{cursor:pointer}button.mr:hover{background:var(--hover)}
 @media (max-width:760px){.mr{grid-template-columns:minmax(0,1fr) 84px 32px}.nr2 .nx{opacity:1}}
 .mr.soon{grid-template-columns:minmax(0,1fr) 140px 32px}
 .mwho{display:flex;align-items:center;gap:6px;min-width:0;font-size:12px;color:var(--sub)}.mwho>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mwho .av{width:20px;height:20px;font-size:10px}
+.gr .gplus{opacity:0;transition:opacity .12s}
+.gr:hover .gplus,.gr .gplus:focus-visible{opacity:1}
+@media (hover:none){.gr .gplus{opacity:1}}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -2360,7 +2363,7 @@ function ganttOf(rows) {
   var GZ = 0;
   rows.forEach(function (r, idx) {
     if (!r.ghost && r.d === 0) GZ++;
-    if (r.ghost) { body += gghost(r.parent.id, r.d, r.d === 1 ? '＋ 業務を追加' : '＋ 追加', r.d); return; }
+    if (r.ghost) return; // 追加の行はフォルダーごとには出さない（行にカーソルを合わせると＋、右クリックでも足せる）
     var n = r.n, parent = isFolder(n), w = member(n.who), dn = isDone(n);
     var cls = parent ? ' sum' + (r.d === 0 ? ' root' : '') + (dn ? ' done' : '') : (n.done ? ' done' : (!n.who ? ' none' : ''));
     var bar = '<div class="bar' + cls + (late(n) ? ' late' : '') + (editSelf(n) ? '' : ' lock') + '" data-bar="' + n.id + '" style="left:' + x(n.start) + 'px;width:' + Math.max(PX, x(n.end) - x(n.start) + PX) + 'px" title="' + esc(ttl(n) + '  ' + fmtDate(n.start) + '–' + fmtDate(n.end) + (w ? '  ' + w.name : '')) + '">' +
@@ -2370,10 +2373,12 @@ function ganttOf(rows) {
         (r.d === 0 && isFolder(n) ? '<span class="wck ckph"></span>' : !parent ? '<input type="checkbox" class="check wck" data-c="done" data-id="' + n.id + '"' + (n.done ? ' checked' : '') + (editSelf(n) || n.who === S.me ? '' : ' disabled') + ' aria-label="完了">' : '<span class="wck ckph"></span>') +
         '<i class="lvb"></i><input class="cell ct" data-c="t" data-id="' + n.id + '" value="' + esc(ttl(n)) + '" title="' + esc(ttl(n)) + '"' + ed + ' aria-label="業務名" autocomplete="off">' + (late(n) ? '<span class="lt" title="期限切れ"></span>' : '') +
         (isFolder(n) ? teamBtn(n, canAssign(n) ? '' : ' disabled', true) : '<select class="cell gsel" data-c="w" data-id="' + n.id + '"' + (canAssign(n) ? '' : ' disabled') + ' aria-label="担当">' + whoOpts(n) + '</select>') +
+        (isFolder(n) && manages(n) ? '<button class="ib ga gplus" data-act="gaddIn" data-id="' + n.id + '" title="中に追加" aria-label="中に追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '') +
         '<button class="ib ga" data-act="edit" data-id="' + n.id + '" aria-label="詳細">' + ic('more') + '</button></div>' +
       '<div class="gt">' + bar + '</div></div>';
   });
-  var addRow = false ? (rows.length ? '<div class="gr gsp" style="' + cols + '"><div class="gl"></div><div class="gt"></div></div>' : '') + gghost('', 0, '＋ イベントを追加', 0) : '';
+  var cf0 = S.view === 'projects' && typeof curFolder === 'function' ? curFolder() : null, addRow = cf0 && manages(cf0) ? gghost(cf0.id, 0, '＋ 追加', 0) : '';
+  var _unused = false ? (rows.length ? '<div class="gr gsp" style="' + cols + '"><div class="gl"></div><div class="gt"></div></div>' : '') + gghost('', 0, '＋ イベントを追加', 0) : '';
   var n = Math.max(3, Math.ceil((window.innerHeight - 52 - 41 - 49 - 56 - (rows.length + 1) * 40) / 40) + 1), fill = '';
   for (var j = 0; j < n; j++) fill += '<div class="gr gfill" style="' + cols + '"><div class="gl"></div><div class="gt"></div></div>';
   var LWH = '<i class="lwh" title="ドラッグで幅を変更（ダブルクリックで元に戻す）"></i>';
@@ -4139,6 +4144,12 @@ function editNew(n) {
   var p = parentOf(n); if (p && S.fcur !== p.id && !editNew._go) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); S.fcur = p.id; UI.fopen = {}; save(); render(); editNew._go = true; try { return editNew(n); } finally { editNew._go = false; } }
   M = { m: 'edit', id: n.id }; renderModal(); var w = document.getElementById('wT'); if (w) { w.focus(); w.select(); }
 }
+window.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-act="gaddIn"]'); if (!b) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  var f = task(b.dataset.id); if (!f || !manages(f)) return;
+  snap(); var k = addUnder(f, '新しいファイル'); expandTo(k.id); save(); render(); editNew(k);
+}, true);
 function iedSave(el) {
   var n = task(el.dataset.id); if (!n) return;
   var v = el.innerText.replace(/ /g, ' ');
@@ -4244,7 +4255,8 @@ function decorateGantt12() {
     var who = '<button class="gwho" data-act="gwho" data-id="' + n.id + '">' + (tm.length ? (isFolder(n) ? avStack(tm, leadsOf(n)) : (fileWho(n).length > 1 ? avStack(fileWho(n)) + '<span>' + esc(fwNames(n)) + '</span>' : av(n.who) + '<span>' + esc(member(n.who).name) + '</span>')) : '<span class="dim">未定</span>') + '</button>';
     var ed = (editSelf(n) || n.who === S.me) ? '<button class="gedit" data-act="edit" data-id="' + n.id + '" title="編集" aria-label="編集"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></button>' : '<span class="gedit ph"></span>';
     var lwh = gl.querySelector('.lwh');
-    gl.insertAdjacentHTML('beforeend', who + ed);
+    var pl = isFolder(n) && manages(n) ? '<button class="gedit gplus" data-act="gaddIn" data-id="' + n.id + '" title="中に追加" aria-label="中に追加"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' : '<span class="gedit ph"></span>';
+    gl.insertAdjacentHTML('beforeend', who + pl + ed);
     if (lwh) gl.appendChild(lwh);
   });
 }
