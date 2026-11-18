@@ -2042,7 +2042,8 @@ class Component extends DCLogic {
         const stOf = {}; PT.forEach((t) => Object.keys(t.units).forEach((c) => { stOf[c] = t.units[c].st; }));
         PT.length = 0;
         adm.tracks.forEach((t) => { const U = {}; (t.list || []).forEach((u) => { if (u && u.title) U[u.code] = { title: u.title, meta: '', st: stOf[u.code] === 'done' ? 'done' : 'open' }; }); PT.push({ id: t.id, name: t.name, kind: 'choose', mine: true, units: U, list: t.list || [] }); });
-        v2 = adm.program.v2;
+        const cb = {}; (adm.cals || []).forEach((c) => { cb[c.id] = c; });
+        v2 = JSON.parse(JSON.stringify(adm.program.v2)); (function w(a) { a.forEach((n) => { if (n.k === 'e') { const c = n.ref && cb[n.ref]; if (c) { n.name = c.title; n.from = c.date; n.to = c.to || ''; n.todo = c.memo || ''; n.link = c.link || ''; n.pub = c.state === 'pub'; } n.jid = n.ref || ('pe:' + n.id); } if (n.items) w(n.items); }); })(v2);
       }
       window.__PROG = { joined: (id) => !!this.state.joined[id], join: (id) => { const j = Object.assign({}, this.state.joined); j[id] = !j[id]; this.setState({ joined: j }); }, jkey: JSON.stringify(s.joined), tracks: PT, program: prog, v2: v2, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock' + (v2 ? JSON.stringify(v2).length : ''), openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
       const ct = PT.find((t) => t.id === cur) || PT[0] || { units: {}, name: '', kind: 'choose' }, KN = { all: '全員', choose: '選択', opt: '任意' };
@@ -2292,7 +2293,7 @@ document.addEventListener('click',function(e){
   function leafRow(P, n, cur) {
     var isCur = n === cur, st = n._done ? 'done' : (n._lk ? 'locked' : 'open'), k = '';
     var dot = '<span class="pgd ' + st + '">' + (st === 'done' ? DOT.done : (st === 'locked' ? LOCK : '')) + '</span>';
-    if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '', jid = 'pe:' + n.id, on = P.joined ? P.joined(jid) : false;
+    if (n.k === 'e') { var when = n.from ? md(n.from) + (n.to && n.to !== n.from ? '–' + md(n.to) : '') : '', jid = n.jid || n.ref || ('pe:' + n.id), on = P.joined ? P.joined(jid) : false;
       return '<div class="pgu ev' + (isCur ? ' cur' : '') + '" data-st="' + st + '"><span class="pgt">' + (when ? '<span class="pgc en">' + esc(when) + '</span>' : '') +
         (n.link ? '<a class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '" href="' + esc(n.link) + '" target="_blank" rel="noopener">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</a>' : '<span class="pgn' + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(n.name) + '</span>') +
         (n.todo && !n._done ? '<span class="pgm">' + esc(n.todo) + '</span>' : '') + '</span>' +
