@@ -1195,8 +1195,8 @@ a.pgn{color:inherit}
 </div>
 <div style="font-weight: 700; font-size: 17px">{{ e.title }}</div>
 <div style="display: flex; justify-content: space-between; align-items: center">
-<span style="font-size: 13px; color: #BDBAB3"><span class="en">{{ e.time }}</span> · {{ e.place }}</span>
-<button onClick="{{ e.toggle }}" style="height: 40px; padding: 0 14px; border-radius: 6px; border: 1px solid {{ e.joinBd }}; background: {{ e.joinBg }}; color: {{ e.joinFg }}; font-weight: 700; font-size: 13px">{{ e.joinLabel }}</button>
+<span style="font-size: 13px; color: #BDBAB3">{{ e.meta }}</span>
+<button onClick="{{ e.toggle }}" style="display: {{ e.jd }}; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; border: 1px solid {{ e.joinBd }}; background: {{ e.joinBg }}; color: {{ e.joinFg }}; font-weight: 700; font-size: 13px">{{ e.joinLabel }}</button>
 </div>
 </div>
 </sc-for>
@@ -1701,7 +1701,7 @@ class Component extends DCLogic {
     const dayEvents = events.filter((e) => e.day === s.day).map((e) => {
       const on = !!s.joined[e.id];
       return Object.assign({}, e, {
-        color: typeColor[e.type],
+        color: typeColor[e.type], meta: [e.time, e.place].filter(Boolean).join(' · '), jd: 'inline-flex', // 時間・場所がないときに「·」だけ出ないように
         joinLabel: on ? '登録済み' : '参加登録',
         joinBg: on ? 'transparent' : A, joinFg: on ? A : INK, joinBd: A,
         toggle: () => { const j = Object.assign({}, this.state.joined); j[e.id] = !on; this.setState({ joined: j }); }
