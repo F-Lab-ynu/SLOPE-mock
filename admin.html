@@ -6498,7 +6498,7 @@ viewDash = function () {
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-act="ndel"],[data-act="fgo2"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
   if (b.dataset.act === 'fgo2') { S.view = 'projects'; S.fcur = 'mine'; save(); render(); return; }
-  var id = b.dataset.id; if (id === 'all' && !confirmOnce('nclr')) { toast('もう一度押すと、通知をすべて削除します'); return; }
+  var id = b.dataset.id;
   window.__delNotif(id); save(); render(); toast(id === 'all' ? '通知をすべて削除しました' : '通知を削除しました');
 }, true);
 // ---------------- events ----------------
