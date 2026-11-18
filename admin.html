@@ -1781,6 +1781,8 @@ body.mvin .mvline{display:none !important}
 .evtag{font-style:normal;font-size:10px;font-weight:700;margin-left:8px;padding:1px 6px;border-radius:4px;background:#FFF4E5;color:#B45309;vertical-align:1px}
 .p2same{margin-left:auto;font-size:11px;color:var(--muted)}
 .evdupc{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#FAFAFB}.evdupc small{font-size:11px;color:var(--muted)}.evdupc b{font-size:14px}
+.tpnote{padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line)}
+.tbtn.fw .avs{display:inline-flex}.tbtn.fw .avs .av+.av{margin-left:-6px}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -2297,7 +2299,9 @@ function ganttOf(rows) {
   var GX = function (i) { return Math.round(i * PX); };
   for (var i = 0; i < days; i++) {
     var d = new Date(lo + i * DAY), wd = d.getUTCDay(), first = d.getUTCDate() === 1;
-    if (first || i === 0) { hd += '<div class="gm" style="left:' + GX(i) + 'px">' + (d.getUTCMonth() === 0 || i === 0 ? d.getUTCFullYear() + '年' : '') + (d.getUTCMonth() + 1) + '月</div>'; if (i) ln += '<div class="gmo" style="left:' + GX(i) + 'px"></div>'; }
+    if (i === 0) { var dim0 = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate(); var skip0 = (dim0 - d.getUTCDate() + 1) * PX < 96; } // 月末近くから始まると次の月の見出しと重なるので、最初の見出しは省く
+    if ((first || i === 0) && !(i === 0 && skip0)) { hd += '<div class="gm" style="left:' + GX(i) + 'px">' + (d.getUTCMonth() === 0 || i === 0 || (skip0 && hd.indexOf('class="gm"') < 0) ? d.getUTCFullYear() + '年' : '') + (d.getUTCMonth() + 1) + '月</div>'; }
+    if (first && i) ln += '<div class="gmo" style="left:' + GX(i) + 'px"></div>';
     if (DAYS) {
       hd += '<div class="gd day' + (wd === 0 ? ' sun' : wd === 6 ? ' sat' : '') + '" style="left:' + GX(i) + 'px;width:' + Math.round(PX) + 'px">' + d.getUTCDate() + '<small>' + WK[wd] + '</small></div>';
       if (wd === 0 || wd === 6) ln += '<div class="gwe" style="left:' + GX(i) + 'px;width:' + (GX(i + 1) - GX(i)) + 'px"></div>';
@@ -3943,7 +3947,7 @@ function fcard(n) {
     '<div class="fct">' + FILE + '<button class="tck" data-act="tdone" data-id="' + n.id + '" aria-pressed="' + !!n.done + '"' + (can ? '' : ' disabled') + ' aria-label="完了"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12l4 4 8-8"/></svg></button><span class="sp"></span></div>' +
     '<b class="fcn">' + esc(ttl(n)) + '</b>' +
     '<div class="fcm num' + (lt ? ' bad' : '') + '">' + shortDate(n.end) + (lt ? ' 期限切れ' : '') + '</div>' +
-    '<div class="fcf">' + (w ? avStack([n.who]) + '<span class="fcw">' + esc(w.name) + '</span>' : '<span class="dim">担当未定</span>') + '</div>' +
+    '<div class="fcf">' + (w ? avStack(fileWho(n)) + '<span class="fcw">' + esc(fwNames(n)) + '</span>' : '<span class="dim">担当未定</span>') + '</div>' +
   '</div>';
 }
 function fhead2() {
@@ -4164,7 +4168,7 @@ function popAt(el, html) {
 }
 function closePop() { var p = document.getElementById('gpop'); if (p) p.remove(); }
 function whoPop(n) {
-  var tm = isFolder(n) ? teamOf(n) : (n.who ? [n.who] : []), ls = isFolder(n) ? leadsOf(n) : [];
+  var tm = isFolder(n) ? teamOf(n) : fileWho(n), ls = isFolder(n) ? leadsOf(n) : [];
   return '<div class="gph">' + esc(ttl(n)) + '</div>' + (tm.length ? tm.map(function (id) { var m = member(id); return '<div class="gpi">' + av(id) + '<span>' + esc(m ? m.name : '') + '</span>' + (ls.indexOf(id) >= 0 ? CROWN : '') + '<small>' + esc(m ? (isOps(m) ? m.unit : (m.roles || []).join('・')) : '') + '</small></div>'; }).join('') : '<div class="gpi dim">担当未定</div>');
 }
 function taskPop(n) {
@@ -4182,8 +4186,8 @@ function decorateGantt12() {
     var ct = gl.querySelector('input.ct[data-c="t"]');
     if (ct) ct.outerHTML = '<button class="gname" data-act="gname" data-id="' + n.id + '" title="' + esc(ttl(n)) + '">' + esc(ttl(n)) + '</button>';
     gl.querySelectorAll('.tbtn, select.gsel, .fin, .ga').forEach(function (x) { x.remove(); });
-    var tm = isFolder(n) ? teamOf(n) : (n.who ? [n.who] : []);
-    var who = '<button class="gwho" data-act="gwho" data-id="' + n.id + '">' + (tm.length ? (isFolder(n) ? avStack(tm, leadsOf(n)) : av(n.who) + '<span>' + esc(member(n.who).name) + '</span>') : '<span class="dim">未定</span>') + '</button>';
+    var tm = isFolder(n) ? teamOf(n) : fileWho(n);
+    var who = '<button class="gwho" data-act="gwho" data-id="' + n.id + '">' + (tm.length ? (isFolder(n) ? avStack(tm, leadsOf(n)) : (fileWho(n).length > 1 ? avStack(fileWho(n)) + '<span>' + esc(fwNames(n)) + '</span>' : av(n.who) + '<span>' + esc(member(n.who).name) + '</span>')) : '<span class="dim">未定</span>') + '</button>';
     var ed = (editSelf(n) || n.who === S.me) ? '<button class="gedit" data-act="edit" data-id="' + n.id + '" title="編集" aria-label="編集"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></button>' : '<span class="gedit ph"></span>';
     var lwh = gl.querySelector('.lwh');
     gl.insertAdjacentHTML('beforeend', who + ed);
@@ -6359,6 +6363,58 @@ p2Editor = function () {
   return h.replace(/<label class="p2sw"><input type="checkbox" data-ce="state"[\s\S]*?<\/label>/, '<button class="btn sm" data-act="evToNotice" data-id="' + c.id + '">告知にも追加</button><small class="muted" style="font-size:12px">告知に入れると、そこで部員に公開できます</small>')
     .replace(/<div class="p2reg">[\s\S]*?<\/div>$/, '');
 };
+
+// ---------- ux54 ファイルも担当を複数に。下の段の担当は、上のフォルダのメンバーからだけ選べる ----------
+function pickable(n) { var p = parentOf(n), pt = p ? teamOf(p) : []; return (pt.length && !isAdmin()) ? pt : null; } // null＝制限なし
+function fwNames(n) { return fileWho(n).map(function (id) { var m = member(id); return m ? m.name : ''; }).join('・'); }
+function fileWho(n) { var t = (n.team || []).slice(); if (n.who && t.indexOf(n.who) < 0) t.unshift(n.who); return t; }
+function setFileWho(n, list) { n.team = list.slice(); n.who = list[0] || ''; delete n.leads; }
+var _whoOpts54 = whoOpts;
+whoOpts = function (n) { var pk = pickable(n); if (!pk) return _whoOpts54(n); return '<option value="">未定</option>' + S.members.filter(function (m) { return pk.indexOf(m.id) >= 0; }).map(function (m) { return '<option value="' + m.id + '"' + (n.who === m.id ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join(''); };
+var _teamBtn54 = teamBtn;
+teamBtn = function (n, dis, compact) {
+  if (isFolder(n)) return _teamBtn54(n, dis, compact);
+  var tm = fileWho(n), nm = function (id) { var m = member(id); return m ? m.name : ''; };
+  var inner = !tm.length ? '<span class="none">担当を選ぶ</span>' : compact ? '<span class="avs">' + tm.slice(0, 3).map(function (id) { return '<span class="av">' + esc(initials(nm(id))) + '</span>'; }).join('') + '</span>' + (tm.length > 3 ? '<span class="more num">+' + (tm.length - 3) + '</span>' : '')
+    : '<span class="avs">' + tm.slice(0, 2).map(function (id) { return av(id); }).join('') + '</span><span class="ld"><b>' + esc(tm.slice(0, 2).map(nm).join('・')) + '</b></span>' + (tm.length > 2 ? '<span class="more num">+' + (tm.length - 2) + '</span>' : '');
+  return '<button class="tbtn fw" data-act="teamPick" data-id="' + n.id + '"' + (dis || '') + ' aria-label="担当 ' + tm.length + '名" title="' + esc(tm.map(nm).join('\n') || '担当なし') + '">' + inner + '</button>';
+};
+var _openTeam54 = openTeam;
+openTeam = function (id, keep) {
+  _openTeam54(id, keep);
+  var n = task(id), tp = document.getElementById('tp'); if (!n || !tp) return;
+  var pk = pickable(n), p = parentOf(n);
+  if (pk) { // フォルダのメンバー以外は出さない
+    var keep = isFolder(n) ? teamOf(n) : fileWho(n); Array.prototype.forEach.call(tp.querySelectorAll('.tpi'), function (r) { var c = r.querySelector('[data-tm]'); if (c && pk.indexOf(c.dataset.tm) < 0 && keep.indexOf(c.dataset.tm) < 0) r.remove(); });
+    Array.prototype.forEach.call(tp.querySelectorAll('.tph'), function (h) { if (/その他/.test(h.textContent)) { var nx = h.nextElementSibling; if (!nx || !nx.classList.contains('tpi')) h.remove(); else h.innerHTML = '<span>フォルダのメンバー外（外すだけできます）</span>'; } });
+    tp.querySelector('.tpl').insertAdjacentHTML('beforeend', '<div class="tpnote">「' + esc(ttl(p)) + '」のメンバーから選べます。ほかの人を入れるときは、先にフォルダのメンバーに加えてください</div>');
+  }
+  if (!isFolder(n)) { // ファイル：リーダーはなし。今の担当にチェック
+    var cur = fileWho(n);
+    Array.prototype.forEach.call(tp.querySelectorAll('.lead'), function (b) { b.remove(); });
+    Array.prototype.forEach.call(tp.querySelectorAll('[data-tm]'), function (c) { c.checked = cur.indexOf(c.dataset.tm) >= 0; c.dataset.fileWho = '1'; });
+  }
+};
+window.addEventListener('change', function (e) {
+  var el = e.target; if (!el.dataset || !el.dataset.tm || !el.dataset.fileWho) return; e.stopImmediatePropagation();
+  var n = task(el.dataset.id), m = el.dataset.tm; if (!n) return; if (!canAssign(n)) { el.checked = !el.checked; toast('担当を変えられるのは、このフォルダのリーダーです'); return; }
+  snap(); var t = fileWho(n);
+  var pk = pickable(n); if (el.checked && pk && pk.indexOf(m) < 0) { el.checked = false; toast('フォルダのメンバーから選んでください'); return; }
+  if (el.checked) { if (t.indexOf(m) < 0) t.push(m); window.notify(m, '「' + ttl(n) + '」の担当になりました', ttl(rootOf(n))); toast(member(m).name + 'に通知しました'); }
+  else t = t.filter(function (x) { return x !== m; });
+  setFileWho(n, t); save(); render(); openTeam(n.id, true);
+}, true);
+// 一人しか選べない欄（担当のセレクト）は、複数選べるボタンに置きかえる
+function fwSwap() {
+  Array.prototype.forEach.call(document.querySelectorAll('select[data-c="w"][data-id], select.gsel2, .fwho'), function (el) {
+    var id = el.dataset.id || (el.querySelector && el.querySelector('[data-fw]') ? el.querySelector('[data-fw]').dataset.fw : null) || UI.gedit, n = id && task(id); if (!n || isFolder(n)) return;
+    var dis = (el.disabled || (el.tagName !== 'SELECT' && !canAssign(n))) ? ' disabled' : '';
+    var w = document.createElement('span'); w.innerHTML = teamBtn(n, dis, el.classList.contains('gsel')); el.replaceWith(w.firstChild);
+  });
+}
+var _render54 = render; render = function () { var r = _render54.apply(this, arguments); fwSwap(); return r; };
+// ガントの編集を確定しても、担当は上で直接変わっているので上書きしない
+var _gEnd54 = gEnd; gEnd = function (saveIt) { var n = task(UI.gedit), d = UI.gdraft; if (n && d && !isFolder(n)) d.who = n.who || ''; return _gEnd54(saveIt); };
 // ---------------- events ----------------
 document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'), a0 = b ? b.dataset.act : '';
