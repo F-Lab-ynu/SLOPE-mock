@@ -1826,6 +1826,8 @@ button.mr{cursor:pointer}button.mr:hover{background:var(--hover)}
 .gr .gplus{opacity:0;transition:opacity .12s}
 .gr:hover .gplus,.gr .gplus:focus-visible{opacity:1}
 @media (hover:none){.gr .gplus{opacity:1}}
+.gghost .gico{flex:none;width:13px}
+.gghost .gl .ct{padding-left:5px}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -2358,7 +2360,7 @@ function ganttOf(rows) {
   if (tx >= 0 && tx <= TW) { ln += '<div class="gnow" style="left:' + tx + 'px"></div>'; hd += '<div class="gnowl" style="left:' + tx + 'px">今日</div>'; }
   var cols = 'grid-template-columns:' + LW + 'px ' + TW + 'px';
   var wopts = function (sel) { return '<option value="">未定</option>' + S.members.map(function (m) { return '<option value="' + m.id + '"' + (sel === m.id ? ' selected' : '') + '>' + esc(m.name) + '</option>'; }).join(''); };
-  var gghost = function (pid, d, ph, L) { return '<div data-d="' + (L || 0) + '" class="gr gghost" style="' + cols + ';--lc:' + LVC[lv(L || 0)] + '"><div class="gl" style="padding-left:' + (narrow ? 2 + d * 8 : 8 + d * 14) + 'px"><span class="dh ph"></span><span class="cx"></span>' + (L ? '<span class="wck ckph"></span>' : '') + '<i class="lvb ghost"></i><input class="cell ct" data-c="new" data-parent="' + pid + '" placeholder="' + ph + '" aria-label="' + ph + '" autocomplete="off"></div><div class="gt"></div></div>'; };
+  var gghost = function (pid, d, ph, L) { return '<div data-d="' + (L || 0) + '" class="gr gghost" style="' + cols + ';--lc:' + LVC[lv(L || 0)] + '"><div class="gl" style="padding-left:' + (narrow ? 2 + d * 8 : 8 + d * 14) + 'px"><span class="dh ph"></span><span class="cx"></span><span class="wck ckph"></span><i class="lvb ghost"></i><span class="gico"></span><input class="cell ct" data-c="new" data-parent="' + pid + '" placeholder="' + ph + '" aria-label="' + ph + '" autocomplete="off"></div><div class="gt"></div></div>'; };
   var body = '';
   var GZ = 0;
   rows.forEach(function (r, idx) {
