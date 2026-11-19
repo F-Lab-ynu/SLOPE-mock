@@ -6569,7 +6569,7 @@ p2Editor = function () {
         (q.c.length < 4 ? '<button class="qzadd sm" data-qzc="' + qi + '">＋ 選択肢</button>' : '') + '</div>';
     }).join('');
     var block = '<div class="p2fld"><span>確認問題</span><div class="qzl">' + qh + '<button class="qzadd" data-qzadd="1">＋ 問題</button></div></div>';
-    return h.replace(/<label class="p2fld">マイルストーン<input[^>]*><\/label>/, block);
+    return h.replace(/<label class="p2fld">マイルストーン<input[^>]*><\/label>/, '') + block; // 教材（URL）のあとに問題
   }
   return h;
 };
