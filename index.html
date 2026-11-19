@@ -516,15 +516,10 @@ a.pgn{color:inherit}
 </sc-for>
 </div>
 
+<div id="uquiz"></div>
+<sc-if value="{{ uNoQuiz }}" hint-placeholder-val="{{ true }}">
 <button style="height: 48px; border: 1px solid #F3F1EC; border-radius: 8px; background: transparent; color: #F3F1EC; font-weight: 700; font-size: 16px">修了にする</button>
-
-<div class="card" style="padding: 16px; display: flex; align-items: center; gap: 14px">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#BDBAB3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg>
-<span style="flex: 1; display: flex; flex-direction: column">
-<span style="font-size: 13px; color: #A3A19B">達成するマイルストーン</span>
-<span style="font-weight: 500">ST-02 競争優位の源泉を説明できる</span>
-</span>
-</div>
+</sc-if>
 </div>
 </sc-if>
 
@@ -1245,7 +1240,8 @@ a.pgn{color:inherit}
 </span>
 </div>
 <div style="display: flex; gap: 6px; flex-wrap: wrap">
-<span class="chip en" style="border-color: #F3F1EC; color: #F3F1EC">Lv.02</span>
+<span class="chip en" style="border-color: #F3F1EC; color: #F3F1EC">{{ meLv }}</span>
+<sc-for list="{{ meMs }}" as="x"><span class="chip en">{{ x.label }}</span></sc-for>
 <span class="chip en">Strategist 受講中</span>
 <span class="chip">ビジネスモデル設計</span>
 <span class="chip">戦略</span>
@@ -2053,7 +2049,7 @@ class Component extends DCLogic {
         const cb = {}; (adm.cals || []).forEach((c) => { cb[c.id] = c; });
         v2 = JSON.parse(JSON.stringify(adm.program.v2)); (function w(a) { a.forEach((n) => { if (n.k === 'e') { const c = n.ref && cb[n.ref]; if (c) { n.name = c.title; n.from = c.date; n.to = c.to || ''; n.todo = c.memo || ''; n.link = c.link || ''; n.pub = c.state === 'pub'; } n.jid = n.ref || ('pe:' + n.id); } if (n.items) w(n.items); }); })(v2);
       }
-      window.__PROG = { joined: (id) => !!this.state.joined[id], join: (id) => { const j = Object.assign({}, this.state.joined); j[id] = !j[id]; this.setState({ joined: j }); }, jkey: JSON.stringify(s.joined), tracks: PT, program: prog, v2: v2, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock' + (v2 ? JSON.stringify(v2).length : ''), openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: () => this.setState({ sub: 'unit' }) };
+      window.__PROG = { joined: (id) => !!this.state.joined[id], join: (id) => { const j = Object.assign({}, this.state.joined); j[id] = !j[id]; this.setState({ joined: j }); }, jkey: JSON.stringify(s.joined), tracks: PT, program: prog, v2: v2, roles: ['Strategist'], today: '2026-11-18', cur: cur, key: 'mock' + (v2 ? JSON.stringify(v2).length : ''), openTrack: (id) => this.setState({ sub: 'course', course: id, cnode: null }), openUnit: (tid, code) => this.setState({ sub: 'unit', unitT: tid, unitC: code }) };
       const ct = PT.find((t) => t.id === cur) || PT[0] || { units: {}, name: '', kind: 'choose' }, KN = { all: '全員', choose: '選択', opt: '任意' };
       var crsKind = KN[ct.kind], crsName = ct.name, crsJp = ct.jp, crsTot = Object.keys(ct.units).length, crsDone = Object.values(ct.units).filter((u) => u.st === 'done').length, crsMine = ct.mine;
     }
@@ -2126,7 +2122,23 @@ class Component extends DCLogic {
     const painSorts = ['共感順', '新着'].map((n) => ({ name: n, fg: s.ps === n ? INK : '', pick: () => this.setState({ ps: n }) }));
     const dd = { b: ddOf('b', bFilters), ex: ddOf('ex', exFilters), ot: ddOf('ot', otFilters), lib: ddOf('lib', libFilters), u: ddOf('u', uFilters), ps: ddOf('ps', painSorts) };
 
+    // レベル（印を付けたイベントの出席）・マイルストーン（確認問題のある単元）・確認問題：運営画面（モック）のデータから
+    let admL = null; try { admL = JSON.parse(localStorage.getItem('slope-admin-v10') || 'null'); } catch (er) {}
+    const qd = s.qz || {}, ME = 'm1'; // モックの自分
+    const trOf = (id) => ((admL && admL.tracks) || []).find((t) => t.id === id);
+    const qzOf = (t, c) => ((((t || {}).units || {})[c] || {}).quiz || []).filter((q) => q && q.q && (q.c || []).filter(Boolean).length >= 2);
+    let meLv = 'Lv0'; const meMs = [];
+    if (admL && admL.program && admL.program.v2) {
+      const cals = {}; (admL.cals || []).forEach((c) => { cals[c.id] = c; }); let i = 0, L = 0;
+      (function w(a) { a.forEach((n) => { if (n.out) return; if (n.k === 'e' && n.lv) { i++; if (((cals[n.ref] || {}).att || []).indexOf(ME) >= 0) L = i; } if (n.items) w(n.items); }); })(admL.program.v2);
+      meLv = 'Lv' + L;
+      admL.program.v2.forEach((f) => { if (f.out || f.k !== 'f') return; let n = 0, d = 0; (function w(a) { a.forEach((x) => { if (x.k === 'u' && qzOf(trOf(x.t), x.c).length) { n++; if (qd[x.t + ':' + x.c]) d++; } if (x.items) w(x.items); }); })(f.items || []); if (n) meMs.push({ label: f.name + ' ' + d + '/' + n }); });
+    }
+    const uq = s.sub === 'unit' && s.unitT ? qzOf(trOf(s.unitT), s.unitC) : [];
+    window.__UQ = uq.length ? { key: s.unitT + ':' + s.unitC, qs: uq, done: !!qd[s.unitT + ':' + s.unitC], pass: () => { const q = Object.assign({}, this.state.qz || {}); q[s.unitT + ':' + s.unitC] = true; this.setState({ qz: q }); } } : null;
+
     return {
+      meLv: meLv, meMs: meMs, uNoQuiz: !uq.length,
       dd: dd,
       accent: A,
       show: {
@@ -2364,5 +2376,56 @@ document.addEventListener('click',function(e){
   };
 })();
 </script>
+<script>
+// 単元の確認問題（window.__UQ = { key, qs:[{q,c,a}], done, pass }）。全問正解でその単元のマイルストーン達成
+(function () {
+  var st = { k: null, pick: {}, shown: false };
+  function esc(x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function html(U) {
+    var all = U.qs.every(function (q, i) { return st.pick[i] != null; });
+    return '<div class="uq"><div class="uqh"><span class="lbl">確認問題</span>' + (U.done ? '<span class="uqok">達成</span>' : '') + '</div>' +
+      U.qs.map(function (q, i) {
+        return '<div class="uqq"><div class="uqt"><span class="en">Q' + (i + 1) + '</span>' + esc(q.q) + '</div>' + q.c.map(function (o, j) {
+          if (!o) return '';
+          var sel = U.done ? j === q.a : st.pick[i] === j, mk = U.done ? (j === q.a ? ' ok' : '') : (st.shown && sel ? (j === q.a ? ' ok' : ' ng') : '');
+          return '<button class="uqo' + (sel ? ' sel' : '') + mk + '" data-uqo="' + i + ':' + j + '"' + (U.done ? ' aria-disabled="true" tabindex="-1"' : '') + '>' + esc(o) + '</button>';
+        }).join('') + '</div>';
+      }).join('') +
+      (U.done ? '' : '<button class="uqgo" data-uqgo="1"' + (all ? '' : ' disabled') + '>答え合わせ</button>') + '</div>';
+  }
+  function paint() {
+    var el = document.getElementById('uquiz'), U = window.__UQ; if (!el) return;
+    if (!U) { if (el.innerHTML) el.innerHTML = ''; el.dataset.k = ''; return; }
+    if (st.k !== U.key) { st = { k: U.key, pick: {}, shown: false }; }
+    var k = U.key + '|' + U.done + '|' + JSON.stringify(st);
+    if (el.dataset.k === k) return; el.dataset.k = k; el.innerHTML = html(U);
+  }
+  new MutationObserver(function (ms) { if (ms.every(function (m) { return m.target.id === 'uquiz' || (m.target.closest && m.target.closest('#uquiz')); })) return; paint(); }).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('click', function (e) {
+    var o = e.target.closest && e.target.closest('[data-uqo]'), g = e.target.closest && e.target.closest('[data-uqgo]'), U = window.__UQ; if (!U || (!o && !g)) return;
+    e.preventDefault();
+    if (o) { var p = o.dataset.uqo.split(':'); st.pick[+p[0]] = +p[1]; st.shown = false; paint(); return; }
+    st.shown = true;
+    if (U.qs.every(function (q, i) { return st.pick[i] === q.a; })) { U.done = true; U.pass(); }
+    paint();
+  });
+})();
+</script>
+<style>
+.uq{display:flex;flex-direction:column;gap:18px}
+.uqh{display:flex;align-items:center;justify-content:space-between}
+.uqok{font-size:13px;font-weight:700;color:#F3F1EC}
+.uqq{display:flex;flex-direction:column;gap:8px}
+.uqt{display:flex;gap:10px;font-size:15px;font-weight:500;line-height:1.6;color:#F3F1EC}
+.uqt .en{flex:none;color:#7D7B76;font-weight:700}
+.uqo{text-align:left;min-height:46px;padding:11px 14px;border:1px solid #2C2C2A;border-radius:8px;background:#131313;color:#D2CFC8;font:inherit;font-size:14px;line-height:1.5;cursor:pointer}
+.uqo.sel{border-color:#F3F1EC;color:#F3F1EC}
+.uqo.ok{border-color:#F3F1EC;background:#F3F1EC;color:#070707;font-weight:700}
+.uqo.ng{border-color:#FF5C66;color:#FF5C66}
+.uqo[aria-disabled]{pointer-events:none}
+.uqo[aria-disabled]:not(.ok){opacity:.4}
+.uqgo{height:48px;border:0;border-radius:8px;background:#F3F1EC;color:#070707;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.uqgo:disabled{background:#2C2C2A;color:#7D7B76;cursor:default}
+</style>
 </body>
 </html>

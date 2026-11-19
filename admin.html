@@ -1828,6 +1828,23 @@ button.mr{cursor:pointer}button.mr:hover{background:var(--hover)}
 @media (hover:none){.gr .gplus{opacity:1}}
 .gghost .gico{flex:none;width:13px}
 .gghost .gl .ct{padding-left:5px}
+.attl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.attc{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 4px;border:1px solid var(--line);border-radius:14px;font-size:13px}
+.attc .av{width:20px;height:20px;font-size:10px}
+.attb,.qzadd{height:28px;padding:0 10px;border:1px dashed var(--line2);border-radius:6px;background:#fff;color:var(--sub);font:inherit;font-size:13px;cursor:pointer}
+.attb:hover,.qzadd:hover{color:var(--text);border-color:var(--sub)}
+.attp{width:320px;max-height:360px;display:flex;flex-direction:column;gap:6px}
+.attp .attls{overflow:auto;min-height:0}
+.qzl{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.qz{width:100%;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px}
+.qzh{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--sub)}
+.qzo{display:flex;align-items:center;gap:8px}
+.qzo input[type=radio]{flex:none;width:16px;height:16px;margin:0;accent-color:var(--text)}
+.qzo .input{flex:1;min-width:0;height:32px}
+.qzx{width:26px;height:26px}
+.qzsp{flex:none;width:26px}
+.qzadd.sm{height:24px;font-size:12px;margin-left:24px;align-self:flex-start}
+.mlv{margin-left:8px;font-size:11px;font-weight:600;color:var(--sub);border:1px solid var(--line2);border-radius:4px;padding:0 5px;vertical-align:1px}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -6321,7 +6338,7 @@ p2Editor = function () {
     '<div class="p2row"><label class="p2sw"><input type="checkbox" data-p2f="lock"' + (n.lock ? ' checked' : '') + '><span>鍵</span><small>上の項目が済むまで開かない</small></label>' +
     '<label class="p2sw"><input type="checkbox" data-ce="state"' + (c.state === 'pub' ? ' checked' : '') + (ro ? ' disabled' : '') + '><span>部員に公開</span><small>予定タブの部内イベントに出て、参加登録できる</small></label></div>' +
     '<div class="p2grid3">' + inp('date', '開始日', 'date') + inp('to', '終了日（1日なら空）', 'date') + inp('time', '時間', 'time') + '</div>' +
-    '<div class="p2grid">' + inp('place', '場所', '', '経営学部 2-101 / オンライン') + inp('link', 'リンク', '', 'https://') + '</div>' +
+    '<div class="p2grid">' + inp('place', '場所') + inp('link', 'リンク', '', 'https://') + '</div>' +
     '<label class="p2fld">部員がやること・説明<textarea class="input" data-ce="memo" rows="3"' + (ro ? ' disabled' : '') + '>' + esc(c.memo || '') + '</textarea></label>' +
     '<div class="p2reg">' + (c.state === 'pub' ? '<span class="p2pub on">公開中</span><span>参加登録</span><b class="num">' + ((S.joins || {})[c.id] || 0) + '</b><span>人</span>' : '<span class="p2pub">未公開</span>') + '<span class="p2same">告知のイベントと同じものです</span></div>';
 };
@@ -6526,6 +6543,80 @@ viewDash = function () {
   var h = _viewDash55(), i = h.indexOf('<section class="dsec">'); if (i < 0) return h; var j = h.indexOf('</section>', i) + 10;
   return (h.slice(0, i) + dashSelf() + h.slice(j)).replace(/<div class="kpi ghostk" aria-hidden="true"><\/div>/g, '');
 };
+// ---------- ux58 レベル：印を付けたイベントの並び順。出席で決まる。単元の確認問題 ----------
+function lvNodes() { var out = []; (function w(a) { (a || []).forEach(function (n) { if (n.out) return; if (n.k === 'e' && n.lv) out.push(n); if (n.items) w(n.items); }); })((S.program && S.program.v2) || []); return out; }
+function lvOf(uid) { var L = 0; lvNodes().forEach(function (n, i) { var c = evCal(n.ref); if (c && (c.att || []).indexOf(uid) >= 0) L = i + 1; }); return L; }
+var _p2Editor58 = p2Editor;
+p2Editor = function () {
+  var h = _p2Editor58(), f = p2Get(UI.psel); if (!f) return h;
+  var n = f.n;
+  if (n.k === 'e') {
+    var c = evCal(n.ref); if (!c) return h;
+    var ro = !can('notices'), i = lvNodes().indexOf(n), att = (c.att || []).filter(function (id) { return member(id); });
+    var sw = '<label class="p2sw"><input type="checkbox" data-p2lv="1"' + (n.lv ? ' checked' : '') + '><span>レベル</span><small>' + (n.lv ? '出席で Lv' + (i + 1) : '') + '</small></label>';
+    h = h.replace('</label></div><div class="p2grid3">', '</label>' + sw + '</div><div class="p2grid3">');
+    var chips = att.map(function (id) { return '<span class="attc">' + av(id) + esc(member(id).name) + '</span>'; }).join('');
+    h += '<div class="p2fld p2att"><span>出席 <b class="num">' + att.length + '</b></span><div class="attl">' + chips + (ro ? '' : '<button class="attb" data-attopen="' + c.id + '">' + (att.length ? '変更' : '付ける') + '</button>') + '</div></div>';
+    return h;
+  }
+  if (n.k === 'u') {
+    var t = p2Track(n.t), u = p2Unit(n); if (!t || !u) return h;
+    var qz = unitData(t, u.code).quiz || [];
+    var qh = qz.map(function (q, qi) {
+      return '<div class="qz"><div class="qzh"><span class="num">Q' + (qi + 1) + '</span><button class="ib qzx" data-qzdel="' + qi + '" aria-label="問題を削除" title="削除">' + ic('x') + '</button></div>' +
+        '<textarea class="input" rows="2" data-qz="' + qi + '" data-qk="q" placeholder="問題" aria-label="問題">' + esc(q.q || '') + '</textarea>' +
+        q.c.map(function (o, j) { return '<label class="qzo"><input type="radio" name="qa' + qi + '" data-qz="' + qi + '" data-qk="a" value="' + j + '"' + (q.a === j ? ' checked' : '') + ' aria-label="正解"><input class="input" data-qz="' + qi + '" data-qk="c" data-qj="' + j + '" value="' + esc(o) + '" placeholder="選択肢" aria-label="選択肢 ' + (j + 1) + '" autocomplete="off">' + (q.c.length > 2 ? '<button class="ib qzx" data-qzcdel="' + qi + ':' + j + '" aria-label="選択肢を削除">' + ic('x') + '</button>' : '<span class="qzsp"></span>') + '</label>'; }).join('') +
+        (q.c.length < 4 ? '<button class="qzadd sm" data-qzc="' + qi + '">＋ 選択肢</button>' : '') + '</div>';
+    }).join('');
+    var block = '<div class="p2fld"><span>確認問題</span><div class="qzl">' + qh + '<button class="qzadd" data-qzadd="1">＋ 問題</button></div></div>';
+    return h.replace(/<label class="p2fld">マイルストーン<input[^>]*><\/label>/, block);
+  }
+  return h;
+};
+// 確認問題の編集
+function qzT() { var f = p2Get(UI.psel); if (!f || f.n.k !== 'u') return null; var t = p2Track(f.n.t), u = p2Unit(f.n); if (!t || !u) return null; var d = unitData(t, u.code); if (!d.quiz) d.quiz = []; return { t: t, d: d }; }
+function qzRe(sel) { save(); render(); if (sel) { var el = document.querySelector(sel); if (el) el.focus(); } }
+document.addEventListener('input', function (e) {
+  var el = e.target; if (!el.dataset || el.dataset.qz == null || el.dataset.qk === 'a') return; var x = qzT(); if (!x) return; var q = x.d.quiz[+el.dataset.qz]; if (!q) return;
+  if (el.dataset.qk === 'q') q.q = el.value; else q.c[+el.dataset.qj] = el.value; touch(x.t); save();
+}, true);
+document.addEventListener('change', function (e) {
+  var el = e.target; if (!el.dataset || el.dataset.qk !== 'a') return; var x = qzT(); if (!x) return; var q = x.d.quiz[+el.dataset.qz]; if (!q) return; q.a = +el.value; touch(x.t); save();
+}, true);
+window.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-qzadd],[data-qzdel],[data-qzc],[data-qzcdel],[data-attopen],[data-p2lv]'); if (!b) return;
+  if (b.dataset.p2lv) { var f = p2Get(UI.psel); if (!f) return; setTimeout(function () { snap(); f.n.lv = b.querySelector('input') ? b.querySelector('input').checked : b.checked; p2Save(); }, 0); return; }
+  if (b.dataset.attopen) { e.preventDefault(); e.stopImmediatePropagation(); attOpen(b.dataset.attopen, b); return; }
+  e.preventDefault(); e.stopImmediatePropagation(); var x = qzT(); if (!x) return; snap();
+  if (b.dataset.qzadd) { x.d.quiz.push({ q: '', c: ['', ''], a: 0 }); touch(x.t); qzRe('[data-qz="' + (x.d.quiz.length - 1) + '"][data-qk="q"]'); }
+  else if (b.dataset.qzdel != null) { x.d.quiz.splice(+b.dataset.qzdel, 1); touch(x.t); qzRe(); }
+  else if (b.dataset.qzc != null) { var q = x.d.quiz[+b.dataset.qzc]; q.c.push(''); touch(x.t); qzRe('[data-qz="' + b.dataset.qzc + '"][data-qj="' + (q.c.length - 1) + '"]'); }
+  else { var p = b.dataset.qzcdel.split(':'), q2 = x.d.quiz[+p[0]], j = +p[1]; q2.c.splice(j, 1); if (q2.a === j) q2.a = 0; else if (q2.a > j) q2.a--; touch(x.t); qzRe(); }
+}, true);
+// 出席を付ける（参加登録した人が上）
+function attOpen(cid, btn) {
+  var c = evCal(cid); if (!c) return; if (!c.att) c.att = [];
+  var jn = (S.joinIds || {})[cid] || [], q = '';
+  var pop = document.getElementById('attp'); if (!pop) { pop = document.createElement('div'); pop.id = 'attp'; pop.className = 'tp attp'; document.body.appendChild(pop); }
+  var draw = function () {
+    var ms = S.members.filter(function (m) { return !q || (m.name + (m.grade || '')).indexOf(q) >= 0; }).sort(function (a, b) { return (jn.indexOf(b.id) >= 0) - (jn.indexOf(a.id) >= 0); });
+    pop.querySelector('.attls').innerHTML = ms.map(function (m) { var on = c.att.indexOf(m.id) >= 0; return '<label class="tpi"><input type="checkbox" class="check" data-attm="' + m.id + '"' + (on ? ' checked' : '') + '>' + av(m.id) + '<span class="tpn">' + esc(m.name) + '</span>' + (jn.indexOf(m.id) >= 0 ? '<small class="muted">登録</small>' : '') + '</label>'; }).join('') || '<div class="muted" style="padding:8px">いません</div>';
+  };
+  pop.innerHTML = '<input class="input" id="attq" placeholder="名前で絞り込み" autocomplete="off"><div class="attls"></div>';
+  draw();
+  var r = btn.getBoundingClientRect(); pop.style.left = Math.max(8, Math.min(innerWidth - 328, r.left)) + 'px'; pop.style.top = Math.min(innerHeight - 380, r.bottom + 6) + 'px'; pop.hidden = false;
+  pop.querySelector('#attq').addEventListener('input', function (e) { q = e.target.value.trim(); draw(); });
+  pop.onchange = function (e) { var id = e.target.dataset && e.target.dataset.attm; if (!id) return; snap(); if (e.target.checked) { if (c.att.indexOf(id) < 0) c.att.push(id); } else c.att = c.att.filter(function (x) { return x !== id; }); save(); };
+  pop.querySelector('#attq').focus();
+  setTimeout(function () {
+    var close = function (ev) { if (ev.type === 'keydown' && ev.key !== 'Escape') return; if (ev.type === 'mousedown' && pop.contains(ev.target)) return; pop.remove(); document.removeEventListener('mousedown', close, true); document.removeEventListener('keydown', close, true); var ed = document.querySelector('.p2ed'); if (ed) ed.innerHTML = p2Editor(); else render(); }; // 一覧はそのまま（押した行がそのまま選べる）
+    document.addEventListener('mousedown', close, true); document.addEventListener('keydown', close, true);
+  }, 0);
+}
+// メンバー一覧にレベル
+var _render58 = render; render = function () { var r = _render58.apply(this, arguments);
+  if (S.view === 'perms' && lvNodes().length) Array.prototype.forEach.call(document.querySelectorAll('.mname[data-id] .cell2 > span:first-child'), function (sp) { var id = sp.closest('.mname').dataset.id; if (!sp.querySelector('.mlv')) sp.insertAdjacentHTML('beforeend', '<span class="mlv num">Lv' + lvOf(id) + '</span>'); });
+  return r; };
 // ---------- ux57 ダッシュボードはタブで切り替える（自分／進行中／統計） ----------
 var _viewDash57 = viewDash;
 viewDash = function () {
