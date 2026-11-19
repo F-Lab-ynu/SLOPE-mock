@@ -6617,6 +6617,21 @@ function attOpen(cid, btn) {
 var _render58 = render; render = function () { var r = _render58.apply(this, arguments);
   if (S.view === 'perms' && lvNodes().length) Array.prototype.forEach.call(document.querySelectorAll('.mname[data-id] .cell2 > span:first-child'), function (sp) { var id = sp.closest('.mname').dataset.id; if (!sp.querySelector('.mlv')) sp.insertAdjacentHTML('beforeend', '<span class="mlv num">Lv' + lvOf(id) + '</span>'); });
   return r; };
+// ---------- ux59 教材のURLから題名を自動で入れる（題名が空のときだけ） ----------
+var TITLE_TRIED = {};
+function autoTitle(t, m) {
+  if (!m || m.memo || TITLE_TRIED[m.url]) return; TITLE_TRIED[m.url] = 1;
+  fetch('https://api.microlink.io/?url=' + encodeURIComponent(m.url)).then(function (r) { return r.json(); }).then(function (j) {
+    var ti = j && j.data && j.data.title; if (!ti || m.memo) return; m.memo = String(ti).replace(/\s+/g, ' ').trim().slice(0, 120); touch(t); save();
+    var inp = document.activeElement, keep = inp && inp.id; render(); if (keep) { var el = document.getElementById(keep); if (el) el.focus(); }
+  }).catch(function () {});
+}
+var _p2Editor59 = p2Editor;
+p2Editor = function () {
+  var h = _p2Editor59(), f = p2Get(UI.psel);
+  if (f && f.n.k === 'u') { var t = p2Track(f.n.t), u = p2Unit(f.n); if (t && u) setTimeout(function () { (unitData(t, u.code).materials || []).forEach(function (m) { autoTitle(t, m); }); }, 0); }
+  return h;
+};
 // ---------- ux57 ダッシュボードはタブで切り替える（自分／進行中／統計） ----------
 var _viewDash57 = viewDash;
 viewDash = function () {

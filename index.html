@@ -509,7 +509,7 @@ a.pgn{color:inherit}
 <div class="card" style="padding: 14px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px">
 <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
 <span style="font-weight: 500">{{ m.title }}</span>
-<span style="font-size: 13px; color: #A3A19B">{{ m.kind }} · {{ m.min }}</span>
+<span style="font-size: 13px; color: #A3A19B">{{ m.sub }}</span>
 </span>
 <span class="chip" style="border-color: {{ m.color }}; color: {{ m.color }}">{{ m.src }}</span>
 </div>
@@ -2170,7 +2170,7 @@ class Component extends DCLogic {
       toggleAnon: () => this.setState({ anon: !this.state.anon }),
       recruits: recruits, recruitsTop: recruits.slice(0, 2).map((r, i) => Object.assign({}, r, { sep: i < 1 ? '1px solid #252524' : '0' })), cur: cur,
       pains: pains, painTop: painTop,
-      baseUnits: baseUnits, courses: courses, materials: materials,
+      baseUnits: baseUnits, courses: courses, materials: materials.map((m) => Object.assign({}, m, { sub: [m.kind, m.min].filter(Boolean).join(' · ') })),
       crs: Object.assign({}, crs, { kind: crsKind, name: crsName, jp: crsJp, count: crsDone + ' / ' + crsTot + ' 修了', lock: crsMine ? '受講中' : '受講可', lockColor: crsMine ? RT : '#BDBAB3' }), cSel: cSel,
       unitGroups: unitGroups, uFilters: uFilters, allCount: allCount, noUnits: unitGroups.length === 0,
       openAll: () => this.setState({ sub: 'allUnits' }),
