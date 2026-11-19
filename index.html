@@ -233,6 +233,7 @@ a.pgn{color:inherit}
 .tradingview-widget-container{background:transparent}
 .tvhits{position:relative;z-index:2;display:flex}.tvhits button{flex:1;height:100%;border:0;background:transparent;cursor:pointer;padding:0}
 .tvhit{position:absolute;inset:0;z-index:2;border:0;background:transparent;cursor:pointer;padding:0}
+.pgempty .pgch{visibility:hidden}.pgempty{cursor:default}
 </style>
 <style id="bootcss">
 #boot{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:var(--bootbg);color:var(--bootfg);transition:opacity .28s ease}
@@ -2285,7 +2286,8 @@ document.addEventListener('click',function(e){
     var prev = true, d = 0, all = 0;
     items.forEach(function (n) {
       n._lk = locked || (!!n.lock && !prev);
-      if (n.k === 'f' && !P._noRole && P.roles && P.roles.length && ROLES.indexOf(n.name) >= 0 && P.roles.indexOf(n.name) < 0) { n._n = 0; n._d = 0; n._done = true; return; }
+      n._hide = false;
+      if (n.k === 'f' && !P._noRole && P.roles && P.roles.length && ROLES.indexOf(n.name) >= 0 && P.roles.indexOf(n.name) < 0) { n._n = 0; n._d = 0; n._done = true; n._hide = true; return; }
       if (n.k === 'f') { var r = mark(P, n.items || [], n._lk); n._d = r.d; n._n = r.n; n._done = r.n > 0 && r.d === r.n; }
       else if (leafOK(P, n)) { n._n = 1; n._done = n.k === 'u' ? tById(P, n.t).units[n.c].st === 'done' : !!(n.to || n.from) && (n.to || n.from) < P.today; n._d = n._done ? 1 : 0; }
       else { n._n = 0; n._d = 0; n._done = true; }
@@ -2308,20 +2310,21 @@ document.addEventListener('click',function(e){
     var u = tById(P, n.t).units[n.c];
     return '<button class="pgu' + (isCur ? ' cur' : '') + '" data-st="' + st + '" data-pgu="' + esc(n.c) + '" data-pgut="' + esc(n.t) + '">' + dot + '<span class="pgt"><span class="pgc en">' + esc(n.c) + '</span><span class="pgn">' + '<i class="nd ' + st + (isCur ? ' cur' : '') + '"></i>' + esc(u.title) + '</span></span>' + CHEV + '</button>';
   }
+  function shown(x) { return x.k === 'f' ? !x._hide : x._n > 0; } // 中身が空でも、あるフォルダは出す（自分のロール以外のロールは出さない）
   function nodeHTML(P, n, cur, top) {
-    if (!n._n) return '';
+    if (!shown(n)) return '';
     if (n.k !== 'f') return leafRow(P, n, cur);
-    var vis = (n.items || []).filter(function (x) { return x._n; });
+    var vis = (n.items || []).filter(shown);
     if (vis.length === 1 && vis[0].k === 'f') { var c1 = vis[0]; return nodeHTML(P, { id: c1.id, k: 'f', name: c1.name || n.name, items: c1.items, _n: c1._n, _d: c1._d, _lk: n._lk || c1._lk, _done: c1._done }, cur, top); } // 中身が1つのフォルダだけなら1段にまとめる
     var k = 'f:' + n.id, open = fold[k] === undefined ? (!!cur && has(n, cur)) : !fold[k];
-    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + '<span class="pgpb" aria-hidden="true"><i style="width:' + Math.round(n._n ? n._d / n._n * 100 : 0) + '%"></i></span><span class="pgsc en">' + n._d + '/' + n._n + '</span><svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
+    var head = '<button class="' + (top ? 'pgbh' : 'pgsh') + (n._n ? '' : ' pgempty') + '" data-pgf="' + esc(k) + '" data-open="' + open + '" data-st="' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + '"><i class="nd ' + (n._done ? 'done' : (n._lk ? 'locked' : 'open')) + (cur && has(n, cur) && !open ? ' cur' : '') + '"></i>' + '<span class="' + (top ? 'pgbn' : 'pgsn') + (/^[\x00-\x7F]+$/.test(n.name || '') ? ' lat' : '') + '">' + esc(n.name || '') + '</span>' + (n._lk ? '<span class="pglk">' + LOCK + '</span>' : '') + (n._n ? '<span class="pgpb" aria-hidden="true"><i style="width:' + Math.round(n._d / n._n * 100) + '%"></i></span><span class="pgsc en">' + n._d + '/' + n._n + '</span>' : '<span class="pgsc">準備中</span>') + '<svg class="pgch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7D7B76" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 0 : -90) + 'deg)"><path d="M6 9l6 6 6-6"/></svg></button>';
     var body = open ? (n.items || []).map(function (x) { return nodeHTML(P, x, cur, false); }).join('') : '';
     return top ? head + (body ? '<div class="pgin">' + body + '</div>' : '') : '<div class="pgsub' + (n._lk ? ' lk' : '') + '">' + head + (open ? '<div class="pgin">' + body + '</div>' : '') + '</div>';
   }
   function v2Of(P) { if (!P._v2) P._v2 = JSON.parse(JSON.stringify(P.v2 || fromOld(P))); return P._v2; }
   function progHTML(P) {
     var T = v2Of(P).filter(function (n) { return !n.out; }); mark(P, T, false); var cur = firstCur(T);
-    return '<div class="pgtree">' + T.filter(function (n) { return n._n; }).map(function (n) {
+    return '<div class="pgtree">' + T.filter(shown).map(function (n) {
       var here = has(n, cur);
       return '<div class="pgb' + (here ? ' here' : '') + '">' + rail(n._n ? n._d / n._n : 0, false, here, n.k === 'f' ? 'f:' + n.id : null) + '<div class="pgbody">' + nodeHTML(P, n, cur, true) + '</div></div>';
     }).join('') + '</div>';
