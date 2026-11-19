@@ -6526,6 +6526,21 @@ viewDash = function () {
   var h = _viewDash55(), i = h.indexOf('<section class="dsec">'); if (i < 0) return h; var j = h.indexOf('</section>', i) + 10;
   return (h.slice(0, i) + dashSelf() + h.slice(j)).replace(/<div class="kpi ghostk" aria-hidden="true"><\/div>/g, '');
 };
+// ---------- ux57 ダッシュボードはタブで切り替える（自分／進行中／統計） ----------
+var _viewDash57 = viewDash;
+viewDash = function () {
+  var h = _viewDash57(), M0 = '<section class="dsec">', at = [], i = -1;
+  while ((i = h.indexOf(M0, i + 1)) >= 0) at.push(i);
+  if (at.length < 2) return h;
+  var end = h.lastIndexOf('</section>') + 10, secs = at.map(function (a, k) { return h.slice(a, k + 1 < at.length ? at[k + 1] : end); });
+  var keys = ['me', 'now', 'stats'], names = ['自分', '進行中', '統計'];
+  if (keys.indexOf(S.dtab) < 0 || keys.indexOf(S.dtab) >= secs.length) S.dtab = 'me';
+  var k = keys.indexOf(S.dtab), sec = secs[k].replace(/<h2>[\s\S]*?<\/h2>/, ''); // 見出しはタブが兼ねる
+  var tabs = utabs('dtab', secs.map(function (x, n) { return [keys[n], names[n]]; }));
+  var b = h.indexOf('<div class="body dash">');
+  if (b < 0) return h.slice(0, at[0]) + tabs + sec + h.slice(end);
+  return h.slice(0, b) + tabs + h.slice(b, at[0]) + sec + h.slice(end);
+};
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-act="ndel"],[data-act="fgo2"]'); if (!b) return; e.preventDefault(); e.stopImmediatePropagation();
   if (b.dataset.act === 'fgo2') { S.view = 'projects'; S.fcur = 'mine'; save(); render(); return; }
