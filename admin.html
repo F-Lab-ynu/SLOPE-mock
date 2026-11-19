@@ -2424,7 +2424,7 @@ function addModal(par) {
   var s0 = par ? isoOf(Math.max(TODAY, dayOf(par.start))) : '', e0 = par ? par.end : '';
   if (par && s0 > e0) s0 = par.start;
   return dlg(par ? '<span style="display:flex;flex-direction:column;line-height:1.3">業務を追加<span class="muted" style="font-size:12px;font-weight:400">' + esc(ttl(par)) + ' の下</span></span>' : 'イベントを追加',
-    '<div class="fld"><label for="wT">名前</label><input id="wT" class="input" placeholder="' + (par ? '例：審査員を探す' : '例：夏合宿 2027') + '"></div>' +
+    '<div class="fld"><label for="wT">名前</label><input id="wT" class="input"></div>' +
     '<div class="two"><div class="fld"><label for="wS">開始</label><input id="wS" class="input num" type="date" value="' + s0 + '"></div><div class="fld"><label for="wE">期限</label><input id="wE" class="input num" type="date" value="' + e0 + '"></div></div>' +
     (par ? '' : '<div class="two"><div class="fld"><label for="wU">担当部</label><select id="wU" class="input">' + ['教育部', '催事部', '外務部', '会計', '代表'].map(function (u) { return '<option>' + u + '</option>'; }).join('') + '</select></div>' +
       '<div class="fld"><label for="wA">告知</label><select id="wA" class="input"><option value="before">告知前</option><option value="done">告知済み</option><option value="">—（業務）</option></select></div></div>'),
@@ -2501,7 +2501,7 @@ function viewTracks() {
       '</div>' +
       '<div class="trk">' +
         '<div class="pane"><div class="ph">単元<span class="muted num" id="unitCount" style="font-weight:400"></span></div>' +
-          '<div class="code"><pre class="gutter" id="gutter" aria-hidden="true"></pre><textarea class="src" id="src" spellcheck="false" aria-label="単元（1行1単元）" placeholder="ST1 社会情勢と業界&#10;ST2 戦略理論 ← ST1">' + esc(t.text) + '</textarea></div></div>' +
+          '<div class="code"><pre class="gutter" id="gutter" aria-hidden="true"></pre><textarea class="src" id="src" spellcheck="false" aria-label="単元（1行1単元）" placeholder="1行に1単元：コード 名前（前提があれば ← 前提のコード）">' + esc(t.text) + '</textarea></div></div>' +
         '<div class="pane"><div class="ph">路線図</div><div class="map-wrap" id="map"></div><div class="warn" id="warn"></div></div>' +
       '</div>' +
       '<div class="pane" id="detail" style="margin-top:16px"></div>' +
@@ -4750,7 +4750,7 @@ viewDash = function () {
 };
 function patchDlg() {
   var x = M.id ? patchesInit().filter(function (y) { return y.id === M.id; })[0] : null, d = x || { date: M.s === 'plan' ? '' : isoOf(TODAY), title: '', note: '', state: M.s || 'done' };
-  var body = '<div class="fld"><label for="pT">内容</label><input id="pT" class="input" value="' + esc(d.title) + '" autocomplete="off" placeholder="例：告知に画像を付けられるように"></div>' +
+  var body = '<div class="fld"><label for="pT">内容</label><input id="pT" class="input" value="' + esc(d.title) + '" autocomplete="off"></div>' +
     '<div class="two"><div class="fld"><label for="pS">状態</label><select id="pS" class="input"><option value="plan"' + (d.state === 'plan' ? ' selected' : '') + '>今後の更新</option><option value="done"' + (d.state !== 'plan' ? ' selected' : '') + '>実施済み</option></select></div>' +
     '<div class="fld"><label for="pD">日付</label><input id="pD" type="date" class="input" value="' + esc(d.date || '') + '"></div></div>' +
     '<div class="fld"><label for="pN">詳細</label><textarea id="pN" class="input" rows="4" placeholder="変更点・理由など">' + esc(d.note || '') + '</textarea></div>';
@@ -5592,10 +5592,10 @@ fabHTML = function () {
 function calDlg() {
   var c = M.id ? calsInit().filter(function (x) { return x.id === M.id; })[0] : null, d = c || { title: '', date: M.d || isoOf(TODAY), to: '', time: '', place: '', memo: '', link: '', state: 'draft' }, inPg = !!(c && evInProg(c.id));
   var ro = !can('notices');
-  var body = '<div class="fld"><label for="cT">イベント名</label><input id="cT" class="input" value="' + esc(d.title) + '" placeholder="定例会 / MIRA" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
+  var body = '<div class="fld"><label for="cT">イベント名</label><input id="cT" class="input" value="' + esc(d.title) + '" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
     '<div class="three"><div class="fld"><label for="cD">開始日</label><input id="cD" type="date" class="input" value="' + esc(d.date) + '"' + (ro ? ' disabled' : '') + '></div><div class="fld"><label for="cE">終了日（1日なら空）</label><input id="cE" type="date" class="input" value="' + esc(d.to || '') + '"' + (ro ? ' disabled' : '') + '></div><div class="fld"><label for="cH">時間</label><input id="cH" type="time" class="input" value="' + esc(d.time || '') + '"' + (ro ? ' disabled' : '') + '></div></div>' +
-    '<div class="fld"><label for="cP">場所</label><input id="cP" class="input" value="' + esc(d.place || '') + '" placeholder="経営学部 2-101 / オンライン" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
-    '<div class="fld"><label for="cM">部員がやること・説明</label><textarea id="cM" class="input" rows="3" placeholder="例：事業案を1つ持ってくる"' + (ro ? ' disabled' : '') + '>' + esc(d.memo || '') + '</textarea></div>' +
+    '<div class="fld"><label for="cP">場所</label><input id="cP" class="input" value="' + esc(d.place || '') + '" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
+    '<div class="fld"><label for="cM">部員がやること・説明</label><textarea id="cM" class="input" rows="3"' + (ro ? ' disabled' : '') + '>' + esc(d.memo || '') + '</textarea></div>' +
     '<div class="fld"><label for="cL">リンク</label><input id="cL" class="input" value="' + esc(d.link || '') + '" placeholder="https://" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
     '<label style="display:flex;align-items:center;gap:8px"><input id="cS" type="checkbox" class="check"' + (d.state === 'pub' ? ' checked' : '') + (ro ? ' disabled' : '') + '>部員に公開する（予定タブの部内イベントに出て、参加登録できる）</label>' +
     (c && !ro && can('tracks') ? '<div style="margin-top:10px"><button class="btn sm" data-act="' + (inPg ? 'evOutProg' : 'evToProg') + '" data-id="' + c.id + '">' + (inPg ? '学ぶから外す' : '学ぶにも追加') + '</button></div>' : '');
@@ -5608,7 +5608,7 @@ function evDlg() {
   var body = '<div class="muted" style="font-size:12px">' + esc(ancestors(n).map(ttl).join(' › ')) + '</div>' +
     '<div class="fld"><label>イベント</label><div style="font-weight:600;font-size:15px">' + esc(ttl(n)) + '</div></div>' +
     '<div class="two"><div class="fld"><label for="eS">開始</label><input id="eS" type="date" class="input" value="' + esc(n.start) + '"' + dis + '></div><div class="fld"><label for="eE">終了</label><input id="eE" type="date" class="input" value="' + esc(n.end) + '"' + dis + '></div></div>' +
-    '<div class="fld"><label for="eP">場所</label><input id="eP" class="input" value="' + esc(n.place || '') + '" placeholder="経営学部 講義棟" autocomplete="off"' + dis + '></div>' +
+    '<div class="fld"><label for="eP">場所</label><input id="eP" class="input" value="' + esc(n.place || '') + '" autocomplete="off"' + dis + '></div>' +
     '<div class="fld"><label for="eD">告知文</label><textarea id="eD" class="input" rows="5" placeholder="内容・対象・持ち物・申し込み方法など"' + dis + '>' + esc(memoText(n.purpose || '')) + '</textarea></div>' +
     '<label style="display:flex;align-items:center;gap:8px"><input id="eA" type="checkbox" class="check"' + (n.announce === 'done' ? ' checked' : '') + dis + '>部員に公開する（ホーム・カレンダーに出て、参加登録できる）</label>' +
     (ok ? '' : '<div class="muted" style="font-size:12px">編集できるのは、このイベントのリーダーか、ひとつ上のフォルダーのリーダーです</div>');
@@ -5844,7 +5844,7 @@ viewTracks = function () {
   var n = f.n, i = h.indexOf('<div class="tkh0">'), j = h.indexOf('<aside class="rec udr"');
   var fm = '<div class="evf"><input class="tkname" data-pe="name" value="' + esc(n.name) + '" placeholder="イベント名" aria-label="イベント名" autocomplete="off">' +
     '<div class="row"><label>開始<input type="date" class="input" data-pe="from" value="' + esc(n.from || '') + '"></label><label>終了<input type="date" class="input" data-pe="to" value="' + esc(n.to || '') + '"></label></div>' +
-    '<label>部員がやること<textarea class="input" data-pe="todo" placeholder="例：事業案を1つ持ってくる／エントリーフォームに登録">' + esc(n.todo || '') + '</textarea></label>' +
+    '<label>部員がやること<textarea class="input" data-pe="todo">' + esc(n.todo || '') + '</textarea></label>' +
     '<label>リンク<input class="input" data-pe="link" value="' + esc(n.link || '') + '" placeholder="https://"></label>' +
     '</div>';
   var k = h.lastIndexOf('</div>', j);
@@ -6000,7 +6000,7 @@ function p2Editor() {
   }
   if (n.k === 'e') return head + '<input class="p2title" data-p2f="name" value="' + esc(n.name) + '" placeholder="イベント名" aria-label="イベント名" autocomplete="off">' + lock +
     '<div class="p2grid"><label>開始<input type="date" class="input" data-p2f="from" value="' + esc(n.from || '') + '"></label><label>終了<input type="date" class="input" data-p2f="to" value="' + esc(n.to || '') + '"></label></div>' +
-    '<label class="p2fld">部員がやること<textarea class="input" data-p2f="todo" rows="4" placeholder="例：事業案を1つ持ってくる">' + esc(n.todo || '') + '</textarea></label>' +
+    '<label class="p2fld">部員がやること<textarea class="input" data-p2f="todo" rows="4">' + esc(n.todo || '') + '</textarea></label>' +
     '<label class="p2fld">リンク<input class="input" data-p2f="link" value="' + esc(n.link || '') + '" placeholder="https://" autocomplete="off"></label>' +
     '<div class="p2reg">' + (n.pub ? '<span class="p2pub on">告知で公開中</span><span>参加登録</span><b class="num">' + ((S.joins || {})['pe:' + n.id] || 0) + '</b><span>人</span>' : '<span class="p2pub">未公開（参加登録なし）</span>') + '<button class="p2golink" data-p2tonotice="1">告知で公開する</button></div>';
   var t = p2Track(n.t), u = p2Unit(n); if (!t || !u) return '';
@@ -6322,7 +6322,7 @@ p2Editor = function () {
     '<label class="p2sw"><input type="checkbox" data-ce="state"' + (c.state === 'pub' ? ' checked' : '') + (ro ? ' disabled' : '') + '><span>部員に公開</span><small>予定タブの部内イベントに出て、参加登録できる</small></label></div>' +
     '<div class="p2grid3">' + inp('date', '開始日', 'date') + inp('to', '終了日（1日なら空）', 'date') + inp('time', '時間', 'time') + '</div>' +
     '<div class="p2grid">' + inp('place', '場所', '', '経営学部 2-101 / オンライン') + inp('link', 'リンク', '', 'https://') + '</div>' +
-    '<label class="p2fld">部員がやること・説明<textarea class="input" data-ce="memo" rows="3" placeholder="例：事業案を1つ持ってくる"' + (ro ? ' disabled' : '') + '>' + esc(c.memo || '') + '</textarea></label>' +
+    '<label class="p2fld">部員がやること・説明<textarea class="input" data-ce="memo" rows="3"' + (ro ? ' disabled' : '') + '>' + esc(c.memo || '') + '</textarea></label>' +
     '<div class="p2reg">' + (c.state === 'pub' ? '<span class="p2pub on">公開中</span><span>参加登録</span><b class="num">' + ((S.joins || {})[c.id] || 0) + '</b><span>人</span>' : '<span class="p2pub">未公開</span>') + '<span class="p2same">告知のイベントと同じものです</span></div>';
 };
 document.addEventListener('input', function (e) {
