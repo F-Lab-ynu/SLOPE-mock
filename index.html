@@ -241,6 +241,7 @@ a.pgn{color:inherit}
 .bootlogo{width:46px;height:46px;transform-origin:50% 55%;animation:bootspin 1.6s cubic-bezier(.55,-0.3,.25,1.35) infinite}
 @keyframes bootspin{0%{transform:scale(1) rotate(0)}28%{transform:scale(.74) rotate(-28deg)}62%{transform:scale(1.1) rotate(360deg)}76%{transform:scale(.97) rotate(360deg)}88%,100%{transform:scale(1) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.bootlogo{animation:bootpulse 1.4s ease-in-out infinite}@keyframes bootpulse{50%{opacity:.4}}}
+.mtt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;line-height:1.5}
 </style>
 </head>
 <body>
@@ -507,9 +508,9 @@ a.pgn{color:inherit}
 <div style="display: flex; align-items: center; gap: 8px"><span class="en" style="font-size: 13px; font-weight: 700; color: #070707; background: #F3F1EC; padding: 2px 8px; border-radius: 6px">INPUT</span><span style="font-size: 14px; color: #BDBAB3">教材</span></div>
 <sc-for list="{{ materials }}" as="m" hint-placeholder-count="3">
 <div class="card" style="padding: 14px 16px; border-radius: 8px; display: flex; align-items: center; gap: 12px">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
-<span style="font-weight: 500">{{ m.title }}</span>
-<span style="font-size: 13px; color: #A3A19B">{{ m.sub }}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span class="mtt" style="font-weight: 500">{{ m.title }}</span>
+<span style="font-size: 13px; color: #A3A19B; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ m.sub }}</span>
 </span>
 <span class="chip" style="border-color: {{ m.color }}; color: {{ m.color }}">{{ m.src }}</span>
 </div>
@@ -2170,7 +2171,7 @@ class Component extends DCLogic {
       toggleAnon: () => this.setState({ anon: !this.state.anon }),
       recruits: recruits, recruitsTop: recruits.slice(0, 2).map((r, i) => Object.assign({}, r, { sep: i < 1 ? '1px solid #252524' : '0' })), cur: cur,
       pains: pains, painTop: painTop,
-      baseUnits: baseUnits, courses: courses, materials: materials.map((m) => Object.assign({}, m, { sub: [m.kind, m.min].filter(Boolean).join(' · ') })),
+      baseUnits: baseUnits, courses: courses, materials: materials.map((m) => Object.assign({}, m, { sub: m.sub || [m.kind, m.min].filter(Boolean).join(' · ') })),
       crs: Object.assign({}, crs, { kind: crsKind, name: crsName, jp: crsJp, count: crsDone + ' / ' + crsTot + ' 修了', lock: crsMine ? '受講中' : '受講可', lockColor: crsMine ? RT : '#BDBAB3' }), cSel: cSel,
       unitGroups: unitGroups, uFilters: uFilters, allCount: allCount, noUnits: unitGroups.length === 0,
       openAll: () => this.setState({ sub: 'allUnits' }),

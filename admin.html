@@ -6620,6 +6620,7 @@ var _render58 = render; render = function () { var r = _render58.apply(this, arg
 // ---------- ux59 教材のURLから題名を自動で入れる（題名が空のときだけ） ----------
 var TITLE_TRIED = {};
 function autoTitle(t, m) {
+  if (m && /^https?:\/\//.test(m.memo || '')) m.memo = ''; // URLが題名に入っていたら空とみなす
   if (!m || m.memo || TITLE_TRIED[m.url]) return; TITLE_TRIED[m.url] = 1;
   fetch('https://api.microlink.io/?url=' + encodeURIComponent(m.url)).then(function (r) { return r.json(); }).then(function (j) {
     var ti = j && j.data && j.data.title; if (!ti || m.memo) return; m.memo = String(ti).replace(/\s+/g, ' ').trim().slice(0, 120); touch(t); save();
