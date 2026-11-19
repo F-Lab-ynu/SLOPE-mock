@@ -2427,5 +2427,53 @@ document.addEventListener('click',function(e){
 .uqgo{height:48px;border:0;border-radius:8px;background:#F3F1EC;color:#070707;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 .uqgo:disabled{background:#2C2C2A;color:#7D7B76;cursor:default}
 </style>
+<script>
+// リンクはアプリの中で開く。YouTube・Googleドライブ・PDF は画面の中に、ほかはアプリ内ブラウザ（インストールしたアプリでは重なって開く）
+(function () {
+  function embed(u) {
+    var m;
+    if ((m = u.match(/(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{6,})/))) return 'https://www.youtube.com/embed/' + m[1] + '?playsinline=1';
+    if ((m = u.match(/drive\.google\.com\/file\/d\/([\w-]+)/))) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
+    if ((m = u.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([\w-]+)/))) return 'https://docs.google.com/' + m[1] + '/d/' + m[2] + '/preview';
+    if (/\.pdf(\?|#|$)/i.test(u)) return u;
+    return null;
+  }
+  function close() { var v = document.getElementById('inv'); if (v) v.remove(); document.documentElement.classList.remove('invon'); }
+  window.__openLink = function (url, title) {
+    if (!url) return; var e = embed(url);
+    if (!e) { window.open(url, '_blank', 'noopener'); return; }
+    close();
+    var host = ''; try { host = new URL(url).hostname.replace(/^www\./, ''); } catch (er) {}
+    var v = document.createElement('div'); v.id = 'inv';
+    v.innerHTML = '<div class="invh"><button class="invb" data-invx aria-label="閉じる"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span class="invt"><b></b><small></small></span><button class="invb" data-invo aria-label="ブラウザで開く"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button></div><iframe allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    v.querySelector('.invt b').textContent = title || host; v.querySelector('.invt small').textContent = title ? host : '';
+    v.querySelector('iframe').src = e;
+    v.querySelector('[data-invx]').onclick = function () { history.state && history.state.inv ? history.back() : close(); };
+    v.querySelector('[data-invo]').onclick = function () { window.open(url, '_blank', 'noopener'); };
+    document.body.appendChild(v); document.documentElement.classList.add('invon');
+    try { history.pushState({ inv: 1 }, ''); } catch (er) {}
+  };
+  window.addEventListener('popstate', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.getElementById('inv')) { e.preventDefault(); history.state && history.state.inv ? history.back() : close(); } });
+  // 画面の中の外部リンク（新しいタブで開くもの）もここを通す
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]'); if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var h = a.getAttribute('href'); if (!/^https?:/i.test(h)) return; var u; try { u = new URL(h); } catch (er) { return; } if (u.origin === location.origin) return;
+    e.preventDefault(); window.__openLink(u.href, a.textContent.trim().slice(0, 60));
+  });
+})();
+</script>
+<style>
+#inv{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:#070707;animation:invin .22s ease;font-family:'Zen Kaku Gothic New','Noto Sans JP','Hiragino Sans','Yu Gothic UI','Meiryo',sans-serif}
+@keyframes invin{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.invh{flex:none;display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top) + 6px) 6px 6px;border-bottom:1px solid #1E1E1D;color:#F3F1EC}
+.invb{flex:none;width:44px;height:44px;border:0;background:transparent;color:#F3F1EC;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:8px}
+.invb:hover{background:#1A1A19}
+.invt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.invt b{max-width:100%;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.invt small{font-size:12px;color:#7D7B76}
+#inv iframe{flex:1;width:100%;border:0;background:#0E0E0D}
+html.invon,html.invon body{overflow:hidden}
+</style>
 </body>
 </html>
