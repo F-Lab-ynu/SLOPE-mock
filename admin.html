@@ -3959,7 +3959,7 @@ document.addEventListener('click', function (e) {
   if (e.target.closest('[data-act]') !== b) return;
   e.stopImmediatePropagation(); e.preventDefault();
   var a = b.dataset.act, f = curFolder();
-  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } UI.fopen = {}; S.fcur = b.dataset.id; UI.rec = null; UI.sp = null; save(); render(); return; }
+  if (a === 'fgo') { if (b.dataset.id !== (S.fcur || '')) { UI.fhist = UI.fhist || []; UI.fhist.push(S.fcur || ''); } UI.fopen = {}; S.fcur = b.dataset.id; foldBelow(S.fcur); UI.rec = null; UI.sp = null; save(); render(); return; }
   if (a === 'ftog') { UI.fopen = UI.fopen || {}; var o = document.querySelector('[data-act="ftog"][data-id="' + b.dataset.id + '"]'); UI.fopen[b.dataset.id] = !(o && o.getAttribute('aria-expanded') === 'true'); render(); return; }
   if (a === 'newF' || a === 'newT') {
     UI.fm = false; UI.fadd = false; if (!manages(f)) return;
@@ -4171,6 +4171,8 @@ window.addEventListener('click', function (e) {
   var f = task(b.dataset.id); if (!f || !manages(f)) return;
   snap(); var k = addUnder(f, '新しいファイル'); expandTo(k.id); save(); render(); editNew(k);
 }, true);
+// フォルダを選んだら、ガントもその1つ下の段まで（子のフォルダは畳んでおく）
+function foldBelow(id) { if (!S.fold) S.fold = {}; var f = id && id !== 'mine' ? task(id) : null; (f ? kids(f) : S.projects).forEach(function (k) { if (isFolder(k)) S.fold[k.id] = true; }); }
 function iedSave(el) {
   var n = task(el.dataset.id); if (!n) return;
   var v = el.innerText.replace(/ /g, ' ');
@@ -6101,7 +6103,7 @@ document.addEventListener('click', function (e) {
   if (!a && !go && !r) return;
   if (UI.p2drag) { UI.p2drag = null; return; }
   e.preventDefault(); e.stopImmediatePropagation();
-  if (go) { UI.psel = go.dataset.p2go || null; UI.pren = null; var g = p2Get(UI.psel); if (g) { var p = g.parent; while (p) { p.open = true; var pp = p2Get(p.id); p = pp && pp.parent; } } render(); if (UI.psel) p2Focus(UI.psel); return; }
+  if (go) { UI.psel = go.dataset.p2go || null; UI.pren = null; var g = p2Get(UI.psel); if (g) { var p = g.parent; while (p) { p.open = true; var pp = p2Get(p.id); p = pp && pp.parent; } } p2Reveal(UI.psel); render(); if (UI.psel) p2Focus(UI.psel); return; }
   if (a) { var act = a.dataset.p2a, id = r ? r.dataset.p2 : UI.psel;
     if (act === 'tog') { var f = p2Get(id); f.n.open = f.n.open === false; save(); render(); p2Focus(id); return; }
     if (act === 'lock') return p2Lock(id);
@@ -6111,9 +6113,15 @@ document.addEventListener('click', function (e) {
     if (act === 'mdel' && u) { snap(); unitData(t, u.code).materials.splice(+a.dataset.i, 1); touch(t); p2Save(); toastUndo('教材を削除しました'); }
     return;
   }
-  if (r) { var id2 = r.dataset.p2; if (UI.psel === id2 && !e.detail) return; UI.psel = id2; if (UI.pren !== id2) UI.pren = null; render(); p2Focus(id2); }
+  if (r) { var id2 = r.dataset.p2; if (UI.psel === id2 && !e.detail) return; UI.psel = id2; if (UI.pren !== id2) UI.pren = null; p2Reveal(id2); render(); p2Focus(id2); }
 }, true);
 document.addEventListener('dblclick', function (e) { var r = e.target.closest && e.target.closest('.p2r'); if (!r || r.classList.contains('out') || e.target.closest('[data-p2a]')) return; UI.pren = r.dataset.p2; render(); p2Focus(r.dataset.p2); });
+// フォルダを選んだら、そのフォルダの1つ下の段までだけ開く（ほかの枝は畳む）。見た目だけなので保存しない
+function p2Reveal(id) {
+  var f = p2Get(id); if (!f || f.n.k !== 'f') return;
+  var keep = {}; keep[f.n.id] = 1; for (var p = f.parent; p; ) { keep[p.id] = 1; var pp = p2Get(p.id); p = pp && pp.parent; }
+  p2Walk(p2(), function (z) { if (z.k === 'f') z.open = !!keep[z.id]; });
+}
 // ---- 入力 ----
 function p2Commit(el) { var f = p2Get(el.dataset.p2ren); UI.pren = null; if (!f) return render(); var v = el.value.trim(); if (v) { snap(); p2SetName(f.n, v); } p2Save(); p2Focus(f.n.id); }
 function p2SetName(n, v) { if (n.k === 'u') { var t = p2Track(n.t), u = p2Unit(n); if (u) { u.title = v; serialize(t); touch(t); } } else { n.name = v; if (n.k === 'f' && n.t) { var t2 = p2Track(n.t); if (t2) t2.name = v; } } }
