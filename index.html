@@ -267,9 +267,9 @@ a.pgn{color:inherit}
 <span class="en" style="font-weight: 700; font-size: 18px; letter-spacing: 0.16em">SLOPE</span>
 </div>
 <div style="display: flex; align-items: center">
-<button class="ibtn" aria-label="通知" style="position: relative">
+<button class="ibtn" onClick="{{ goNotifs }}" aria-label="通知" style="position: relative">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
-<span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: #F2A93B"></span>
+<span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: #F2A93B; display: {{ bellDot }}"></span>
 </button>
 <span class="mode"><span>運営</span><button class="msw" data-to="admin.html" role="switch" aria-checked="false" aria-label="運営画面に切り替える"><i></i></button></span>
 <button onClick="{{ goMe }}" aria-label="マイページ" style="width: 44px; height: 44px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center">
@@ -2151,6 +2151,7 @@ class Component extends DCLogic {
     window.__UQ = uq.length ? { key: s.unitT + ':' + s.unitC, qs: uq, done: !!qd[s.unitT + ':' + s.unitC], pass: () => { const q = Object.assign({}, this.state.qz || {}); q[s.unitT + ':' + s.unitC] = true; this.setState({ qz: q }); } } : null;
 
     return {
+      goNotifs: () => this.setState({ sub: 'notifs' }), bellDot: 'block', notifsAll: [], noNotifs: true,
       meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' },
       dd: dd,
       accent: A,
@@ -2158,11 +2159,11 @@ class Component extends DCLogic {
         main: main, subbar: !main,
         home: main && s.tab === 'home', learn: main && s.tab === 'learn', board: main && s.tab === 'board', cal: main && s.tab === 'cal', me: main && s.tab === 'me', news: main && s.tab === 'news', newsDetail: s.sub === 'news', mk: s.sub === 'mk', mkEdit: s.sub === 'mkEdit',
         lib: s.lseg === 'lib', study: s.lseg === 'study', practice: s.lseg === 'practice',
-        unit: s.sub === 'unit', allUnits: s.sub === 'allUnits', course: s.sub === 'course', postNew: s.sub === 'postNew', eventNew: s.sub === 'eventNew', npIdea: s.np === 'idea', npRecruit: s.np === 'recruit', post: s.sub === 'post', painNew: s.sub === 'painNew', admin: s.sub === 'admin',
+        notifs: s.sub === 'notifs', unit: s.sub === 'unit', allUnits: s.sub === 'allUnits', course: s.sub === 'course', postNew: s.sub === 'postNew', eventNew: s.sub === 'eventNew', npIdea: s.np === 'idea', npRecruit: s.np === 'recruit', post: s.sub === 'post', painNew: s.sub === 'painNew', admin: s.sub === 'admin',
         recruit: s.seg === 'recruit', pain: s.seg === 'pain', event: s.seg === 'event', other: s.seg === 'other',
         fab: main && s.tab === 'board' && s.seg !== 'other'
       },
-      subTitle: s.sub === 'course' ? 'プログラム' : (s.sub === 'post' ? (cur.isIdea ? 'アイデアの詳細' : '募集の詳細') : (s.sub === 'postNew' ? '投稿する' : s.sub === 'eventNew' ? 'イベントを共有' : s.sub === 'allUnits' ? 'すべての単元' : (titles[s.sub] || ''))),
+      subTitle: s.sub === 'notifs' ? '通知' : s.sub === 'course' ? 'プログラム' : (s.sub === 'post' ? (cur.isIdea ? 'アイデアの詳細' : '募集の詳細') : (s.sub === 'postNew' ? '投稿する' : s.sub === 'eventNew' ? 'イベントを共有' : s.sub === 'allUnits' ? 'すべての単元' : (titles[s.sub] || ''))),
       ti: { home: s.tab === 'home' ? RT : 'transparent', learn: s.tab === 'learn' ? RT : 'transparent', board: s.tab === 'board' ? RT : 'transparent', cal: s.tab === 'cal' ? RT : 'transparent', news: s.tab === 'news' ? RT : 'transparent' },
       tc: { home: s.tab === 'home' ? A : M, learn: s.tab === 'learn' ? A : M, board: s.tab === 'board' ? A : M, cal: s.tab === 'cal' ? A : M, news: s.tab === 'news' ? A : M },
       seg: { oBg: s.seg === 'other' ? '#F3F1EC' : 'transparent', oFg: s.seg === 'other' ? INK : '#BDBAB3', rBg: s.seg === 'recruit' ? '#F3F1EC' : 'transparent', rFg: s.seg === 'recruit' ? INK : '#BDBAB3', pBg: s.seg === 'pain' ? '#F3F1EC' : 'transparent', pFg: s.seg === 'pain' ? INK : '#BDBAB3', eBg: s.seg === 'event' ? '#F3F1EC' : 'transparent', eFg: s.seg === 'event' ? INK : '#BDBAB3' },
