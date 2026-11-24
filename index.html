@@ -255,6 +255,35 @@ a.pgn{color:inherit}
 .npi button{flex:none;width:32px;height:32px;margin:2px -8px 0 0;border:0;background:transparent;color:#7D7B76;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .npempty{padding:22px 0 26px;text-align:center;font-size:14px;color:#A3A19B}
 body.wide .nppanel{top:64px}
+.mp{padding:6px 20px 36px;display:flex;flex-direction:column;gap:28px}
+.mpcard{background:#131313;border:1px solid #232322;border-radius:12px;overflow:hidden}
+.mphead{display:flex;align-items:center;gap:14px;padding:18px}
+.mpav{flex:none;width:52px;height:52px;border-radius:10px;background:#F3F1EC;color:#070707;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+.mpwho{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.mpwho b{font-size:18px;font-weight:700;color:#F3F1EC;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mpwho small{font-size:13px;color:#A3A19B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mpedit{flex:none;height:34px;padding:0 14px;border:1px solid #383836;border-radius:8px;background:transparent;color:#D2CFC8;font:inherit;font-size:13px}
+.mpstats{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #232322}
+.mpstats > div{display:flex;flex-direction:column;gap:4px;padding:14px 18px}
+.mpstats > div + div{border-left:1px solid #232322}
+.mpstats small{font-size:12px;color:#A3A19B}
+.mpstats b{font-size:22px;font-weight:700;color:#F3F1EC;line-height:1.1}
+.mpsec{display:flex;flex-direction:column;gap:12px}
+.mplist{background:#131313;border:1px solid #232322;border-radius:12px;overflow:hidden}
+.mprow{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:12px 18px;border:0;border-top:1px solid #232322;background:transparent;color:#F3F1EC;font:inherit;font-size:15px;text-align:left;text-decoration:none;cursor:pointer}
+.mprow:first-child{border-top:0}
+.mprow:active{background:#1A1A19}
+.mpl{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;font-size:15px;font-weight:500;letter-spacing:normal}
+.mpl small{font-size:12px;font-weight:400;color:#A3A19B}
+.mpl small:empty{display:none}
+.mpch{flex:none;color:#7D7B76}
+.mpck{flex:none;width:24px;height:24px;border-radius:50%;background:#F3F1EC;color:#070707;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+.mpnote{flex:none;font-size:13px;color:#A3A19B}
+.mpsw{flex:none;position:relative;width:44px;height:26px;border-radius:13px;transition:background .2s}
+.mpsw i{position:absolute;top:3px;width:20px;height:20px;border-radius:50%;transition:left .2s}
+.mpnone{margin:0;padding:2px 2px 0;font-size:14px;color:#7D7B76;line-height:1.6}
+.mpout{height:50px;border:1px solid #2C2C2A;border-radius:12px;background:transparent;color:#BDBAB3;font:inherit;font-size:15px}
+.mpfoot{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px;opacity:.5;font-size:12px;color:#A3A19B}
 </style>
 </head>
 <body>
@@ -1263,76 +1292,51 @@ body.wide .nppanel{top:64px}
 
 
 <sc-if value="{{ show.me }}" hint-placeholder-val="{{ false }}">
-<div style="padding: 6px 20px 32px; display: flex; flex-direction: column; gap: 22px">
-<div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
-<div style="display: flex; align-items: center; gap: 14px">
-<span class="en" style="width: 60px; height: 60px; border-radius: 10px; background: #F3F1EC; color: #070707; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px">YT</span>
-<span style="display: flex; flex-direction: column">
-<span style="font-weight: 700; font-size: 18px">山田 太郎</span>
-<span style="font-size: 13px; color: #BDBAB3">経営学部 1年 · 横浜国立大学</span>
-</span>
+<div class="mp">
+<section class="mpcard">
+<div class="mphead">
+<span class="mpav en">{{ meIni }}</span>
+<span class="mpwho"><b>{{ me.name }}</b><small>{{ me.grade }} · {{ me.post }}</small></span>
+<button class="mpedit" onClick="{{ me.editName }}">編集</button>
 </div>
-<div style="display: flex; gap: 6px; flex-wrap: wrap">
-<span class="chip en" style="border-color: #F3F1EC; color: #F3F1EC">{{ meLv }}</span>
-<sc-for list="{{ meMs }}" as="x"><span class="chip en">{{ x.label }}</span></sc-for>
-<span class="chip en">Strategist 受講中</span>
-<span class="chip">ビジネスモデル設計</span>
-<span class="chip">戦略</span>
+<div class="mpstats">
+<div><small>レベル</small><b class="en">{{ me.lv }}</b></div>
+<div><small>マイルストーン</small><b class="en">{{ me.msTotal }}</b></div>
 </div>
-</div>
+</section>
 
-<div style="display: flex; flex-direction: column; gap: 10px">
+<section class="mpsec">
+<h2 class="h2">ロール</h2>
+<div class="mplist">
+<sc-for list="{{ me.roles }}" as="r"><button class="mprow" onClick="{{ r.pick }}" role="checkbox" aria-checked="{{ r.on }}"><span class="mpl en">{{ r.name }}</span><span class="mpck" style="opacity: {{ r.op }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button></sc-for>
+</div>
+</section>
+
+<section class="mpsec">
 <h2 class="h2">参加中のプロジェクト</h2>
-<button onClick="{{ openR1 }}" class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; color: #F3F1EC; text-align: left; width: 100%">
-<span style="flex: 1; display: flex; flex-direction: column">
-<span style="font-size: 13px; color: #A3A19B">実プロジェクト枠 · Strategist</span>
-<span style="font-weight: 500">空きコマ×単発バイトのマッチング</span>
-</span>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-</button>
-</div>
+<sc-if value="{{ noProjects }}"><p class="mpnone">まだありません。掲示板の募集に応募するとここに出ます</p></sc-if>
+<sc-if value="{{ hasProjects }}"><div class="mplist"><sc-for list="{{ myProjects }}" as="p"><button class="mprow" onClick="{{ p.open }}"><span class="mpl"><small>{{ p.label }}</small>{{ p.title }}</span><svg class="mpch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></sc-for></div></sc-if>
+</section>
 
-<div style="display: flex; flex-direction: column; gap: 10px">
-<h2 class="h2">外部出場の記録</h2>
-<div class="card" style="padding: 16px; border-radius: 8px; border-style: dashed; font-size: 14px; color: #A3A19B; line-height: 1.6">まだありません</div>
+<section class="mpsec">
+<h2 class="h2">設定</h2>
+<div class="mplist">
+<button class="mprow" onClick="{{ push.toggle }}" role="switch" aria-checked="{{ push.on }}"><span class="mpl">通知を受け取る<small>{{ push.note }}</small></span><span class="mpsw" style="background: {{ push.bg }}"><i style="left: {{ push.x }}; background: {{ push.knob }}"></i></span></button>
+<a class="mprow" href="{{ calSub.ios }}"><span class="mpl">iPhone・Mac のカレンダーに追加</span><svg class="mpch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+<a class="mprow" href="{{ calSub.google }}"><span class="mpl">Google カレンダーに追加</span><svg class="mpch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+<button class="mprow" onClick="{{ calSub.copy }}"><span class="mpl">カレンダーの URL をコピー</span><span class="mpnote">{{ calSub.note }}</span></button>
 </div>
+</section>
 
-<div style="display: flex; flex-direction: column; gap: 10px">
-<h2 class="h2">カレンダー</h2>
-<div class="card" style="border-radius: 8px; overflow: hidden">
-<a href="{{ calSub.ios }}" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #252524; color: #F3F1EC; text-decoration: none"><span style="flex: 1; font-weight: 500">iPhone・Mac</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
-<a href="{{ calSub.google }}" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #252524; color: #F3F1EC; text-decoration: none"><span style="flex: 1; font-weight: 500">Google</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
-<button onClick="{{ calSub.copy }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; border: 0; background: transparent; color: #F3F1EC; font: inherit; text-align: left"><span style="flex: 1; font-weight: 500">URLをコピー</span><span style="font-size: 13px; color: #A3A19B">{{ calSub.note }}</span></button>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 10px">
-<h2 class="h2">通知</h2>
-<div class="card" style="border-radius: 8px; overflow: hidden">
-<button onClick="{{ push.toggle }}" role="switch" aria-checked="{{ push.on }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; border: 0; background: transparent; color: #F3F1EC; font: inherit; text-align: left">
-<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px"><span style="font-weight: 500">この端末で受け取る</span><span style="font-size: 13px; color: #A3A19B">{{ push.note }}</span></span>
-<span style="flex: none; position: relative; width: 44px; height: 26px; border-radius: 13px; background: {{ push.bg }}; transition: background .2s"><span style="position: absolute; top: 3px; left: {{ push.x }}; width: 20px; height: 20px; border-radius: 50%; background: {{ push.knob }}; transition: left .2s"></span></span>
-</button>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-if value="{{ isOps }}">
+<section class="mpsec">
 <h2 class="h2">運営</h2>
-<div class="card" style="border-radius: 8px; overflow: hidden">
-<a href="admin.html" data-replace="1" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; background: transparent; border: 0; border-bottom: 1px solid #252524; color: #F3F1EC; text-align: left; text-decoration: none">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 500">運営画面</span><span style="font-size: 13px; color: #A3A19B">業務・教材・告知・掲示板の管理</span></span>
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-</a>
-<div style="display: flex; align-items: center; justify-content: space-between; padding: 16px">
-<span style="font-weight: 500">所属テナント</span>
-<span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #BDBAB3"><span class="mark" aria-hidden="true" style="width: 20px; height: 20px"></span>横浜国立大学 起業部</span>
-</div>
-</div>
-</div>
-<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0 4px; opacity: 0.55">
-<span class="mark" role="img" aria-label="F-LAB" style="width: 44px; height: 44px"></span>
-<span class="wordmark" aria-hidden="true"></span>
-</div>
+<div class="mplist"><a class="mprow" href="admin.html" data-replace="1"><span class="mpl">運営画面<small>業務・教材・告知・掲示板</small></span><svg class="mpch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a></div>
+</section>
+</sc-if>
+
+<button class="mpout" onClick="{{ logout }}">ログアウト</button>
+<div class="mpfoot"><span class="mark" role="img" aria-label="F-LAB" style="width: 36px; height: 36px"></span><span>横浜国立大学 起業部</span></div>
 </div>
 </sc-if>
 
@@ -2191,6 +2195,9 @@ class Component extends DCLogic {
 
     return {
       goNotifs: () => this.setState({ nPop: !s.nPop }), closeNotifs: () => this.setState({ nPop: false }), nPop: !!s.nPop, bellDot: 'block', notifsAll: [], noNotifs: true, hasNotifs: false,
+      me: { name: '山田 太郎', grade: '経営学部 1年', post: 'プレイヤー', editName: () => {}, lv: meLv, msTotal: meMs.length ? meMs.reduce((a, x) => a + (+x.label.split(' ').pop().split('/')[0]), 0) + '/' + meMs.reduce((a, x) => a + (+x.label.split('/').pop()), 0) : '—',
+        roles: ['Strategist', 'Negotiator', 'Advertiser', 'Engineer', 'Innovator'].map((r) => ({ name: r, on: String(r === 'Strategist'), op: r === 'Strategist' ? 1 : 0, pick: () => {} })) },
+      noProjects: false, hasProjects: true, myProjects: [{ label: '実プロジェクト枠 · Strategist', title: '空きコマ×単発バイトのマッチング', open: () => {} }], isOps: true, logout: () => {}, meIni: 'YT',
       meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' }, push: { toggle: () => {}, on: 'false', note: '', bg: '#383836', x: '3px', knob: '#7D7B76' },
       dd: dd,
       accent: A,
