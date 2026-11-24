@@ -242,6 +242,19 @@ a.pgn{color:inherit}
 @keyframes bootspin{0%{transform:scale(1) rotate(0)}28%{transform:scale(.74) rotate(-28deg)}62%{transform:scale(1.1) rotate(360deg)}76%{transform:scale(.97) rotate(360deg)}88%,100%{transform:scale(1) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.bootlogo{animation:bootpulse 1.4s ease-in-out infinite}@keyframes bootpulse{50%{opacity:.4}}}
 .mtt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;line-height:1.5}
+.npbg{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35)}
+.nppanel{position:fixed;z-index:81;top:calc(env(safe-area-inset-top) + 58px);right:12px;width:min(380px,calc(100vw - 24px));max-height:min(70vh,560px);display:flex;flex-direction:column;background:#131313;border:1px solid #2C2C2A;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.5);overflow:hidden;animation:npin .16s ease-out}
+@keyframes npin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.nphead{flex:none;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;font-weight:700;font-size:15px;color:#F3F1EC}
+.nphead button{border:0;background:transparent;color:#A3A19B;font:inherit;font-size:12px;font-weight:400;padding:4px 0;cursor:pointer}
+.nplist{overflow:auto;padding:0 16px 6px}
+.npi{display:flex;align-items:flex-start;gap:10px;padding:12px 0}
+.npdot{flex:none;width:7px;height:7px;margin-top:8px;border-radius:50%}
+.npt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.5;color:#F3F1EC}
+.npt small{font-size:12px;color:#A3A19B}
+.npi button{flex:none;width:32px;height:32px;margin:2px -8px 0 0;border:0;background:transparent;color:#7D7B76;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.npempty{padding:22px 0 26px;text-align:center;font-size:14px;color:#A3A19B}
+body.wide .nppanel{top:64px}
 </style>
 </head>
 <body>
@@ -279,6 +292,22 @@ a.pgn{color:inherit}
 </header>
 </sc-if>
 
+<sc-if value="{{ nPop }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeNotifs }}" class="npbg"></div>
+<div class="nppanel" role="dialog" aria-label="通知">
+<div class="nphead"><span>通知</span><sc-if value="{{ hasNotifs }}"><button onClick="{{ delAllNotifs }}">すべて削除</button></sc-if></div>
+<div class="nplist">
+<sc-for list="{{ notifsAll }}" as="n">
+<div class="npi" style="border-bottom: {{ n.sep }}">
+<span class="npdot" style="background: {{ n.dot }}"></span>
+<span class="npt"><span>{{ n.text }}</span><small>{{ n.sub }} · {{ n.at }}</small></span>
+<button onClick="{{ n.del }}" aria-label="このお知らせを削除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+</sc-for>
+<sc-if value="{{ noNotifs }}"><div class="npempty">お知らせはありません</div></sc-if>
+</div>
+</div>
+</sc-if>
 <sc-if value="{{ show.subbar }}" hint-placeholder-val="{{ false }}">
 <header style="height: 60px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; border-bottom: 1px solid #1C1C1B">
 <button class="ibtn" onClick="{{ back }}" aria-label="戻る">
@@ -2161,7 +2190,7 @@ class Component extends DCLogic {
     window.__UQ = uq.length ? { key: s.unitT + ':' + s.unitC, qs: uq, done: !!qd[s.unitT + ':' + s.unitC], pass: () => { const q = Object.assign({}, this.state.qz || {}); q[s.unitT + ':' + s.unitC] = true; this.setState({ qz: q }); } } : null;
 
     return {
-      goNotifs: () => this.setState({ sub: 'notifs' }), bellDot: 'block', notifsAll: [], noNotifs: true,
+      goNotifs: () => this.setState({ nPop: !s.nPop }), closeNotifs: () => this.setState({ nPop: false }), nPop: !!s.nPop, bellDot: 'block', notifsAll: [], noNotifs: true, hasNotifs: false,
       meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' }, push: { toggle: () => {}, on: 'false', note: '', bg: '#383836', x: '3px', knob: '#7D7B76' },
       dd: dd,
       accent: A,
