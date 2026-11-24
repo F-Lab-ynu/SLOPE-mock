@@ -1278,6 +1278,16 @@ a.pgn{color:inherit}
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 10px">
+<h2 class="h2">通知</h2>
+<div class="card" style="border-radius: 8px; overflow: hidden">
+<button onClick="{{ push.toggle }}" role="switch" aria-checked="{{ push.on }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; border: 0; background: transparent; color: #F3F1EC; font: inherit; text-align: left">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px"><span style="font-weight: 500">この端末で受け取る</span><span style="font-size: 13px; color: #A3A19B">{{ push.note }}</span></span>
+<span style="flex: none; position: relative; width: 44px; height: 26px; border-radius: 13px; background: {{ push.bg }}; transition: background .2s"><span style="position: absolute; top: 3px; left: {{ push.x }}; width: 20px; height: 20px; border-radius: 50%; background: {{ push.knob }}; transition: left .2s"></span></span>
+</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
 <h2 class="h2">運営</h2>
 <div class="card" style="border-radius: 8px; overflow: hidden">
 <a href="admin.html" data-replace="1" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; background: transparent; border: 0; border-bottom: 1px solid #252524; color: #F3F1EC; text-align: left; text-decoration: none">
@@ -2152,7 +2162,7 @@ class Component extends DCLogic {
 
     return {
       goNotifs: () => this.setState({ sub: 'notifs' }), bellDot: 'block', notifsAll: [], noNotifs: true,
-      meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' },
+      meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' }, push: { toggle: () => {}, on: 'false', note: '', bg: '#383836', x: '3px', knob: '#7D7B76' },
       dd: dd,
       accent: A,
       show: {
