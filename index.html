@@ -1193,7 +1193,10 @@ a.pgn{color:inherit}
 <div style="font-weight: 700; font-size: 17px">{{ e.title }}</div>
 <div style="display: flex; justify-content: space-between; align-items: center">
 <span style="font-size: 13px; color: #BDBAB3">{{ e.meta }}</span>
+<span style="display: flex; gap: 8px; align-items: center">
+<button onClick="{{ e.icsGo }}" aria-label="カレンダーに追加" title="カレンダーに追加" style="display: {{ e.icsD }}; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 6px; border: 1px solid #383836; background: transparent; color: #D2CFC8"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button>
 <button onClick="{{ e.toggle }}" style="display: {{ e.jd }}; align-items: center; height: 40px; padding: 0 14px; border-radius: 6px; border: 1px solid {{ e.joinBd }}; background: {{ e.joinBg }}; color: {{ e.joinFg }}; font-weight: 700; font-size: 13px">{{ e.joinLabel }}</button>
+</span>
 </div>
 </div>
 </sc-for>
@@ -1263,6 +1266,15 @@ a.pgn{color:inherit}
 <div style="display: flex; flex-direction: column; gap: 10px">
 <h2 class="h2">外部出場の記録</h2>
 <div class="card" style="padding: 16px; border-radius: 8px; border-style: dashed; font-size: 14px; color: #A3A19B; line-height: 1.6">まだありません</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 class="h2">カレンダー</h2>
+<div class="card" style="border-radius: 8px; overflow: hidden">
+<a href="{{ calSub.ios }}" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #252524; color: #F3F1EC; text-decoration: none"><span style="flex: 1; font-weight: 500">iPhone・Mac</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a href="{{ calSub.google }}" style="display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #252524; color: #F3F1EC; text-decoration: none"><span style="flex: 1; font-weight: 500">Google</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<button onClick="{{ calSub.copy }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 16px; border: 0; background: transparent; color: #F3F1EC; font: inherit; text-align: left"><span style="flex: 1; font-weight: 500">URLをコピー</span><span style="font-size: 13px; color: #A3A19B">{{ calSub.note }}</span></button>
+</div>
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 10px">
@@ -1699,7 +1711,7 @@ class Component extends DCLogic {
     const dayEvents = events.filter((e) => e.day === s.day).map((e) => {
       const on = !!s.joined[e.id];
       return Object.assign({}, e, {
-        color: typeColor[e.type], meta: [e.time, e.place].filter(Boolean).join(' · '), jd: 'inline-flex', // 時間・場所がないときに「·」だけ出ないように
+        color: typeColor[e.type], meta: [e.time, e.place].filter(Boolean).join(' · '), jd: 'inline-flex', icsD: 'none', icsGo: () => {}, // 時間・場所がないときに「·」だけ出ないように
         joinLabel: on ? '登録済み' : '参加登録',
         joinBg: on ? 'transparent' : A, joinFg: on ? A : INK, joinBd: A,
         toggle: () => { const j = Object.assign({}, this.state.joined); j[e.id] = !on; this.setState({ joined: j }); }
@@ -2139,7 +2151,7 @@ class Component extends DCLogic {
     window.__UQ = uq.length ? { key: s.unitT + ':' + s.unitC, qs: uq, done: !!qd[s.unitT + ':' + s.unitC], pass: () => { const q = Object.assign({}, this.state.qz || {}); q[s.unitT + ':' + s.unitC] = true; this.setState({ qz: q }); } } : null;
 
     return {
-      meLv: meLv, meMs: meMs, uNoQuiz: !uq.length,
+      meLv: meLv, meMs: meMs, uNoQuiz: !uq.length, calSub: { ios: 'webcal://example.com/slope.ics', google: 'https://calendar.google.com/calendar/r', copy: () => {}, note: '' },
       dd: dd,
       accent: A,
       show: {
